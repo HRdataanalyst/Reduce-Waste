@@ -50,7 +50,16 @@
     .live.error{color:#a12f3d;border-color:#efc0c7;background:#fff0f2}.live-dot{width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 0 4px rgba(23,101,76,.1)}
     .filters{display:flex;align-items:center;gap:9px;padding:7px;border:1px solid var(--line);border-radius:15px;background:#fff}
     .filter{position:relative}.filter svg{position:absolute;left:11px;top:50%;width:16px;color:#72827b;transform:translateY(-50%);pointer-events:none}.filter select{height:38px;min-width:150px;padding:0 33px 0 34px;border:0;border-radius:10px;color:var(--ink);background:#f5f8f6;font-size:.75rem;font-weight:700;outline:0}.filter select:focus{box-shadow:0 0 0 3px rgba(99,215,179,.22)}
-    .bento{display:grid;grid-template-columns:1.35fr repeat(2,minmax(0,.72fr)) 1fr;gap:14px;margin-bottom:14px}
+.bento{
+  display:grid;
+  grid-template-columns:
+    minmax(420px,1.35fr)
+    minmax(330px,1fr)
+    minmax(270px,.9fr);
+  align-items:stretch;
+  gap:14px;
+  margin-bottom:14px;
+}
     .card{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:var(--radius);background:var(--card);box-shadow:var(--shadow)}
     .score-card{min-height:268px;padding:25px;color:#fff;border:0;background:linear-gradient(145deg,#092f27 0%,var(--forest-2) 100%)}
     .score-card:after{content:"";position:absolute;width:230px;height:230px;right:-85px;bottom:-112px;border-radius:50%;background:rgba(201,239,74,.12)}
@@ -58,22 +67,698 @@
     .score-body{position:relative;z-index:1;display:flex;align-items:center;gap:22px;margin-top:27px}.score-ring{--score:0;position:relative;width:132px;height:132px;display:grid;place-items:center;flex:none;border-radius:50%;background:conic-gradient(var(--lime) calc(var(--score)*1%),rgba(255,255,255,.13) 0);transform:rotate(-90deg)}
     .score-ring:before{content:"";position:absolute;width:106px;height:106px;border-radius:50%;background:#104638}.score-number{position:relative;z-index:1;text-align:center;transform:rotate(90deg)}.score-number strong{display:block;font:800 2.1rem/1 Manrope,sans-serif;letter-spacing:-.06em}.score-number small{color:#a9c5ba;font-size:.67rem}
     .score-copy h2{margin:0;font-size:1.25rem;line-height:1.4}.score-copy p{margin:7px 0 0;color:#b9d0c7;font-size:.76rem;line-height:1.7}.period{display:inline-block;margin-top:13px;padding-top:12px;border-top:1px solid rgba(255,255,255,.13);color:#fff;font-size:.72rem;font-weight:700}
-    .metric-card{min-height:268px;padding:22px;display:flex;flex-direction:column}.metric-icon{width:40px;height:40px;display:grid;place-items:center;border-radius:13px}.metric-icon svg{width:20px}.metric-card.general .metric-icon{color:#227558;background:#e4f7ee}.metric-card.recycle .metric-icon{color:#2674b4;background:#e8f4ff}
-    .metric-label{margin-top:28px;color:var(--muted);font-size:.75rem;font-weight:700}.metric-value{margin-top:7px;font:800 clamp(1.65rem,2.4vw,2.2rem)/1 Manrope,sans-serif;letter-spacing:-.055em}.metric-value small{font:700 .72rem "Noto Sans Thai";color:var(--muted);letter-spacing:0}.metric-foot{margin-top:auto;padding-top:17px;color:var(--muted);font-size:.69rem;line-height:1.5}.metric-line{height:5px;margin-top:12px;border-radius:99px;background:var(--soft);overflow:hidden}.metric-line i{display:block;height:100%;width:68%;border-radius:inherit}.general .metric-line i{background:var(--mint)}.recycle .metric-line i{background:var(--blue)}
-    .leader-card{min-height:268px;padding:22px}.leader-top{display:flex;align-items:center;justify-content:space-between}.leader-top span{color:var(--muted);font-size:.75rem;font-weight:700}.crown{width:37px;height:37px;display:grid;place-items:center;border-radius:12px;color:#8b6300;background:#fff4cf}.crown svg{width:19px}.champion{margin-top:20px;padding:17px;border-radius:17px;background:#f6f9f7}.champion-label{color:var(--muted);font-size:.65rem;font-weight:700}.champion-name{margin-top:5px;font-size:1rem;font-weight:800}.champion-building{margin-top:2px;color:var(--muted);font-size:.7rem}.champion-score{display:flex;align-items:baseline;gap:4px;margin-top:14px;color:var(--forest);font:800 2rem/1 Manrope,sans-serif;letter-spacing:-.05em}.champion-score small{font:700 .68rem "Noto Sans Thai";color:var(--muted);letter-spacing:0}.runner-list{display:grid;gap:8px;margin-top:12px}.runner{display:grid;grid-template-columns:25px 1fr auto;align-items:center;gap:8px;font-size:.7rem}.runner-rank{width:25px;height:25px;display:grid;place-items:center;border-radius:8px;background:var(--soft);font:800 .7rem Manrope}.runner strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.runner-score{color:var(--forest);font:800 .73rem Manrope}
-    .summary-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin-bottom:14px;border:1px solid var(--line);border-radius:18px;background:var(--line);overflow:hidden;box-shadow:var(--shadow)}
-    .summary-item{padding:16px 20px;background:#fff}.summary-item span{display:block;color:var(--muted);font-size:.69rem}.summary-item strong{display:block;margin-top:4px;font-size:.86rem}.summary-item strong b{font:800 1.25rem Manrope;color:var(--forest)}
+.metric-stack{
+  display:grid;
+  grid-template-rows:repeat(2,minmax(0,1fr));
+  gap:14px;
+}
+
+.metric-card{
+  min-height:0;
+  padding:18px 20px;
+  display:grid;
+  grid-template-columns:44px minmax(0,1fr) auto;
+  grid-template-areas:
+    "icon label value"
+    "icon foot foot";
+  align-items:center;
+  column-gap:14px;
+  row-gap:8px;
+}
+
+.metric-icon{
+  grid-area:icon;
+  width:40px;
+  height:40px;
+  display:grid;
+  place-items:center;
+  border-radius:13px;
+}
+
+.metric-icon svg{
+  width:20px;
+}
+
+.metric-card.general .metric-icon{
+  color:#227558;
+  background:#e4f7ee;
+}
+
+.metric-card.recycle .metric-icon{
+  color:#2674b4;
+  background:#e8f4ff;
+}
+
+.metric-label{
+  grid-area:label;
+  margin:0;
+  color:var(--muted);
+  font-size:.75rem;
+  font-weight:700;
+}
+
+.metric-value{
+  grid-area:value;
+  margin:0;
+  white-space:nowrap;
+  font:800 clamp(1.65rem,2.4vw,2.2rem)/1 Manrope,sans-serif;
+  letter-spacing:-.055em;
+}
+
+.metric-value small{
+  font:700 .72rem "Noto Sans Thai";
+  color:var(--muted);
+  letter-spacing:0;
+}
+
+.metric-foot{
+  grid-area:foot;
+  margin:0;
+  padding:0;
+  color:var(--muted);
+  font-size:.69rem;
+  line-height:1.5;
+}
+
+.metric-line{
+  height:5px;
+  margin-top:7px;
+  border-radius:99px;
+  background:var(--soft);
+  overflow:hidden;
+}
+
+.metric-line i{
+  display:block;
+  width:68%;
+  height:100%;
+  border-radius:inherit;
+}
+
+.general .metric-line i{
+  background:var(--mint);
+}
+
+.recycle .metric-line i{
+  background:var(--blue);
+}
+
+.leader-card{
+  min-height:auto;
+  padding:22px;
+  margin-bottom:14px;
+}
+
+.leader-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.leader-top span{
+  color:var(--muted);
+  font-size:.75rem;
+  font-weight:700;
+}
+
+.crown{
+  width:37px;
+  height:37px;
+  display:grid;
+  place-items:center;
+  border-radius:12px;
+  color:#8b6300;
+  background:#fff4cf;
+}
+
+.crown svg{
+  width:19px;
+}
+
+.leader-card #podium{
+  display:grid;
+  grid-template-columns:minmax(320px,.9fr) minmax(460px,1.1fr);
+  align-items:center;
+  gap:14px;
+  margin-top:18px;
+}
+
+/* =========================
+   อันดับ 1
+   ========================= */
+
+.champion{
+  position:relative;
+  overflow:hidden;
+  width:100%;
+  min-height:190px;
+  margin:0;
+  padding:22px 24px;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:22px;
+
+  /* กรอบสีเขียวอ่อน */
+  border:1px solid rgba(145,194,159,.72);
+  border-left:5px solid #69b47c;
+  border-radius:18px;
+
+  color:var(--forest);
+
+  /* พื้นหลังเขียวอ่อนแบบโปร่งแสง */
+  background:linear-gradient(
+    135deg,
+    rgba(218,240,222,.88) 0%,
+    rgba(237,248,235,.76) 55%,
+    rgba(249,252,244,.68) 100%
+  );
+
+  /* ทำให้พื้นหลังมีความโปร่งและนุ่มขึ้น */
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+
+  box-shadow:0 8px 20px rgba(23,102,79,.08);
+}
+
+/* วงกลมตกแต่งมุมขวาล่าง */
+.champion::after{
+  content:"";
+  position:absolute;
+  right:-45px;
+  bottom:-65px;
+  width:125px;
+  height:125px;
+  border-radius:50%;
+  background:rgba(99,215,179,.14);
+}
+
+/* ทำให้ข้อความอยู่เหนือวงกลมตกแต่ง */
+.champion > *{
+  position:relative;
+  z-index:1;
+}
+
+.champion-info{
+  min-width:0;
+}
+
+/* แถวมงกุฎและป้ายอันดับ */
+.champion-eyebrow{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+/* กล่องมงกุฎ */
+.champion-crown{
+  width:42px;
+  height:42px;
+  display:grid;
+  place-items:center;
+  flex:none;
+
+  border:1px solid #efd071;
+  border-radius:13px;
+
+  color:#735500;
+
+  background:linear-gradient(
+    135deg,
+    #ffe9a6 0%,
+    #f6d777 100%
+  );
+
+  box-shadow:0 5px 12px rgba(116,89,12,.13);
+}
+
+.champion-crown svg{
+  width:22px;
+  height:22px;
+}
+
+/* ป้ายอันดับ 1 */
+.champion-label{
+  width:max-content;
+  padding:6px 10px;
+
+  border:1px solid rgba(23,102,79,.18);
+  border-radius:999px;
+
+  color:var(--forest);
+  background:rgba(255,255,255,.72);
+
+  font-size:.7rem;
+  font-weight:800;
+}
+
+/* ชื่อชั้น */
+.champion-name{
+  margin-top:16px;
+  color:var(--forest);
+
+  /* ขนาดเดียวกับชื่ออาคาร */
+  font-size:1.05rem;
+  font-weight:800;
+  line-height:1.4;
+}
+
+/* ชื่ออาคาร */
+.champion-building{
+  margin-top:4px;
+  color:#3f6255;
+
+  /* ขนาดเดียวกับชื่อชั้น */
+  font-size:1.05rem;
+  font-weight:700;
+  line-height:1.4;
+}
+
+/* คะแนนอันดับ 1 */
+.champion-score{
+  display:flex;
+  align-items:baseline;
+  gap:5px;
+  flex:none;
+  margin:0;
+
+  color:var(--forest);
+  font:800 2.2rem/1 Manrope,sans-serif;
+  letter-spacing:-.05em;
+}
+
+.champion-score small{
+  color:#526a61;
+  font:700 .7rem "Noto Sans Thai";
+  letter-spacing:0;
+}
+
+
+/* =========================
+   รายการอันดับ 2–5
+   ========================= */
+
+.runner-list{
+  display:grid;
+  gap:8px;
+  margin:0;
+}
+
+.runner{
+  min-height:43px;
+  padding:8px 11px;
+  display:grid;
+  grid-template-columns:27px minmax(0,1fr) auto;
+  align-items:center;
+  gap:10px;
+  border:1px solid #edf2ef;
+  border-radius:12px;
+  background:#fbfdfc;
+  font-size:.72rem;
+}
+
+.runner-rank{
+  width:27px;
+  height:27px;
+  display:grid;
+  place-items:center;
+  border-radius:8px;
+  color:var(--forest);
+  background:var(--soft);
+  font:800 .72rem Manrope;
+}
+
+.runner strong{
+  overflow:hidden;
+  color:var(--ink);
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:.74rem;
+}
+
+.runner-score{
+  color:var(--forest);
+  font:800 .8rem Manrope;
+}
+
+
+/* =========================
+   อันดับ 2
+   runner ตัวแรก = อันดับ 2
+   ========================= */
+
+.runner:nth-child(1){
+  min-height:58px;
+  padding:11px 14px;
+  border-color:#dceba5;
+  background:linear-gradient(
+    135deg,
+    #f2f9d8 0%,
+    #fbfdf3 100%
+  );
+  box-shadow:0 7px 16px rgba(116,145,27,.08);
+}
+
+.runner:nth-child(1) .runner-rank{
+  width:35px;
+  height:35px;
+  border-radius:11px;
+  color:var(--forest);
+  background:var(--lime);
+  font-size:.88rem;
+}
+
+.runner:nth-child(1) strong{
+  font-size:.86rem;
+  font-weight:800;
+}
+
+.runner:nth-child(1) .runner-score{
+  font-size:1.1rem;
+}
+
+
+/* =========================
+   อันดับ 3
+   runner ตัวที่สอง = อันดับ 3
+   ========================= */
+
+.runner:nth-child(2){
+  min-height:54px;
+  padding:10px 14px;
+  border-color:#d8e8e2;
+  background:linear-gradient(
+    135deg,
+    #edf7f3 0%,
+    #fafcfb 100%
+  );
+}
+
+.runner:nth-child(2) .runner-rank{
+  width:32px;
+  height:32px;
+  border-radius:10px;
+  color:#185c48;
+  background:#dceee7;
+  font-size:.82rem;
+}
+
+.runner:nth-child(2) strong{
+  font-size:.82rem;
+  font-weight:800;
+}
+
+.runner:nth-child(2) .runner-score{
+  font-size:1rem;
+}
+
+
+/* =========================
+   อันดับ 4–5
+   ========================= */
+
+.runner:nth-child(n+3){
+  background:#fbfdfc;
+  border-color:#edf2ef;
+}
+
+.runner:nth-child(n+3) .runner-rank{
+  color:#53635c;
+  background:#eef3f0;
+}
+
+.runner:nth-child(n+3) strong{
+  color:#3d4c46;
+  font-weight:700;
+}
+
+.runner:nth-child(n+3) .runner-score{
+  color:#53635c;
+}
+    
+.summary-strip{
+  min-height:268px;
+  display:grid;
+  grid-template-columns:1fr;
+  grid-template-rows:repeat(3,1fr);
+  gap:0;
+  margin:0;
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  background:var(--line);
+  overflow:hidden;
+  box-shadow:var(--shadow);
+}
+
+.summary-item{
+  padding:16px 20px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  background:#fff;
+}
+
+.summary-item + .summary-item{
+  border-top:1px solid var(--line);
+}
+
+.summary-item span{
+  display:block;
+  color:var(--muted);
+  font-size:.69rem;
+}
+
+.summary-item strong{
+  display:block;
+  margin-top:4px;
+  font-size:.86rem;
+}
+
+.summary-item strong b{
+  font:800 1.25rem Manrope;
+  color:var(--forest);
+}
+    
     .main-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(310px,.55fr);gap:14px;margin-bottom:14px}.panel{padding:23px}.panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px}.panel-head h2{margin:0;font-size:1rem}.panel-head p{margin:4px 0 0;color:var(--muted);font-size:.7rem}.pill{padding:6px 10px;border-radius:999px;color:#1b634d;background:#e7f7f0;font-size:.64rem;font-weight:800;white-space:nowrap}
-    .trend{display:grid;gap:16px}.week{display:grid;grid-template-columns:92px minmax(0,1fr) 48px;align-items:center;gap:12px}.week-label{color:var(--muted);font-size:.68rem}.track{height:10px;border-radius:99px;background:#edf2ef;overflow:hidden}.bar{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--mint),var(--lime));transition:width .45s ease}.week-score{text-align:right;color:var(--forest);font:800 .76rem Manrope}.trend-empty{padding:45px 10px;text-align:center;color:var(--muted);font-size:.78rem}
+    .trend-actions{display:flex;align-items:center;gap:8px}.trend-nav{width:32px;height:32px;display:grid;place-items:center;padding:0;border:1px solid var(--line);border-radius:10px;color:var(--forest);background:#fff;cursor:pointer;transition:.2s ease}.trend-nav:hover{border-color:#a9d9c7;background:#eff9f5;transform:translateY(-1px)}.trend-nav:active{transform:translateY(0)}.trend-nav svg{width:16px;height:16px}.trend-scroll{width:100%;overflow-x:auto;overflow-y:hidden;padding:2px 0 10px;scroll-behavior:smooth;overscroll-behavior-x:contain;scrollbar-color:#b9d8cd #edf3f0;scrollbar-width:thin}.trend-scroll::-webkit-scrollbar{height:8px}.trend-scroll::-webkit-scrollbar-track{border-radius:99px;background:#edf3f0}.trend-scroll::-webkit-scrollbar-thumb{border-radius:99px;background:#b9d8cd}.trend{min-width:100%;min-height:292px}.trend svg{display:block;overflow:visible}.trend-empty{display:grid;place-items:center;min-height:260px;text-align:center;color:var(--muted);font-size:.78rem}.trend-hint{margin:9px 0 0;color:var(--muted);font-size:.64rem;text-align:right}
     .formula-card{color:#fff;border:0;background:#142b24}.formula-card .panel-head h2{color:#fff}.formula-card .panel-head p{color:#8eaaa0}.formula{display:grid;gap:10px}.formula-row{display:grid;grid-template-columns:47px 1fr auto;align-items:center;gap:10px;padding:13px;border:1px solid rgba(255,255,255,.09);border-radius:15px;background:rgba(255,255,255,.045)}.formula-percent{font:800 1rem Manrope;color:var(--lime)}.formula-row.blue .formula-percent{color:var(--blue)}.formula-name{font-size:.74rem;font-weight:700}.formula-name small{display:block;margin-top:2px;color:#8eaaa0;font-size:.63rem;font-weight:500}.formula-mark{font:800 .7rem Manrope;color:#fff}.formula-total{display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding:14px;border-radius:14px;color:var(--forest);background:var(--lime);font-size:.72rem;font-weight:800}.formula-total b{font:800 1.1rem Manrope}
     .table-card{padding:0}.table-card .panel-head{padding:22px 23px;margin:0;border-bottom:1px solid var(--line)}.table-wrap{overflow:auto}.ranking{width:100%;min-width:900px;border-collapse:collapse}.ranking th{padding:12px 15px;text-align:left;color:#708079;background:#f8faf9;font-size:.66rem;font-weight:800;white-space:nowrap}.ranking td{padding:14px 15px;border-top:1px solid #edf2ef;font-size:.73rem;vertical-align:middle}.ranking tbody tr:hover{background:#fbfdfc}.rank-cell{font:800 .8rem Manrope;color:var(--forest)}.location strong,.location small{display:block}.location strong{font-size:.76rem}.location small{margin-top:2px;color:var(--muted);font-size:.65rem}.mini{display:flex;align-items:center;gap:7px}.mini-track{width:48px;height:5px;border-radius:99px;background:#edf2ef;overflow:hidden}.mini-track i{display:block;height:100%;border-radius:inherit}.mini.green i{background:var(--mint)}.mini.blue i{background:var(--blue)}.total-score{font:800 .88rem Manrope;color:var(--forest)}
     .status{display:inline-flex;padding:5px 8px;border-radius:999px;font-size:.62rem;font-weight:800}.status.ok{color:#17654c;background:#e7f7f0}.status.wait{color:#8a6000;background:#fff4d5}.status.missing{color:#a12f3d;background:#ffecef}.empty{padding:38px;text-align:center;color:var(--muted);font-size:.77rem}.hidden{display:none!important}
     .loading{position:fixed;inset:0;z-index:50;display:grid;place-items:center;background:rgba(242,246,243,.84);backdrop-filter:blur(5px)}.loader{display:flex;align-items:center;gap:11px;padding:15px 18px;border:1px solid var(--line);border-radius:15px;background:#fff;box-shadow:var(--shadow);font-size:.77rem;font-weight:700}.spinner{width:20px;height:20px;border:3px solid #dfebe5;border-top-color:var(--forest);border-radius:50%;animation:spin .75s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
     .error-box{margin-bottom:14px;padding:14px 16px;border:1px solid #efbdc4;border-radius:14px;color:#9b2e3b;background:#fff0f2;font-size:.76rem}
     footer{padding-top:22px;text-align:center;color:#89958f;font-size:.65rem}
-    @media(max-width:1180px){.app{grid-template-columns:190px minmax(0,1fr)}.bento{grid-template-columns:1.2fr repeat(2,.7fr)}.leader-card{grid-column:1/-1;min-height:auto}.champion{display:grid;grid-template-columns:1fr auto;column-gap:15px}.champion-score{grid-column:2;grid-row:1/4;align-self:center;margin:0}.runner-list{grid-template-columns:1fr 1fr}}
-    @media(max-width:900px){.app{display:block}.sidebar{display:none}.content{padding:18px 18px 44px}.mobile-brand{display:flex;align-items:center;gap:9px}.mobile-brand .brand-mark{width:38px;height:38px;border-radius:12px}.mobile-brand strong{font:800 .75rem Manrope}.title p{display:none}.title h1{margin-top:14px}.topbar{align-items:flex-start;flex-wrap:wrap}.top-actions{width:100%;justify-content:space-between}.bento{grid-template-columns:1fr 1fr}.score-card{grid-column:1/-1}.leader-card{grid-column:1/-1}.main-grid{grid-template-columns:1fr}.formula-card{min-height:auto}}
-    @media(max-width:590px){.content{padding:14px 12px 38px}.topbar{margin-bottom:17px}.top-actions{align-items:stretch;flex-direction:column}.live{align-self:flex-start}.filters{display:grid;grid-template-columns:1fr 1fr;width:100%}.filter select{width:100%;min-width:0}.bento{grid-template-columns:1fr;gap:10px}.score-card,.leader-card{grid-column:auto}.score-card{min-height:auto;padding:21px}.score-body{gap:16px}.score-ring{width:112px;height:112px}.score-ring:before{width:90px;height:90px}.score-number strong{font-size:1.75rem}.metric-card{min-height:190px}.metric-label{margin-top:18px}.summary-strip{grid-template-columns:1fr}.summary-item{padding:13px 16px}.main-grid{gap:10px}.panel{padding:19px}.week{grid-template-columns:77px 1fr 40px}.table-card .panel-head{padding:19px}.runner-list{grid-template-columns:1fr}.champion{display:block}.champion-score{margin-top:13px}.card{border-radius:20px}}
+@media(max-width:1180px){
+  .app{
+    grid-template-columns:190px minmax(0,1fr);
+  }
+
+  .bento{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .score-card{
+    grid-column:1/-1;
+  }
+}
+
+@media(max-width:900px){
+  .app{
+    display:block;
+  }
+
+  .sidebar{
+    display:none;
+  }
+
+  .content{
+    padding:18px 18px 44px;
+  }
+
+  .mobile-brand{
+    display:flex;
+    align-items:center;
+    gap:9px;
+  }
+
+  .mobile-brand .brand-mark{
+    width:38px;
+    height:38px;
+    border-radius:12px;
+  }
+
+  .mobile-brand strong{
+    font:800 .75rem Manrope;
+  }
+
+  .title p{
+    display:none;
+  }
+
+  .title h1{
+    margin-top:14px;
+  }
+
+  .topbar{
+    align-items:flex-start;
+    flex-wrap:wrap;
+  }
+
+  .top-actions{
+    width:100%;
+    justify-content:space-between;
+  }
+
+  .bento{
+    grid-template-columns:1fr;
+  }
+
+  .score-card{
+    grid-column:auto;
+  }
+
+  .metric-stack .metric-card{
+    min-height:118px;
+  }
+
+  .summary-strip{
+    min-height:auto;
+  }
+
+  .leader-card #podium{
+    grid-template-columns:1fr;
+  }
+
+  .main-grid{
+    grid-template-columns:1fr;
+  }
+
+  .formula-card{
+    min-height:auto;
+  }
+}
+
+@media(max-width:590px){
+  .content{
+    padding:14px 12px 38px;
+  }
+
+  .topbar{
+    margin-bottom:17px;
+  }
+
+  .top-actions{
+    align-items:stretch;
+    flex-direction:column;
+  }
+
+  .live{
+    align-self:flex-start;
+  }
+
+  .filters{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    width:100%;
+  }
+
+  .filter select{
+    width:100%;
+    min-width:0;
+  }
+
+  .bento{
+    grid-template-columns:1fr;
+    gap:10px;
+  }
+
+  .score-card{
+    min-height:auto;
+    padding:21px;
+  }
+
+  .score-body{
+    gap:16px;
+  }
+
+  .score-ring{
+    width:112px;
+    height:112px;
+  }
+
+  .score-ring:before{
+    width:90px;
+    height:90px;
+  }
+
+  .score-number strong{
+    font-size:1.75rem;
+  }
+
+  .metric-stack{
+    gap:10px;
+  }
+
+  .metric-stack .metric-card{
+    min-height:112px;
+    padding:15px 16px;
+    grid-template-columns:40px minmax(0,1fr) auto;
+    column-gap:10px;
+  }
+
+  .metric-value{
+    font-size:1.65rem;
+  }
+
+  .summary-item{
+    padding:13px 16px;
+  }
+
+  .main-grid{
+    gap:10px;
+  }
+
+  .panel{
+    padding:19px;
+  }
+
+  .trend-actions .pill{
+    display:none;
+  }
+
+  .trend-nav{
+    width:34px;
+    height:34px;
+  }
+
+  .table-card .panel-head{
+    padding:19px;
+  }
+
+  .runner-list{
+    grid-template-columns:1fr;
+  }
+
+.champion{
+  min-height:auto;
+  display:block;
+  padding:19px;
+}
+
+.champion-score{
+  margin-top:18px;
+  font-size:1.9rem;
+}
+  
+.champion-name,
+.champion-building{
+  font-size:1rem;
+}
+
+  .card{
+    border-radius:20px;
+  }
+}
   </style>
 </head>
 <body>
@@ -116,18 +801,169 @@
       </div>
 
       <div class="error-box hidden" id="errorBox" role="alert"></div>
+<section class="bento">
 
-      <section class="bento">
-        <article class="card score-card"><div class="card-kicker"><span>คะแนนรวมเฉลี่ย</span><span class="score-badge">80 : 20 SCORE</span></div><div class="score-body"><div class="score-ring" id="scoreRing"><div class="score-number" id="averageScore"><strong>—</strong><small>จาก 100</small></div></div><div class="score-copy"><h2>พลังเล็ก ๆ<br>สร้างผลลัพธ์ที่ใหญ่ขึ้น</h2><p>คะแนนเฉลี่ยจากทุกชั้นที่มีข้อมูลสมบูรณ์</p><span class="period" id="periodLabel">—</span></div></div></article>
-        <article class="card metric-card general"><span class="metric-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M9 3h6l1 4H8l1-4M6 7l1 14h10l1-14M10 11v6M14 11v6"/></svg></span><span class="metric-label">ขยะทั่วไปทั้งหมด</span><div class="metric-value" id="generalTotal">—</div><div class="metric-foot">น้ำหนักสะสมของเดือน<div class="metric-line"><i></i></div></div></article>
-        <article class="card metric-card recycle"><span class="metric-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7.5 5 2-3 2 3M9.5 2l3 5M18 9l3 .5-1.5 2.5M21 9.5l-4 5M8 19l-3 .2L6 16.5M5 19.2l5-1"/><path d="M7 8 4 13a3 3 0 0 0 2.6 4.5M13 6h3a3 3 0 0 1 2.6 1.5M16 18h-6"/></svg></span><span class="metric-label">รีไซเคิลทั้งหมด</span><div class="metric-value" id="recycleTotal">—</div><div class="metric-foot">PET และกระป๋องอะลูมิเนียม<div class="metric-line"><i></i></div></div></article>
-        <article class="card leader-card"><div class="leader-top"><span>ผู้นำประจำเดือน</span><span class="crown"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 7 4 4 5-7 5 7 4-4-2 11H5L3 7Z"/><path d="M5 21h14"/></svg></span></div><div id="podium"></div></article>
-      </section>
+  <!-- คะแนนรวมเฉลี่ย -->
+  <article class="card score-card">
+    <div class="card-kicker">
+      <span>คะแนนรวมเฉลี่ย</span>
+      <span class="score-badge">80 : 20 SCORE</span>
+    </div>
 
-      <section class="summary-strip"><div class="summary-item"><span>ชั้นที่เข้าร่วม</span><strong id="floorCount"><b>—</b> ชั้น</strong></div><div class="summary-item"><span>ช่วงเวลารายงาน</span><strong id="reportPeriod">—</strong></div><div class="summary-item"><span>อัปเดตข้อมูลล่าสุด</span><strong id="updatedAt">—</strong></div></section>
+    <div class="score-body">
+      <div class="score-ring" id="scoreRing">
+        <div class="score-number" id="averageScore">
+          <strong>—</strong>
+          <small>จาก 100</small>
+        </div>
+      </div>
+
+      <div class="score-copy">
+        <h2>พลังเล็ก ๆ<br>สร้างผลลัพธ์ที่ใหญ่ขึ้น</h2>
+        <p>คะแนนเฉลี่ยจากทุกชั้นที่มีข้อมูลสมบูรณ์</p>
+        <span class="period" id="periodLabel">—</span>
+      </div>
+    </div>
+  </article>
+
+
+  <!-- ขยะทั่วไปและรีไซเคิล -->
+  <div class="metric-stack">
+
+    <article class="card metric-card general">
+      <span class="metric-icon">
+        <svg viewBox="0 0 24 24"
+             fill="none"
+             stroke="currentColor"
+             stroke-width="2">
+          <path d="M4 7h16M9 3h6l1 4H8l1-4M6 7l1 14h10l1-14M10 11v6M14 11v6"/>
+        </svg>
+      </span>
+
+      <span class="metric-label">
+        ขยะทั่วไปทั้งหมด
+      </span>
+
+      <div class="metric-value" id="generalTotal">—</div>
+
+      <div class="metric-foot">
+        น้ำหนักสะสมของเดือน
+        <div class="metric-line">
+          <i></i>
+        </div>
+      </div>
+    </article>
+
+
+    <article class="card metric-card recycle">
+<span class="metric-icon">
+  <svg viewBox="0 0 24 24"
+       fill="none"
+       stroke="currentColor"
+       stroke-width="1.8"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       aria-hidden="true">
+
+    <!-- ฝาขวด -->
+    <path d="M9 2h6v3H9z"/>
+
+    <!-- ตัวขวด -->
+    <path d="M9 5v1.2L7.8 8.1A5 5 0 0 0 7 10.8V19
+             a3 3 0 0 0 3 3h4
+             a3 3 0 0 0 3-3v-8.2
+             a5 5 0 0 0-.8-2.7L15 6.2V5"/>
+
+    <!-- ลายบนขวด -->
+    <path d="M7.5 11h9"/>
+    <path d="M7.5 17h9"/>
+
+  </svg>
+</span>
+
+      <span class="metric-label">
+        รีไซเคิลทั้งหมด
+      </span>
+
+      <div class="metric-value" id="recycleTotal">—</div>
+
+      <div class="metric-foot">
+        PET และกระป๋องอะลูมิเนียม
+        <div class="metric-line">
+          <i></i>
+        </div>
+      </div>
+    </article>
+
+  </div>
+
+
+  <!-- ข้อมูลสรุปรายงาน -->
+  <div class="summary-strip">
+
+    <div class="summary-item">
+      <span>ชั้นที่เข้าร่วม</span>
+      <strong id="floorCount">
+        <b>—</b> ชั้น
+      </strong>
+    </div>
+
+    <div class="summary-item">
+      <span>ช่วงเวลารายงาน</span>
+      <strong id="reportPeriod">—</strong>
+    </div>
+
+    <div class="summary-item">
+      <span>อัปเดตข้อมูลล่าสุด</span>
+      <strong id="updatedAt">—</strong>
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ผู้นำประจำเดือน -->
+<section class="card leader-card">
+
+  <div class="leader-top">
+    <span>5 อันดับผู้นำประจำเดือน</span>
+
+    <span class="crown">
+      <svg viewBox="0 0 24 24"
+           fill="none"
+           stroke="currentColor"
+           stroke-width="2">
+        <path d="m3 7 4 4 5-7 5 7 4-4-2 11H5L3 7Z"/>
+        <path d="M5 21h14"/>
+      </svg>
+    </span>
+  </div>
+
+  <div id="podium"></div>
+
+</section>
 
       <section class="main-grid">
-        <article class="card panel"><div class="panel-head"><div><h2>แนวโน้มคะแนนรายสัปดาห์</h2><p>คะแนนเฉลี่ยของทุกชั้น วันจันทร์–อาทิตย์</p></div><span class="pill">WEEKLY TREND</span></div><div class="trend" id="trend"></div></article>
+        <article class="card panel">
+          <div class="panel-head">
+            <div>
+              <h2>แนวโน้มคะแนนรายสัปดาห์</h2>
+              <p>เปรียบเทียบคะแนนเฉลี่ยรายสัปดาห์ แยกตามช่วงเดือน</p>
+            </div>
+            <div class="trend-actions">
+              <span class="pill">MONTHLY · WEEKLY TREND</span>
+              <button class="trend-nav" id="trendPrev" type="button" aria-label="เลื่อนกราฟไปทางซ้าย">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m15 18-6-6 6-6"/></svg>
+              </button>
+              <button class="trend-nav" id="trendNext" type="button" aria-label="เลื่อนกราฟไปทางขวา">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m9 18 6-6-6-6"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="trend-scroll" id="trendScroll"><div class="trend" id="trend"></div></div>
+          <p class="trend-hint">เลื่อนซ้าย–ขวาเพื่อดูแนวโน้มระหว่างเดือน</p>
+        </article>
         <article class="card panel formula-card" id="method"><div class="panel-head"><div><h2>เกณฑ์คะแนน</h2><p>คะแนนรวมเต็ม 100 คะแนน</p></div></div><div class="formula"><div class="formula-row"><span class="formula-percent">80%</span><span class="formula-name">ลดขยะทั่วไป<small>ยิ่งเฉลี่ยต่อคนน้อย ยิ่งได้คะแนนสูง</small></span><span class="formula-mark">80 pts</span></div><div class="formula-row blue"><span class="formula-percent">20%</span><span class="formula-name">แยกขยะรีไซเคิล<small>ยิ่งเฉลี่ยต่อคนมาก ยิ่งได้คะแนนสูง</small></span><span class="formula-mark">20 pts</span></div><div class="formula-total"><span>คะแนนรวมทั้งหมด</span><b>100</b></div></div></article>
       </section>
 
@@ -140,23 +976,222 @@
 
   <script>
     const CONFIG={apiUrl:'https://script.google.com/macros/s/AKfycbwXm6FMjhg4BBvdLjVaSRyVDsH5_uoV7kOnFgw4OLjo8MwHw-u0UkLvUIFmGZDUXgBs4Q/exec',timeoutMs:20000};
-    const state={month:'',building:'ALL',data:null};
-    const el={month:document.querySelector('#monthFilter'),building:document.querySelector('#buildingFilter'),connection:document.querySelector('#connection'),loading:document.querySelector('#loading'),error:document.querySelector('#errorBox'),period:document.querySelector('#periodLabel'),reportPeriod:document.querySelector('#reportPeriod'),updated:document.querySelector('#updatedAt'),general:document.querySelector('#generalTotal'),recycle:document.querySelector('#recycleTotal'),average:document.querySelector('#averageScore'),scoreRing:document.querySelector('#scoreRing'),floorCount:document.querySelector('#floorCount'),podium:document.querySelector('#podium'),trend:document.querySelector('#trend'),body:document.querySelector('#rankingBody'),empty:document.querySelector('#emptyState'),rowCount:document.querySelector('#rowCount')};
+    const state={month:'',building:'ALL',data:null,trendRequest:0,trendCache:new Map()};
+    const el={month:document.querySelector('#monthFilter'),building:document.querySelector('#buildingFilter'),connection:document.querySelector('#connection'),loading:document.querySelector('#loading'),error:document.querySelector('#errorBox'),period:document.querySelector('#periodLabel'),reportPeriod:document.querySelector('#reportPeriod'),updated:document.querySelector('#updatedAt'),general:document.querySelector('#generalTotal'),recycle:document.querySelector('#recycleTotal'),average:document.querySelector('#averageScore'),scoreRing:document.querySelector('#scoreRing'),floorCount:document.querySelector('#floorCount'),podium:document.querySelector('#podium'),trend:document.querySelector('#trend'),trendScroll:document.querySelector('#trendScroll'),trendPrev:document.querySelector('#trendPrev'),trendNext:document.querySelector('#trendNext'),body:document.querySelector('#rankingBody'),empty:document.querySelector('#emptyState'),rowCount:document.querySelector('#rowCount')};
     function escapeHtml(v){return String(v==null?'':v).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
     function number(v,d=2){return Number(v||0).toLocaleString('th-TH',{minimumFractionDigits:d,maximumFractionDigits:d})}
     function optional(v,d=3){return v==null?'—':number(v,d)}
     function monthName(v){return /^\d{4}-\d{2}$/.test(v||'')?new Intl.DateTimeFormat('th-TH',{month:'long',year:'numeric'}).format(new Date(v+'-01T12:00:00+07:00')):'—'}
+    function shortMonth(v){return /^\d{4}-\d{2}$/.test(v||'')?new Intl.DateTimeFormat('th-TH',{month:'short',year:'2-digit'}).format(new Date(v+'-01T12:00:00+07:00')):'—'}
     function shortDate(v){return v?new Intl.DateTimeFormat('th-TH',{day:'numeric',month:'short'}).format(new Date(v+'T12:00:00+07:00')):'—'}
     function average(values){const a=values.filter(v=>Number.isFinite(Number(v))).map(Number);return a.length?a.reduce((s,v)=>s+v,0)/a.length:null}
     function requestJsonp(params){return new Promise((resolve,reject)=>{if(!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec/.test(CONFIG.apiUrl)){reject(new Error('กรุณาใส่ Apps Script Web App URL ในตัวแปร CONFIG.apiUrl ก่อนนำขึ้น GitHub'));return}const callback='__wasteDashboard_'+Date.now()+'_'+Math.random().toString(36).slice(2),script=document.createElement('script'),timer=setTimeout(()=>finish(new Error('เชื่อมต่อข้อมูลเกินเวลาที่กำหนด กรุณาตรวจสอบ Web App URL')),CONFIG.timeoutMs);function finish(error,data){clearTimeout(timer);delete window[callback];script.remove();error?reject(error):resolve(data)}window[callback]=data=>finish(null,data);const query=new URLSearchParams({action:'dashboard',callback,...params});script.src=CONFIG.apiUrl+(CONFIG.apiUrl.includes('?')?'&':'?')+query.toString();script.onerror=()=>finish(new Error('เชื่อมต่อ Apps Script ไม่สำเร็จ กรุณาตรวจสอบการ Deploy แบบ Anyone'));document.head.appendChild(script)})}
-    async function loadDashboard(){setLoading(true);hideError();try{const data=await requestJsonp({month:state.month,building:state.building==='ALL'?'':state.building});if(!data||!data.ok)throw new Error(data&&data.message?data.message:'ไม่พบข้อมูลจากระบบ');state.data=data;state.month=data.selectedMonth;state.building=data.selectedBuilding||'ALL';populateFilters(data);render(data);setConnection(true)}catch(error){showError(error.message||'ไม่สามารถโหลดข้อมูลได้');setConnection(false)}finally{setLoading(false)}}
+    async function loadDashboard(){const trendRequest=++state.trendRequest;setLoading(true);hideError();try{const data=await requestJsonp({month:state.month,building:state.building==='ALL'?'':state.building});if(!data||!data.ok)throw new Error(data&&data.message?data.message:'ไม่พบข้อมูลจากระบบ');state.data=data;state.month=data.selectedMonth;state.building=data.selectedBuilding||'ALL';state.trendCache.set(state.building+'|'+state.month,data);populateFilters(data);render(data);setConnection(true);loadTrendHistory(data,trendRequest)}catch(error){showError(error.message||'ไม่สามารถโหลดข้อมูลได้');setConnection(false)}finally{setLoading(false)}}
     function populateFilters(data){el.month.innerHTML=(data.availableMonths.length?data.availableMonths:[data.selectedMonth]).map(v=>`<option value="${escapeHtml(v)}" ${v===data.selectedMonth?'selected':''}>${escapeHtml(monthName(v))}</option>`).join('');el.building.innerHTML='<option value="ALL">ทุกอาคาร</option>'+data.availableBuildings.map(v=>`<option value="${escapeHtml(v)}" ${v===data.selectedBuilding?'selected':''}>${escapeHtml(v)}</option>`).join('')}
-    function render(data){const rows=[...data.monthly].sort((a,b)=>{if(a.totalScore==null)return 1;if(b.totalScore==null)return-1;return b.totalScore-a.totalScore||a.building.localeCompare(b.building,'th')||a.floor.localeCompare(b.floor,'th',{numeric:true})});const label=monthName(data.selectedMonth)+(data.selectedBuilding==='ALL'?' · ทุกอาคาร':' · '+data.selectedBuilding);el.period.textContent=label;el.reportPeriod.textContent=label;el.updated.textContent=data.updatedAt?new Intl.DateTimeFormat('th-TH',{dateStyle:'medium',timeStyle:'short'}).format(new Date(data.updatedAt)):'—';const general=rows.reduce((s,r)=>s+Number(r.generalKg||0),0),recycle=rows.reduce((s,r)=>s+Number(r.recycleKg||0),0),score=average(rows.map(r=>r.totalScore));el.general.innerHTML=number(general,2)+' <small>กก.</small>';el.recycle.innerHTML=number(recycle,2)+' <small>กก.</small>';el.average.innerHTML=`<strong>${score==null?'—':number(score,1)}</strong><small>จาก 100</small>`;el.scoreRing.style.setProperty('--score',score==null?0:Math.max(0,Math.min(100,score)));el.floorCount.innerHTML=`<b>${rows.length.toLocaleString('th-TH')}</b> ชั้น`;renderPodium(rows);renderTrend(data.weekly);renderTable(rows)}
-    function renderPodium(rows){const top=rows.filter(r=>r.totalScore!=null).slice(0,3);if(!top.length){el.podium.innerHTML='<div class="empty">ยังไม่มีชั้นที่มีคะแนนสมบูรณ์</div>';return}const first=top[0],runners=top.slice(1);el.podium.innerHTML=`<div class="champion"><div><div class="champion-label">อันดับ 1 ประจำเดือน</div><div class="champion-name">ชั้น ${escapeHtml(first.floor)}</div><div class="champion-building">${escapeHtml(first.building)}</div></div><div class="champion-score">${number(first.totalScore,1)}<small>คะแนน</small></div></div><div class="runner-list">${runners.map((r,i)=>`<div class="runner"><span class="runner-rank">${i+2}</span><strong>ชั้น ${escapeHtml(r.floor)} · ${escapeHtml(r.building)}</strong><span class="runner-score">${number(r.totalScore,1)}</span></div>`).join('')}</div>`}
-    function renderTrend(rows){const groups=new Map();rows.forEach(r=>{const key=r.weekStart+'|'+r.weekEnd;if(!groups.has(key))groups.set(key,{start:r.weekStart,end:r.weekEnd,scores:[]});if(r.totalScore!=null)groups.get(key).scores.push(Number(r.totalScore))});const weeks=[...groups.values()].sort((a,b)=>a.start.localeCompare(b.start));el.trend.innerHTML=weeks.length?weeks.map(w=>{const score=average(w.scores),width=score==null?0:Math.max(0,Math.min(100,score));return `<div class="week"><span class="week-label">${shortDate(w.start)}–${shortDate(w.end)}</span><span class="track"><span class="bar" style="width:${width}%"></span></span><span class="week-score">${score==null?'—':number(score,1)}</span></div>`}).join(''):'<div class="trend-empty">ยังไม่มีข้อมูลรายสัปดาห์ในช่วงนี้</div>'}
+    function render(data){const rows=[...data.monthly].sort((a,b)=>{if(a.totalScore==null)return 1;if(b.totalScore==null)return-1;return b.totalScore-a.totalScore||a.building.localeCompare(b.building,'th')||a.floor.localeCompare(b.floor,'th',{numeric:true})});const label=monthName(data.selectedMonth)+(data.selectedBuilding==='ALL'?' · ทุกอาคาร':' · '+data.selectedBuilding);el.period.textContent=label;el.reportPeriod.textContent=label;el.updated.textContent=data.updatedAt?new Intl.DateTimeFormat('th-TH',{dateStyle:'medium',timeStyle:'short'}).format(new Date(data.updatedAt)):'—';const general=rows.reduce((s,r)=>s+Number(r.generalKg||0),0),recycle=rows.reduce((s,r)=>s+Number(r.recycleKg||0),0),score=average(rows.map(r=>r.totalScore));el.general.innerHTML=number(general,2)+' <small>กก.</small>';el.recycle.innerHTML=number(recycle,2)+' <small>กก.</small>';el.average.innerHTML=`<strong>${score==null?'—':number(score,1)}</strong><small>จาก 100</small>`;el.scoreRing.style.setProperty('--score',score==null?0:Math.max(0,Math.min(100,score)));el.floorCount.innerHTML=`<b>${rows.length.toLocaleString('th-TH')}</b> ชั้น`;renderPodium(rows);renderTrend(data.weekly,data.selectedMonth);renderTable(rows)}
+function renderPodium(rows){
+  const top = rows
+    .filter(r => r.totalScore != null)
+    .slice(0,5);
+
+  if(!top.length){
+    el.podium.innerHTML =
+      '<div class="empty">ยังไม่มีชั้นที่มีคะแนนสมบูรณ์</div>';
+    return;
+  }
+
+  const first = top[0];
+  const runners = top.slice(1);
+
+  el.podium.innerHTML = `
+    
+    <div class="champion">
+
+  <div class="champion-info">
+
+    <div class="champion-eyebrow">
+
+      <span class="champion-crown">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="m3 7 4 4 5-7 5 7 4-4-2 11H5L3 7Z"/>
+          <path d="M5 21h14"/>
+        </svg>
+      </span>
+
+      <div class="champion-label">
+        อันดับ 1 ประจำเดือน
+      </div>
+
+    </div>
+
+    <div class="champion-name">
+      ชั้น ${escapeHtml(first.floor)}
+    </div>
+
+    <div class="champion-building">
+      ${escapeHtml(first.building)}
+    </div>
+
+  </div>
+
+  <div class="champion-score">
+    ${number(first.totalScore,1)}
+    <small>คะแนน</small>
+  </div>
+
+</div>
+
+    <div class="runner-list">
+
+      ${runners.map((r,i) => `
+        <div class="runner">
+
+          <span class="runner-rank">
+            ${i+2}
+          </span>
+
+          <strong>
+            ชั้น ${escapeHtml(r.floor)} ·
+            ${escapeHtml(r.building)}
+          </strong>
+
+          <span class="runner-score">
+            ${number(r.totalScore,1)}
+          </span>
+
+        </div>
+      `).join('')}
+
+    </div>
+  `;
+}
+    function getTrendMonths(availableMonths,selectedMonth){
+      const months=[...new Set([...(availableMonths||[]),selectedMonth].filter(Boolean))].sort();
+      if(months.length<=12)return months;
+      const selectedIndex=Math.max(0,months.indexOf(selectedMonth));
+      const start=Math.max(0,Math.min(months.length-12,selectedIndex-6));
+      return months.slice(start,start+12);
+    }
+
+    async function loadTrendHistory(currentData,requestId){
+      const months=getTrendMonths(currentData.availableMonths,currentData.selectedMonth);
+      const selectedBuilding=currentData.selectedBuilding||'ALL';
+      const building=selectedBuilding==='ALL'?'':selectedBuilding;
+      const results=await Promise.allSettled(months.map(month=>{
+        const key=selectedBuilding+'|'+month;
+        const cached=state.trendCache.get(key);
+        if(cached)return Promise.resolve(cached);
+        return requestJsonp({month,building}).then(data=>{
+          if(data&&data.ok)state.trendCache.set(key,data);
+          return data;
+        });
+      }));
+      if(requestId!==state.trendRequest)return;
+      const weekly=[];
+      results.forEach(result=>{
+        if(result.status==='fulfilled'&&result.value&&result.value.ok&&Array.isArray(result.value.weekly)){
+          weekly.push(...result.value.weekly);
+        }
+      });
+      renderTrend(weekly,currentData.selectedMonth);
+    }
+
+    function renderTrend(rows,selectedMonth){
+      const groups=new Map();
+      (rows||[]).forEach(r=>{
+        if(!r.weekStart||!r.weekEnd)return;
+        const key=r.weekStart+'|'+r.weekEnd;
+        if(!groups.has(key))groups.set(key,{start:r.weekStart,end:r.weekEnd,scores:[]});
+        if(r.totalScore!=null&&Number.isFinite(Number(r.totalScore)))groups.get(key).scores.push(Number(r.totalScore));
+      });
+
+      const weeks=[...groups.values()]
+        .map(w=>({...w,score:average(w.scores),month:w.start.slice(0,7)}))
+        .sort((a,b)=>a.start.localeCompare(b.start));
+
+      if(!weeks.length){
+        el.trend.innerHTML='<div class="trend-empty">ยังไม่มีข้อมูลรายสัปดาห์ในช่วงนี้</div>';
+        return;
+      }
+
+      const pointGap=112,left=58,right=30,height=292,plotTop=53,plotBottom=204;
+      const width=Math.max(el.trendScroll.clientWidth-2,left+right+Math.max(1,weeks.length-1)*pointGap);
+      const x=i=>weeks.length===1?left+(width-left-right)/2:left+i*((width-left-right)/(weeks.length-1));
+      const y=score=>plotBottom-(Math.max(0,Math.min(100,score))/100)*(plotBottom-plotTop);
+
+      const monthRanges=[];
+      weeks.forEach((w,i)=>{
+        const last=monthRanges[monthRanges.length-1];
+        if(!last||last.month!==w.month)monthRanges.push({month:w.month,start:i,end:i});
+        else last.end=i;
+      });
+
+      const weekNumbers=new Map();
+      const weekNo=weeks.map(w=>{
+        const next=(weekNumbers.get(w.month)||0)+1;
+        weekNumbers.set(w.month,next);
+        return next;
+      });
+
+      const grid=[100,75,50,25,0].map(value=>`<g><line x1="${left}" y1="${y(value)}" x2="${width-right}" y2="${y(value)}" stroke="#e6ede9" stroke-width="1" stroke-dasharray="4 6"/><text x="${left-12}" y="${y(value)+4}" text-anchor="end" fill="#819088" font-size="11" font-family="Manrope, sans-serif">${value}</text></g>`).join('');
+
+      const monthBands=monthRanges.map((range,index)=>{
+        const startX=range.start===0?left-34:(x(range.start-1)+x(range.start))/2;
+        const endX=range.end===weeks.length-1?width-right+22:(x(range.end)+x(range.end+1))/2;
+        const active=range.month===selectedMonth;
+        return `<g data-month="${escapeHtml(range.month)}"><rect x="${startX}" y="2" width="${Math.max(64,endX-startX)}" height="31" rx="10" fill="${active?'#dff5ec':index%2?'#f5f8f6':'#eef4f1'}"/><text x="${(startX+endX)/2}" y="22" text-anchor="middle" fill="${active?'#17654c':'#63736c'}" font-size="12" font-weight="800" font-family="Noto Sans Thai, sans-serif">${escapeHtml(shortMonth(range.month))}</text>${range.start?`<line x1="${startX}" y1="40" x2="${startX}" y2="264" stroke="#cbd9d3" stroke-width="1.5"/>`:''}</g>`;
+      }).join('');
+
+      const lineSegments=[];
+      let segment=[];
+      weeks.forEach((w,i)=>{
+        if(w.score==null){if(segment.length)lineSegments.push(segment);segment=[];return;}
+        segment.push(`${x(i)},${y(w.score)}`);
+      });
+      if(segment.length)lineSegments.push(segment);
+
+      const line=lineSegments.map(points=>points.length===1
+        ?''
+        :`<polyline points="${points.join(' ')}" fill="none" stroke="url(#trendLine)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`
+      ).join('');
+
+      const points=weeks.map((w,i)=>{
+        const score=w.score==null?null:Math.max(0,Math.min(100,w.score));
+        const active=w.month===selectedMonth;
+        return `<g>${score==null
+          ?`<circle cx="${x(i)}" cy="${plotBottom}" r="5" fill="#fff" stroke="#c4d0cb" stroke-width="2"/><text x="${x(i)}" y="${plotBottom-12}" text-anchor="middle" fill="#9aa7a1" font-size="11">—</text>`
+          :`<circle cx="${x(i)}" cy="${y(score)}" r="${active?7:6}" fill="${active?'#073f32':'#45b995'}" stroke="#fff" stroke-width="3"><title>${escapeHtml(shortDate(w.start)+'–'+shortDate(w.end)+' · '+number(score,1)+' คะแนน')}</title></circle><text x="${x(i)}" y="${y(score)-13}" text-anchor="middle" fill="#073f32" font-size="12" font-weight="800" font-family="Manrope, sans-serif">${number(score,1)}</text>`}
+          <text x="${x(i)}" y="230" text-anchor="middle" fill="${active?'#073f32':'#687870'}" font-size="12" font-weight="800" font-family="Manrope, sans-serif">W${weekNo[i]}</text>
+          <text x="${x(i)}" y="249" text-anchor="middle" fill="#819088" font-size="10" font-family="Noto Sans Thai, sans-serif">${escapeHtml(shortDate(w.start))}</text>
+          <text x="${x(i)}" y="263" text-anchor="middle" fill="#819088" font-size="10" font-family="Noto Sans Thai, sans-serif">– ${escapeHtml(shortDate(w.end))}</text>
+        </g>`;
+      }).join('');
+
+      el.trend.innerHTML=`<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="กราฟเส้นแนวโน้มคะแนนรายสัปดาห์">
+        <defs><linearGradient id="trendLine" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#63d7b3"/><stop offset="1" stop-color="#a8dc35"/></linearGradient></defs>
+        ${monthBands}${grid}${line}${points}
+        <text x="${left}" y="286" fill="#819088" font-size="10" font-family="Noto Sans Thai, sans-serif">คะแนนเฉลี่ยรายสัปดาห์ (เต็ม 100)</text>
+      </svg>`;
+
+      requestAnimationFrame(()=>{
+        const selectedIndex=weeks.findIndex(w=>w.month===selectedMonth);
+        if(selectedIndex<0)return;
+        const target=Math.max(0,x(selectedIndex)-el.trendScroll.clientWidth*.35);
+        el.trendScroll.scrollTo({left:target,behavior:'smooth'});
+      });
+    }
     function renderTable(rows){el.rowCount.textContent=rows.length.toLocaleString('th-TH')+' รายการ';el.empty.classList.toggle('hidden',rows.length>0);let lastScore=null,lastRank=0;el.body.innerHTML=rows.map((r,i)=>{const scored=r.totalScore!=null;if(scored&&r.totalScore!==lastScore)lastRank=i+1;if(scored)lastScore=r.totalScore;const cls=r.dataStatus!=='OK'?'missing':r.periodStatus==='Complete'?'ok':'wait',status=r.dataStatus!=='OK'?'ข้อมูลพนักงานไม่ครบ':r.periodStatus==='Complete'?'สรุปแล้ว':'กำลังสะสม';return `<tr><td class="rank-cell">${scored?lastRank:'—'}</td><td class="location"><strong>ชั้น ${escapeHtml(r.floor)}</strong><small>${escapeHtml(r.building)}</small></td><td>${optional(r.headcount,0)}</td><td>${optional(r.generalAverage,5)} กก./คน</td><td><span class="mini green"><span class="mini-track"><i style="width:${Math.max(0,Math.min(100,Number(r.generalScore||0)/80*100))}%"></i></span>${optional(r.generalScore,0)}</span></td><td>${optional(r.recycleAverage,5)} กก./คน</td><td><span class="mini blue"><span class="mini-track"><i style="width:${Math.max(0,Math.min(100,Number(r.recycleScore||0)/20*100))}%"></i></span>${optional(r.recycleScore,0)}</span></td><td><span class="total-score">${optional(r.totalScore,2)}</span></td><td><span class="status ${cls}">${status}</span></td></tr>`}).join('')}
     function setLoading(active){el.loading.classList.toggle('hidden',!active)}function setConnection(ok){el.connection.className='live'+(ok?'':' error');el.connection.querySelector('span:last-child').textContent=ok?'ข้อมูลพร้อมใช้งาน':'เชื่อมต่อไม่สำเร็จ'}function showError(message){el.error.textContent=message;el.error.classList.remove('hidden')}function hideError(){el.error.classList.add('hidden')}
-    el.month.addEventListener('change',()=>{state.month=el.month.value;loadDashboard()});el.building.addEventListener('change',()=>{state.building=el.building.value;loadDashboard()});loadDashboard();
+    el.month.addEventListener('change',()=>{state.month=el.month.value;loadDashboard()});
+    el.building.addEventListener('change',()=>{state.building=el.building.value;loadDashboard()});
+    el.trendPrev.addEventListener('click',()=>el.trendScroll.scrollBy({left:-Math.max(300,el.trendScroll.clientWidth*.72),behavior:'smooth'}));
+    el.trendNext.addEventListener('click',()=>el.trendScroll.scrollBy({left:Math.max(300,el.trendScroll.clientWidth*.72),behavior:'smooth'}));
+    loadDashboard();
   </script>
 </body>
 </html>
