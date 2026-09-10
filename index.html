@@ -16,9 +16,9 @@
       --bg:#f2f6f3;--card:#fff;--line:#dfe8e3;--soft:#eef4f1;--danger:#c53c4c;
       --shadow:0 14px 36px rgba(20,49,38,.08);--radius:24px
     }
-    *{box-sizing:border-box}html{max-width:100%;overflow-x:hidden;font-family:"Noto Sans Thai",sans-serif;color:var(--ink);background:var(--bg)}
-    body{width:100%;max-width:100%;margin:0;min-height:100vh;overflow-x:hidden;background:var(--bg)}button,select{font:inherit}select{cursor:pointer}
-    svg{display:block}.app{width:100%;max-width:100%;min-height:100vh;display:grid;grid-template-columns:224px minmax(0,1fr);overflow-x:clip}
+    *{box-sizing:border-box}html{font-family:"Noto Sans Thai",sans-serif;color:var(--ink);background:var(--bg)}
+    body{margin:0;min-height:100vh;background:var(--bg)}button,select{font:inherit}select{cursor:pointer}
+    svg{display:block}.app{min-height:100vh;display:grid;grid-template-columns:224px minmax(0,1fr)}
     .sidebar{position:sticky;top:0;height:100vh;padding:26px 18px;display:flex;flex-direction:column;color:#fff;background:var(--forest)}
     .brand{display:flex;align-items:center;gap:12px;padding:0 8px 27px;border-bottom:1px solid rgba(255,255,255,.12)}
     .brand-mark{
@@ -44,26 +44,21 @@
     .nav-item svg{width:18px}.nav-item.active{color:#fff;background:rgba(255,255,255,.11)}.nav-item.active svg{color:var(--lime)}
     .mission{margin-top:auto;padding:18px;border-radius:18px;color:var(--forest);background:var(--lime)}
     .mission-label{font:800 .67rem Manrope,sans-serif;letter-spacing:.1em}.mission strong{display:block;margin:8px 0 4px;font-size:1.12rem}.mission p{margin:0;font-size:.7rem;line-height:1.55;opacity:.72}
-    .content{width:100%;max-width:100%;min-width:0;padding:28px clamp(20px,3.2vw,46px) 56px}.topbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;margin-bottom:24px}
+    .content{min-width:0;padding:28px clamp(20px,3.2vw,46px) 56px}.topbar{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:24px}
     .mobile-brand{display:none}.title p{margin:0 0 4px;color:var(--muted);font:700 .7rem Manrope,sans-serif;letter-spacing:.13em}.title h1{margin:0;font-size:clamp(1.55rem,2.6vw,2.15rem);line-height:1.25;letter-spacing:-.035em}
-    .top-actions{max-width:100%;margin-left:auto;display:flex;align-items:center;flex-wrap:wrap;gap:10px}.live{display:flex;align-items:center;gap:8px;padding:10px 13px;border:1px solid #bde2d4;border-radius:13px;color:#17654c;background:#eaf8f2;font-size:.75rem;font-weight:700}
+    .top-actions{display:flex;align-items:center;gap:10px}.live{display:flex;align-items:center;gap:8px;padding:10px 13px;border:1px solid #bde2d4;border-radius:13px;color:#17654c;background:#eaf8f2;font-size:.75rem;font-weight:700}
     .live.error{color:#a12f3d;border-color:#efc0c7;background:#fff0f2}.live-dot{width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 0 4px rgba(23,101,76,.1)}
-    .filters{max-width:100%;display:flex;align-items:center;gap:9px;padding:7px;border:1px solid var(--line);border-radius:15px;background:#fff}
+    .filters{display:flex;align-items:center;gap:9px;padding:7px;border:1px solid var(--line);border-radius:15px;background:#fff}
     .filter{position:relative}.filter svg{position:absolute;left:11px;top:50%;width:16px;color:#72827b;transform:translateY(-50%);pointer-events:none}.filter select{height:38px;min-width:150px;padding:0 33px 0 34px;border:0;border-radius:10px;color:var(--ink);background:#f5f8f6;font-size:.75rem;font-weight:700;outline:0}.filter select:focus{box-shadow:0 0 0 3px rgba(99,215,179,.22)}
 .bento{
   display:grid;
   grid-template-columns:
-    minmax(340px,1.35fr)
-    minmax(270px,1fr)
-    minmax(220px,.9fr);
+    minmax(420px,1.35fr)
+    minmax(330px,1fr)
+    minmax(270px,.9fr);
   align-items:stretch;
   gap:14px;
   margin-bottom:14px;
-}
-
-.bento > *{
-  min-width:0;
-  max-width:100%;
 }
     .card{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:var(--radius);background:var(--card);box-shadow:var(--shadow)}
     .score-card{min-height:268px;padding:25px;color:#fff;border:0;background:linear-gradient(145deg,#092f27 0%,var(--forest-2) 100%)}
@@ -503,9 +498,6 @@
 }
     
 .summary-strip{
-  width:100%;
-  max-width:100%;
-  min-width:0;
   min-height:268px;
   display:grid;
   grid-template-columns:1fr;
@@ -541,7 +533,6 @@
   display:block;
   margin-top:4px;
   font-size:.86rem;
-  overflow-wrap:anywhere;
 }
 
 .summary-item strong b{
@@ -1204,3 +1195,4 @@ function renderPodium(rows){
   </script>
 </body>
 </html>
+
