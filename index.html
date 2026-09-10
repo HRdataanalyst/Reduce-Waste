@@ -53,12 +53,19 @@
 .bento{
   display:grid;
   grid-template-columns:
-    minmax(420px,1.35fr)
-    minmax(330px,1fr)
-    minmax(270px,.9fr);
+    minmax(0,1.35fr)
+    minmax(0,1fr)
+    minmax(230px,.72fr);
   align-items:stretch;
   gap:14px;
   margin-bottom:14px;
+}
+
+/* อนุญาตให้การ์ดทุกใบย่อตามพื้นที่ของ Grid ได้จริง */
+.bento > *{
+  width:100%;
+  max-width:100%;
+  min-width:0;
 }
     .card{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:var(--radius);background:var(--card);box-shadow:var(--shadow)}
     .score-card{min-height:268px;padding:25px;color:#fff;border:0;background:linear-gradient(145deg,#092f27 0%,var(--forest-2) 100%)}
@@ -498,6 +505,9 @@
 }
     
 .summary-strip{
+  width:100%;
+  max-width:100%;
+  min-width:0;
   min-height:268px;
   display:grid;
   grid-template-columns:1fr;
@@ -512,6 +522,7 @@
 }
 
 .summary-item{
+  min-width:0;
   padding:16px 20px;
   display:flex;
   flex-direction:column;
@@ -531,8 +542,12 @@
 
 .summary-item strong{
   display:block;
+  max-width:100%;
   margin-top:4px;
   font-size:.86rem;
+  white-space:normal;
+  overflow-wrap:anywhere;
+  word-break:break-word;
 }
 
 .summary-item strong b{
@@ -1195,4 +1210,3 @@ function renderPodium(rows){
   </script>
 </body>
 </html>
-
