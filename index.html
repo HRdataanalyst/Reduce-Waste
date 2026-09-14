@@ -2086,13 +2086,7 @@ function renderPodium(rows,rankScope){
       });
     }
     function rankedTableRows(rows){
-      let lastScore=null,lastRank=0;
-      return rows.map((row,index)=>{
-        const scored=row.totalScore!=null;
-        if(scored&&row.totalScore!==lastScore)lastRank=index+1;
-        if(scored)lastScore=row.totalScore;
-        return {row,rank:scored?lastRank:'—'};
-      });
+      return rows.map((row,index)=>({row,rank:index+1}));
     }
 
     function paginationTokens(currentPage,totalPages){
