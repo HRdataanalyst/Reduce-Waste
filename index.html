@@ -1311,7 +1311,6 @@
           <div>
             <span class="yearly-kicker">YEAR-TO-DATE OVERVIEW</span>
             <h1>ภาพรวมยอดสะสมทั้งปี</h1>
-            <p>ไม่เปลี่ยนตาม Filter</p>
           </div>
           <span class="yearly-fixed" id="yearlyPeriod">กำลังโหลดช่วงเวลา...</span>
         </div>
@@ -1588,9 +1587,9 @@
       el.yearlyPeriod.textContent=yearlyPeriodLabel(currentMonthBangkok())+(missingLabels?` · ข้อมูลไม่ครบ: ${missingLabels}`:'');
       el.yearlyPeriod.classList.toggle('warning',failedMonths.length>0);
       el.yearlyScore.innerHTML=`${score==null?'—':number(score,1)} <small>จาก 100</small>`;
-      el.yearlyTotal.innerHTML=`${number(total,2)} <small>กก.</small>`;
-      el.yearlyGeneral.innerHTML=`${number(general,2)} <small>กก.</small>`;
-      el.yearlyRecycle.innerHTML=`${number(recycle,2)} <small>กก.</small>`;
+      el.yearlyTotal.innerHTML=`${number(total,0)} <small>กก.</small>`;
+      el.yearlyGeneral.innerHTML=`${number(general,0)} <small>กก.</small>`;
+      el.yearlyRecycle.innerHTML=`${number(recycle,0)} <small>กก.</small>`;
       renderYearlyChart(dataSets,'SCORE');
       renderYearlyChart(dataSets,'TOTAL');
       renderYearlyChart(dataSets,'GENERAL');
