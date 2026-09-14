@@ -724,7 +724,7 @@
 
 .yearly-charts{
   display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
+  grid-template-columns:1fr;
   gap:14px;
 }
 
@@ -1646,12 +1646,16 @@
       const linePoints=plotted.map(point=>`${point.x},${point.y}`);
       const line=linePoints.length>1?`<polyline points="${linePoints.join(' ')}" fill="none" stroke="${color}" stroke-width="${lineWidth}" stroke-linecap="round" stroke-linejoin="round"/>`:'';
       const area=linePoints.length>1?`<polygon points="${plotted[0].x},${bottom} ${linePoints.join(' ')} ${plotted[plotted.length-1].x},${bottom}" fill="${softColor}" opacity=".55"/>`:'';
+      const compactPoints=chartMode==='GENERAL'||chartMode==='RECYCLE';
+      const pointRadius=compactPoints?4:6;
+      const pointStroke=compactPoints?2:3;
+      const emptyPointRadius=compactPoints?3.5:5;
       const marks=points.map((point,index)=>{
         const value=point.value;
         const monthLabel=new Intl.DateTimeFormat('th-TH',{month:'short'}).format(new Date(point.month+'-01T12:00:00+07:00'));
-        if(value==null)return `<g><circle cx="${x(index)}" cy="${bottom}" r="5" fill="#fff" stroke="#c4d0cb" stroke-width="2"/><text x="${x(index)}" y="${bottom+27}" text-anchor="middle" fill="#819088" font-size="11" font-family="Noto Sans Thai, sans-serif">${escapeHtml(monthLabel)}</text></g>`;
+        if(value==null)return `<g><circle cx="${x(index)}" cy="${bottom}" r="${emptyPointRadius}" fill="#fff" stroke="#c4d0cb" stroke-width="${pointStroke}"/><text x="${x(index)}" y="${bottom+27}" text-anchor="middle" fill="#819088" font-size="11" font-family="Noto Sans Thai, sans-serif">${escapeHtml(monthLabel)}</text></g>`;
         const display=isScore?number(value,1):number(value,value<100?1:0);
-        return `<g><circle cx="${x(index)}" cy="${y(value)}" r="6" fill="${color}" stroke="#fff" stroke-width="3"><title>${escapeHtml(monthLabel+' · '+display+(isScore?' คะแนน':' กก.'))}</title></circle><text x="${x(index)}" y="${Math.max(15,y(value)-13)}" text-anchor="middle" fill="#173c31" font-size="11" font-weight="800" font-family="Manrope, sans-serif">${display}</text><text x="${x(index)}" y="${bottom+27}" text-anchor="middle" fill="#65756e" font-size="11" font-weight="700" font-family="Noto Sans Thai, sans-serif">${escapeHtml(monthLabel)}</text></g>`;
+        return `<g><circle cx="${x(index)}" cy="${y(value)}" r="${pointRadius}" fill="${color}" stroke="#fff" stroke-width="${pointStroke}"><title>${escapeHtml(monthLabel+' · '+display+(isScore?' คะแนน':' กก.'))}</title></circle><text x="${x(index)}" y="${Math.max(15,y(value)-13)}" text-anchor="middle" fill="#173c31" font-size="11" font-weight="800" font-family="Manrope, sans-serif">${display}</text><text x="${x(index)}" y="${bottom+27}" text-anchor="middle" fill="#65756e" font-size="11" font-weight="700" font-family="Noto Sans Thai, sans-serif">${escapeHtml(monthLabel)}</text></g>`;
       }).join('');
       const unit=isScore?'คะแนนเฉลี่ยรายเดือน (เต็ม 100)':chartMode==='TOTAL'?'ยอดขยะรวมรายเดือน (กิโลกรัม)':'น้ำหนักรายเดือน (กิโลกรัม)';
 
