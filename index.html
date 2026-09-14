@@ -565,8 +565,9 @@
 
 .yearly-page-top{
   display:flex;
-  align-items:flex-start;
+  align-items:center;
   justify-content:space-between;
+  flex-wrap:wrap;
   gap:18px;
   margin-bottom:20px;
 }
@@ -636,6 +637,30 @@
 .yearly-fixed.warning{
   color:#8a5a00;
   background:#fff1d3;
+}
+
+.yearly-filter-row{
+  display:flex;
+  justify-content:flex-end;
+  margin:0;
+}
+
+.yearly-page-actions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  flex-wrap:wrap;
+  gap:10px;
+  min-width:0;
+  margin-left:auto;
+}
+
+.yearly-filters{
+  box-shadow:0 8px 24px rgba(20,54,44,.06);
+}
+
+.yearly-filters .filter select{
+  min-width:170px;
 }
 
 .yearly-grid{
@@ -969,6 +994,24 @@
     gap:12px;
   }
 
+  .yearly-page-top{
+    align-items:stretch;
+  }
+
+  .yearly-page-actions{
+    width:100%;
+    align-items:stretch;
+    flex-direction:column;
+  }
+
+  .yearly-filter-row{
+    width:100%;
+  }
+
+  .yearly-fixed{
+    align-self:flex-start;
+  }
+
   .yearly-chart-card{
     padding:18px;
   }
@@ -1089,8 +1132,8 @@
 </div>
       <nav class="nav">
         <a class="nav-item active" href="#overview" data-page="overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>ภาพรวม</a>
-        <a class="nav-item" href="#ranking" data-page="overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4Z"/><path d="M7 6H4v2a4 4 0 0 0 4 4M17 6h3v2a4 4 0 0 1-4 4"/></svg>อันดับคะแนน</a>
         <a class="nav-item" href="#method" data-page="overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>เกณฑ์คะแนน</a>
+        <a class="nav-item" href="#ranking" data-page="overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4Z"/><path d="M7 6H4v2a4 4 0 0 0 4 4M17 6h3v2a4 4 0 0 1-4 4"/></svg>อันดับคะแนน</a>
         <a class="nav-item" href="#yearly" data-page="yearly"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M8 14h3M8 17h7"/></svg>ยอดสะสมทั้งปี</a>
       </nav>
       <div class="mission"><div class="mission-label">OUR MISSION</div><strong>ลดขยะให้ได้ 100%</strong><p>ทุกการแยกขยะของเรา สร้างการเปลี่ยนแปลงได้</p></div>
@@ -1312,7 +1355,25 @@
             <span class="yearly-kicker">YEAR-TO-DATE OVERVIEW</span>
             <h1>ภาพรวมยอดสะสมทั้งปี</h1>
           </div>
-          <span class="yearly-fixed" id="yearlyPeriod">กำลังโหลดช่วงเวลา...</span>
+          <div class="yearly-page-actions">
+            <div class="yearly-filter-row">
+              <div class="filters yearly-filters" aria-label="ตัวกรองยอดสะสมทั้งปี">
+                <div class="filter">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 21V7l8-4 8 4v14M9 21v-5h6v5M8 10h.01M12 10h.01M16 10h.01"/></svg>
+                  <select id="yearlyBuildingFilter" aria-label="เลือกอาคารสำหรับยอดสะสม" disabled>
+                    <option value="ALL">ทุกอาคาร</option>
+                  </select>
+                </div>
+                <div class="filter">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3 8 4-8 4-8-4 8-4Z"/><path d="m4 12 8 4 8-4M4 17l8 4 8-4"/></svg>
+                  <select id="yearlyFloorFilter" aria-label="เลือกชั้นสำหรับยอดสะสม" disabled>
+                    <option value="ALL">ทุกชั้น</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <span class="yearly-fixed" id="yearlyPeriod">กำลังโหลดช่วงเวลา...</span>
+          </div>
         </div>
 
         <section class="card yearly-section" id="yearly">
@@ -1335,13 +1396,13 @@
             <article class="yearly-card general">
               <div class="yearly-label"><span>ขยะทั่วไปสะสม</span></div>
               <div class="yearly-value" id="yearlyGeneral">— <small>กก.</small></div>
-              <p class="yearly-note">น้ำหนักจริงรวมทุกอาคาร ไม่หารจำนวนพนักงาน</p>
+              <p class="yearly-note">น้ำหนักจริงสะสม ไม่หารจำนวนพนักงาน</p>
             </article>
 
             <article class="yearly-card recycle">
               <div class="yearly-label"><span>รีไซเคิลสะสม</span></div>
               <div class="yearly-value" id="yearlyRecycle">— <small>กก.</small></div>
-              <p class="yearly-note">PET และกระป๋องอะลูมิเนียมรวมทุกอาคาร</p>
+              <p class="yearly-note">PET และกระป๋องอะลูมิเนียมสะสม</p>
             </article>
           </div>
         </section>
@@ -1362,7 +1423,7 @@
             <div class="yearly-chart-head">
               <div>
                 <h2>ยอดขยะรวมรายเดือน</h2>
-                <p>ขยะทั่วไปและรีไซเคิลของแต่ละเดือนรวมทุกอาคาร</p>
+                <p>ขยะทั่วไปและรีไซเคิลของแต่ละเดือน</p>
               </div>
             </div>
             <div class="yearly-chart-scroll"><div class="yearly-chart" id="yearlyTotalChart"></div></div>
@@ -1373,7 +1434,7 @@
             <div class="yearly-chart-head">
               <div>
                 <h2>ขยะทั่วไปรายเดือน</h2>
-                <p>น้ำหนักของแต่ละเดือนรวมทุกอาคาร ไม่หารจำนวนพนักงาน</p>
+                <p>น้ำหนักของแต่ละเดือน ไม่หารจำนวนพนักงาน</p>
               </div>
             </div>
             <div class="yearly-chart-scroll"><div class="yearly-chart" id="yearlyGeneralChart"></div></div>
@@ -1384,7 +1445,7 @@
             <div class="yearly-chart-head">
               <div>
                 <h2>รีไซเคิลรายเดือน</h2>
-                <p>PET และกระป๋องอะลูมิเนียมของแต่ละเดือนรวมทุกอาคาร</p>
+                <p>PET และกระป๋องอะลูมิเนียมของแต่ละเดือน</p>
               </div>
             </div>
             <div class="yearly-chart-scroll"><div class="yearly-chart" id="yearlyRecycleChart"></div></div>
@@ -1407,7 +1468,7 @@
       const month=parts.find(part=>part.type==='month').value;
       return `${year}-${month}`;
     }
-    const state={view:'MONTH',month:currentMonthBangkok(),weekKey:'',building:'ALL',data:null,periodData:[],trendRequest:0,trendCache:new Map(),yearlyData:[]};
+    const state={view:'MONTH',month:currentMonthBangkok(),weekKey:'',building:'ALL',data:null,periodData:[],trendRequest:0,trendCache:new Map(),yearlyData:[],yearlyFailedMonths:[],yearlyBuilding:'ALL',yearlyFloor:'ALL'};
     const el={
       overviewPage:document.querySelector('#overviewPage'),yearlyPage:document.querySelector('#yearlyPage'),
       view:document.querySelector('#viewModeFilter'),
@@ -1420,6 +1481,7 @@
       metricHint:document.querySelector('#metricPeriodHint'),leaderTitle:document.querySelector('#leaderTitle'),
       yearlyPeriod:document.querySelector('#yearlyPeriod'),yearlyScore:document.querySelector('#yearlyScore'),yearlyTotal:document.querySelector('#yearlyTotal'),
       yearlyGeneral:document.querySelector('#yearlyGeneral'),yearlyRecycle:document.querySelector('#yearlyRecycle'),
+      yearlyBuilding:document.querySelector('#yearlyBuildingFilter'),yearlyFloor:document.querySelector('#yearlyFloorFilter'),
       yearlyScoreChart:document.querySelector('#yearlyScoreChart'),yearlyTotalChart:document.querySelector('#yearlyTotalChart'),yearlyGeneralChart:document.querySelector('#yearlyGeneralChart'),yearlyRecycleChart:document.querySelector('#yearlyRecycleChart'),
       rankingTitle:document.querySelector('#rankingTitle'),rankingSubtitle:document.querySelector('#rankingSubtitle'),
       trend:document.querySelector('#trend'),trendScroll:document.querySelector('#trendScroll'),trendPrev:document.querySelector('#trendPrev'),trendNext:document.querySelector('#trendNext'),
@@ -1568,12 +1630,45 @@
       return dates.length?new Date(Math.max(...dates.map(value=>value.getTime()))):null;
     }
 
+    function populateYearlyFilters(dataSets){
+      const rows=(dataSets||[]).flatMap(data=>Array.isArray(data.monthly)?data.monthly:[]);
+      const buildings=[...new Set(rows.map(row=>String(row.building||'').trim()).filter(Boolean))]
+        .sort((a,b)=>a.localeCompare(b,'th',{numeric:true}));
+      if(state.yearlyBuilding!=='ALL'&&!buildings.includes(state.yearlyBuilding))state.yearlyBuilding='ALL';
+      el.yearlyBuilding.innerHTML='<option value="ALL">ทุกอาคาร</option>'+buildings.map(building=>`<option value="${escapeHtml(building)}">${escapeHtml(building)}</option>`).join('');
+      el.yearlyBuilding.value=state.yearlyBuilding;
+      el.yearlyBuilding.disabled=!buildings.length;
+
+      const floors=state.yearlyBuilding==='ALL'?[]:[...new Set(rows
+        .filter(row=>String(row.building||'').trim()===state.yearlyBuilding)
+        .map(row=>String(row.floor||'').trim()).filter(Boolean))]
+        .sort((a,b)=>a.localeCompare(b,'th',{numeric:true}));
+      if(state.yearlyFloor!=='ALL'&&!floors.includes(state.yearlyFloor))state.yearlyFloor='ALL';
+      el.yearlyFloor.innerHTML='<option value="ALL">ทุกชั้น</option>'+floors.map(floor=>`<option value="${escapeHtml(floor)}">ชั้น ${escapeHtml(floor)}</option>`).join('');
+      el.yearlyFloor.value=state.yearlyFloor;
+      el.yearlyFloor.disabled=state.yearlyBuilding==='ALL'||!floors.length;
+    }
+
+    function filterYearlyData(dataSets){
+      return (dataSets||[]).map(data=>({...data,monthly:(Array.isArray(data.monthly)?data.monthly:[]).filter(row=>{
+        const building=String(row.building||'').trim();
+        const floor=String(row.floor||'').trim();
+        return (state.yearlyBuilding==='ALL'||building===state.yearlyBuilding)&&(state.yearlyFloor==='ALL'||floor===state.yearlyFloor);
+      })}));
+    }
+
+    function yearlyScopeLabel(){
+      if(state.yearlyBuilding==='ALL')return 'ทุกอาคาร';
+      return state.yearlyFloor==='ALL'?`${state.yearlyBuilding} · ทุกชั้น`:`${state.yearlyBuilding} · ชั้น ${state.yearlyFloor}`;
+    }
+
     function yearlyPeriodLabel(monthKey){
-      if(!/^\d{4}-\d{2}$/.test(monthKey||''))return 'มกราคม–เดือนปัจจุบัน · ทุกอาคาร';
+      if(!/^\d{4}-\d{2}$/.test(monthKey||''))return `มกราคม–เดือนปัจจุบัน · ${yearlyScopeLabel()}`;
       const date=new Date(monthKey+'-01T12:00:00+07:00');
       const endMonth=new Intl.DateTimeFormat('th-TH',{month:'long'}).format(date);
       const year=new Intl.DateTimeFormat('th-TH',{year:'numeric'}).format(date).replace(/^พ\.ศ\.\s*/, '');
-      return endMonth==='มกราคม'?`มกราคม ${year} · ทุกอาคาร`:`มกราคม–${endMonth} ${year} · ทุกอาคาร`;
+      const period=endMonth==='มกราคม'?`มกราคม ${year}`:`มกราคม–${endMonth} ${year}`;
+      return `${period} · ${yearlyScopeLabel()}`;
     }
 
     function renderYearlySummary(dataSets,failedMonths=[]){
@@ -1582,7 +1677,6 @@
       const recycle=rows.reduce((sum,row)=>sum+Number(row.recycleKg||0),0);
       const total=general+recycle;
       const score=average(rows.filter(row=>row.totalScore!=null).map(row=>row.totalScore));
-      state.yearlyData=dataSets;
       const missingLabels=failedMonths.map(month=>shortMonth(month)).join(', ');
       el.yearlyPeriod.textContent=yearlyPeriodLabel(currentMonthBangkok())+(missingLabels?` · ข้อมูลไม่ครบ: ${missingLabels}`:'');
       el.yearlyPeriod.classList.toggle('warning',failedMonths.length>0);
@@ -1594,6 +1688,10 @@
       renderYearlyChart(dataSets,'TOTAL');
       renderYearlyChart(dataSets,'GENERAL');
       renderYearlyChart(dataSets,'RECYCLE');
+    }
+
+    function renderYearlyView(){
+      renderYearlySummary(filterYearlyData(state.yearlyData),state.yearlyFailedMonths);
     }
 
     function niceChartMax(value){
@@ -1632,7 +1730,7 @@
       const color=chartMode==='RECYCLE'?'#5fb7ff':chartMode==='GENERAL'?'#91c92f':chartMode==='TOTAL'?'#d99532':'#0b6a51';
       const softColor=chartMode==='RECYCLE'?'#dcefff':chartMode==='GENERAL'?'#ebf7c9':chartMode==='TOTAL'?'#fff0d3':'#dff3eb';
       const description=isScore?'คะแนนเฉลี่ย 80:20 ของแต่ละเดือน':chartMode==='TOTAL'?'น้ำหนักขยะรวมของแต่ละเดือน':chartMode==='GENERAL'?'น้ำหนักขยะทั่วไปของแต่ละเดือน':'น้ำหนักรีไซเคิลของแต่ละเดือน';
-      const lineWidth=chartMode==='GENERAL'||chartMode==='RECYCLE'?2.5:4;
+      const lineWidth=2.5;
 
       const left=64,right=52,top=32,bottom=208,height=280;
       const parentWidth=target.parentElement.clientWidth||720;
@@ -1650,10 +1748,9 @@
       const linePoints=plotted.map(point=>`${point.x},${point.y}`);
       const line=linePoints.length>1?`<polyline points="${linePoints.join(' ')}" fill="none" stroke="${color}" stroke-width="${lineWidth}" stroke-linecap="round" stroke-linejoin="round"/>`:'';
       const area=linePoints.length>1?`<polygon points="${plotted[0].x},${bottom} ${linePoints.join(' ')} ${plotted[plotted.length-1].x},${bottom}" fill="${softColor}" opacity=".55"/>`:'';
-      const compactPoints=chartMode==='GENERAL'||chartMode==='RECYCLE';
-      const pointRadius=compactPoints?4:6;
-      const pointStroke=compactPoints?2:3;
-      const emptyPointRadius=compactPoints?3.5:5;
+      const pointRadius=4;
+      const pointStroke=2;
+      const emptyPointRadius=3.5;
       const marks=points.map((point,index)=>{
         const value=point.value;
         const monthLabel=new Intl.DateTimeFormat('th-TH',{month:'short'}).format(new Date(point.month+'-01T12:00:00+07:00'));
@@ -1670,7 +1767,10 @@
       try{
         const {dataSets,failedMonths}=await fetchYearToDate();
         if(!dataSets.length)throw new Error('ยังไม่มีข้อมูลสะสมของปีปัจจุบัน');
-        renderYearlySummary(dataSets,failedMonths);
+        state.yearlyData=dataSets;
+        state.yearlyFailedMonths=failedMonths;
+        populateYearlyFilters(dataSets);
+        renderYearlyView();
       }catch(error){
         el.yearlyPeriod.textContent=error.message||'ไม่สามารถโหลดข้อมูลสะสมทั้งปีได้';
         el.yearlyPeriod.classList.add('warning');
@@ -1859,25 +1959,75 @@ function renderPodium(rows,rankScope){
       renderTrend(weekly,currentData.selectedMonth,'');
     }
 
-    function renderTrend(rows,selectedMonth,selectedWeekKey=''){
-      const groups=new Map();
-      (rows||[]).forEach(r=>{
-        if(!r.weekStart||!r.weekEnd)return;
-        const key=r.weekStart+'|'+r.weekEnd;
-        if(!groups.has(key))groups.set(key,{start:r.weekStart,end:r.weekEnd,scores:[]});
-        if(r.totalScore!=null&&Number.isFinite(Number(r.totalScore)))groups.get(key).scores.push(Number(r.totalScore));
+    function isoDateUtc(date){
+      return date.toISOString().slice(0,10);
+    }
+
+    function fixedTrendWeeks(rows,selectedMonth,selectedWeekKey=''){
+      const fallbackMonth=/^\d{4}-\d{2}$/.test(state.month||'')?state.month:currentMonthBangkok();
+      const trendMonth=/^\d{4}-\d{2}$/.test(selectedMonth||'')?selectedMonth:fallbackMonth;
+      const year=Number(trendMonth.slice(0,4));
+      const scoresByWeek=new Map();
+      const actualWeeksByMonth=new Map();
+
+      (rows||[]).forEach(row=>{
+        if(!row.weekStart||!row.weekEnd)return;
+        const key=row.weekStart+'|'+row.weekEnd;
+        if(!scoresByWeek.has(key))scoresByWeek.set(key,[]);
+        const month=row.weekStart.slice(0,7);
+        if(!actualWeeksByMonth.has(month))actualWeeksByMonth.set(month,new Map());
+        actualWeeksByMonth.get(month).set(key,{start:row.weekStart,end:row.weekEnd,month});
+        if(row.totalScore!=null&&Number.isFinite(Number(row.totalScore))){
+          scoresByWeek.get(key).push(Number(row.totalScore));
+        }
       });
 
-      const weeks=[...groups.values()]
-        .map(w=>({...w,score:average(w.scores),month:w.start.slice(0,7)}))
-        .sort((a,b)=>a.start.localeCompare(b.start));
+      return Array.from({length:12},(_,monthIndex)=>{
+        const month=`${year}-${String(monthIndex+1).padStart(2,'0')}`;
+        const firstDay=new Date(Date.UTC(year,monthIndex,1));
+        const daysUntilMonday=(8-firstDay.getUTCDay())%7;
+        const firstMonday=new Date(firstDay);
+        firstMonday.setUTCDate(firstDay.getUTCDate()+daysUntilMonday);
+
+        const slots=Array.from({length:4},(_,weekIndex)=>{
+          const startDate=new Date(firstMonday);
+          startDate.setUTCDate(firstMonday.getUTCDate()+(weekIndex*7));
+          const endDate=new Date(startDate);
+          endDate.setUTCDate(startDate.getUTCDate()+6);
+          const start=isoDateUtc(startDate);
+          const end=isoDateUtc(endDate);
+          const scores=scoresByWeek.get(start+'|'+end)||[];
+          return {start,end,month,score:average(scores)};
+        });
+
+        const slotKeys=new Set(slots.map(slot=>slot.start+'|'+slot.end));
+        const extraWeeks=[...(actualWeeksByMonth.get(month)||new Map()).entries()]
+          .filter(([key])=>!slotKeys.has(key))
+          .map(([key,week])=>({...week,key,score:average(scoresByWeek.get(key)||[])}))
+          .sort((a,b)=>{
+            if(a.key===selectedWeekKey)return -1;
+            if(b.key===selectedWeekKey)return 1;
+            return a.start.localeCompare(b.start);
+          });
+
+        extraWeeks.forEach(extra=>{
+          const replaceIndex=slots.findLastIndex(slot=>slot.score==null);
+          if(replaceIndex>=0)slots[replaceIndex]={start:extra.start,end:extra.end,month,score:extra.score};
+        });
+
+        return slots.sort((a,b)=>a.start.localeCompare(b.start));
+      }).flat();
+    }
+
+    function renderTrend(rows,selectedMonth,selectedWeekKey=''){
+      const weeks=fixedTrendWeeks(rows,selectedMonth,selectedWeekKey);
 
       if(!weeks.length){
         el.trend.innerHTML='<div class="trend-empty">ยังไม่มีข้อมูลรายสัปดาห์ในช่วงนี้</div>';
         return;
       }
 
-      const pointGap=112,left=58,right=30,height=292,plotTop=53,plotBottom=204;
+      const pointGap=124,left=58,right=30,height=292,plotTop=53,plotBottom=204;
       const width=Math.max(el.trendScroll.clientWidth-2,left+right+Math.max(1,weeks.length-1)*pointGap);
       const x=i=>weeks.length===1?left+(width-left-right)/2:left+i*((width-left-right)/(weeks.length-1));
       const y=score=>plotBottom-(Math.max(0,Math.min(100,score))/100)*(plotBottom-plotTop);
@@ -1925,8 +2075,7 @@ function renderPodium(rows,rankScope){
           ?`<circle cx="${x(i)}" cy="${plotBottom}" r="5" fill="#fff" stroke="#c4d0cb" stroke-width="2"/><text x="${x(i)}" y="${plotBottom-12}" text-anchor="middle" fill="#9aa7a1" font-size="11">—</text>`
           :`<circle cx="${x(i)}" cy="${y(score)}" r="${active?7:6}" fill="${active?'#073f32':'#45b995'}" stroke="#fff" stroke-width="3"><title>${escapeHtml(shortDate(w.start)+'–'+shortDate(w.end)+' · '+number(score,1)+' คะแนน')}</title></circle><text x="${x(i)}" y="${y(score)-13}" text-anchor="middle" fill="#073f32" font-size="12" font-weight="800" font-family="Manrope, sans-serif">${number(score,1)}</text>`}
           <text x="${x(i)}" y="230" text-anchor="middle" fill="${active?'#073f32':'#687870'}" font-size="12" font-weight="800" font-family="Manrope, sans-serif">W${weekNo[i]}</text>
-          <text x="${x(i)}" y="249" text-anchor="middle" fill="#819088" font-size="10" font-family="Noto Sans Thai, sans-serif">${escapeHtml(shortDate(w.start))}</text>
-          <text x="${x(i)}" y="263" text-anchor="middle" fill="#819088" font-size="10" font-family="Noto Sans Thai, sans-serif">– ${escapeHtml(shortDate(w.end))}</text>
+          <text x="${x(i)}" y="252" text-anchor="middle" fill="#819088" font-size="9.5" font-family="Noto Sans Thai, sans-serif">${escapeHtml(shortDate(w.start)+' – '+shortDate(w.end))}</text>
         </g>`;
       }).join('');
 
@@ -1968,6 +2117,16 @@ function renderPodium(rows,rankScope){
       state.weekKey='';
       loadDashboard();
     });
+    el.yearlyBuilding.addEventListener('change',()=>{
+      state.yearlyBuilding=el.yearlyBuilding.value;
+      state.yearlyFloor='ALL';
+      populateYearlyFilters(state.yearlyData);
+      renderYearlyView();
+    });
+    el.yearlyFloor.addEventListener('change',()=>{
+      state.yearlyFloor=el.yearlyFloor.value;
+      renderYearlyView();
+    });
     el.trendPrev.addEventListener('click',()=>el.trendScroll.scrollBy({left:-Math.max(300,el.trendScroll.clientWidth*.72),behavior:'smooth'}));
     el.trendNext.addEventListener('click',()=>el.trendScroll.scrollBy({left:Math.max(300,el.trendScroll.clientWidth*.72),behavior:'smooth'}));
     function showDashboardPage(hash){
@@ -1980,10 +2139,7 @@ function renderPodium(rows,rankScope){
         if(isYearly){
           window.scrollTo({top:0,behavior:'smooth'});
           if(state.yearlyData.length){
-            renderYearlyChart(state.yearlyData,'SCORE');
-            renderYearlyChart(state.yearlyData,'TOTAL');
-            renderYearlyChart(state.yearlyData,'GENERAL');
-            renderYearlyChart(state.yearlyData,'RECYCLE');
+            renderYearlyView();
           }
           return;
         }
