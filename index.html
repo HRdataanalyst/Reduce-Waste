@@ -1327,7 +1327,7 @@
           <div class="panel-head">
             <div>
               <h2>แนวโน้มคะแนนรายสัปดาห์</h2>
-              <p>เปรียบเทียบคะแนนเฉลี่ยรายสัปดาห์ แยกตามช่วงเดือน</p>
+              <p>เปรียบเทียบคะแนนเฉลี่ยรายสัปดาห์ จันทร์–ศุกร์ แยกตามเดือนของวันศุกร์</p>
             </div>
             <div class="trend-actions">
               <span class="pill">MONTHLY · WEEKLY TREND</span>
@@ -1495,7 +1495,19 @@
     function shortDate(v){return v?new Intl.DateTimeFormat('th-TH',{day:'numeric',month:'short'}).format(new Date(v+'T12:00:00+07:00')):'—'}
     function thaiYear(v){return v?new Intl.DateTimeFormat('th-TH',{year:'numeric'}).format(new Date(v+'T12:00:00+07:00')).replace(/^พ\.ศ\.\s*/, ''):''}
     function weekKey(row){return row&&row.weekStart&&row.weekEnd?row.weekStart+'|'+row.weekEnd:''}
-    function weekLabel(key){const [start,end]=String(key||'').split('|');return start&&end?shortDate(start)+'–'+shortDate(end)+' '+thaiYear(end):'—'}
+    function isoDateUtc(date){return date.toISOString().slice(0,10)}
+    function addDaysUtc(dateText,days){
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(dateText||''))return '';
+      const date=new Date(dateText+'T00:00:00Z');
+      date.setUTCDate(date.getUTCDate()+days);
+      return isoDateUtc(date);
+    }
+    function workWeekEnd(start){return addDaysUtc(start,4)}
+    function weekLabel(key){
+      const [start]=String(key||'').split('|');
+      const end=workWeekEnd(start);
+      return start&&end?shortDate(start)+'–'+shortDate(end)+' '+thaiYear(end):'—';
+    }
     function average(values){const a=values.filter(v=>Number.isFinite(Number(v))).map(Number);return a.length?a.reduce((s,v)=>s+v,0)/a.length:null}
     function requestJsonp(params){return new Promise((resolve,reject)=>{if(!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec/.test(CONFIG.apiUrl)){reject(new Error('กรุณาใส่ Apps Script Web App URL ในตัวแปร CONFIG.apiUrl ก่อนนำขึ้น GitHub'));return}const callback='__wasteDashboard_'+Date.now()+'_'+Math.random().toString(36).slice(2),script=document.createElement('script'),timer=setTimeout(()=>finish(new Error('เชื่อมต่อข้อมูลเกินเวลาที่กำหนด กรุณาตรวจสอบ Web App URL')),CONFIG.timeoutMs);function finish(error,data){clearTimeout(timer);delete window[callback];script.remove();error?reject(error):resolve(data)}window[callback]=data=>finish(null,data);const query=new URLSearchParams({action:'dashboard',callback,...params});script.src=CONFIG.apiUrl+(CONFIG.apiUrl.includes('?')?'&':'?')+query.toString();script.onerror=()=>finish(new Error('เชื่อมต่อ Apps Script ไม่สำเร็จ กรุณาตรวจสอบการ Deploy แบบ Anyone'));document.head.appendChild(script)})}
     function cacheKey(building,month){return (building||'ALL')+'|'+month}
@@ -1814,7 +1826,8 @@
       }
       if(state.view==='WEEK'){
         const rows=weekly.filter(row=>weekKey(row)===state.weekKey);
-        const selectedMonth=state.weekKey?state.weekKey.slice(0,7):'';
+        const selectedWeekStart=state.weekKey?state.weekKey.split('|')[0]:'';
+        const selectedMonth=selectedWeekStart?workWeekEnd(selectedWeekStart).slice(0,7):'';
         renderSummary(rows,{periodLabel:weekLabel(state.weekKey),metricHint:'น้ำหนักสะสมของสัปดาห์',rankScope:'ประจำสัปดาห์',rankingSubtitle:'คะแนนของสัปดาห์ที่เลือก เรียงจากมากไปน้อย',dataSets});
         renderTrend(weekly,selectedMonth,state.weekKey);
         return;
@@ -1959,68 +1972,42 @@ function renderPodium(rows,rankScope){
       renderTrend(weekly,currentData.selectedMonth,'');
     }
 
-    function isoDateUtc(date){
-      return date.toISOString().slice(0,10);
-    }
-
-    function fixedTrendWeeks(rows,selectedMonth,selectedWeekKey=''){
+    function calendarTrendWeeks(rows,selectedMonth){
       const fallbackMonth=/^\d{4}-\d{2}$/.test(state.month||'')?state.month:currentMonthBangkok();
       const trendMonth=/^\d{4}-\d{2}$/.test(selectedMonth||'')?selectedMonth:fallbackMonth;
       const year=Number(trendMonth.slice(0,4));
-      const scoresByWeek=new Map();
-      const actualWeeksByMonth=new Map();
+      const scoresByStart=new Map();
 
       (rows||[]).forEach(row=>{
-        if(!row.weekStart||!row.weekEnd)return;
-        const key=row.weekStart+'|'+row.weekEnd;
-        if(!scoresByWeek.has(key))scoresByWeek.set(key,[]);
-        const month=row.weekStart.slice(0,7);
-        if(!actualWeeksByMonth.has(month))actualWeeksByMonth.set(month,new Map());
-        actualWeeksByMonth.get(month).set(key,{start:row.weekStart,end:row.weekEnd,month});
+        const start=String(row.weekStart||'');
+        if(!/^\d{4}-\d{2}-\d{2}$/.test(start))return;
+        if(!scoresByStart.has(start))scoresByStart.set(start,[]);
         if(row.totalScore!=null&&Number.isFinite(Number(row.totalScore))){
-          scoresByWeek.get(key).push(Number(row.totalScore));
+          scoresByStart.get(start).push(Number(row.totalScore));
         }
       });
 
-      return Array.from({length:12},(_,monthIndex)=>{
-        const month=`${year}-${String(monthIndex+1).padStart(2,'0')}`;
-        const firstDay=new Date(Date.UTC(year,monthIndex,1));
-        const daysUntilMonday=(8-firstDay.getUTCDay())%7;
-        const firstMonday=new Date(firstDay);
-        firstMonday.setUTCDate(firstDay.getUTCDate()+daysUntilMonday);
+      const firstDay=new Date(Date.UTC(year,0,1));
+      const firstMonday=new Date(firstDay);
+      firstMonday.setUTCDate(firstDay.getUTCDate()-((firstDay.getUTCDay()+6)%7));
+      const lastDay=new Date(Date.UTC(year,11,31));
+      const weeks=[];
 
-        const slots=Array.from({length:4},(_,weekIndex)=>{
-          const startDate=new Date(firstMonday);
-          startDate.setUTCDate(firstMonday.getUTCDate()+(weekIndex*7));
-          const endDate=new Date(startDate);
-          endDate.setUTCDate(startDate.getUTCDate()+6);
-          const start=isoDateUtc(startDate);
-          const end=isoDateUtc(endDate);
-          const scores=scoresByWeek.get(start+'|'+end)||[];
-          return {start,end,month,score:average(scores)};
-        });
+      for(const monday=new Date(firstMonday);monday<=lastDay;monday.setUTCDate(monday.getUTCDate()+7)){
+        const friday=new Date(monday);
+        friday.setUTCDate(monday.getUTCDate()+4);
+        if(friday.getUTCFullYear()!==year)continue;
+        const start=isoDateUtc(monday);
+        const end=isoDateUtc(friday);
+        const scores=scoresByStart.get(start)||[];
+        weeks.push({start,end,month:end.slice(0,7),score:average(scores)});
+      }
 
-        const slotKeys=new Set(slots.map(slot=>slot.start+'|'+slot.end));
-        const extraWeeks=[...(actualWeeksByMonth.get(month)||new Map()).entries()]
-          .filter(([key])=>!slotKeys.has(key))
-          .map(([key,week])=>({...week,key,score:average(scoresByWeek.get(key)||[])}))
-          .sort((a,b)=>{
-            if(a.key===selectedWeekKey)return -1;
-            if(b.key===selectedWeekKey)return 1;
-            return a.start.localeCompare(b.start);
-          });
-
-        extraWeeks.forEach(extra=>{
-          const replaceIndex=slots.findLastIndex(slot=>slot.score==null);
-          if(replaceIndex>=0)slots[replaceIndex]={start:extra.start,end:extra.end,month,score:extra.score};
-        });
-
-        return slots.sort((a,b)=>a.start.localeCompare(b.start));
-      }).flat();
+      return weeks;
     }
 
     function renderTrend(rows,selectedMonth,selectedWeekKey=''){
-      const weeks=fixedTrendWeeks(rows,selectedMonth,selectedWeekKey);
+      const weeks=calendarTrendWeeks(rows,selectedMonth);
 
       if(!weeks.length){
         el.trend.innerHTML='<div class="trend-empty">ยังไม่มีข้อมูลรายสัปดาห์ในช่วงนี้</div>';
@@ -2068,9 +2055,10 @@ function renderPodium(rows,rankScope){
         :`<polyline points="${points.join(' ')}" fill="none" stroke="url(#trendLine)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`
       ).join('');
 
+      const activeWeekStart=String(selectedWeekKey||'').split('|')[0];
       const points=weeks.map((w,i)=>{
         const score=w.score==null?null:Math.max(0,Math.min(100,w.score));
-        const active=selectedWeekKey?weekKey({weekStart:w.start,weekEnd:w.end})===selectedWeekKey:w.month===selectedMonth;
+        const active=activeWeekStart?w.start===activeWeekStart:w.month===selectedMonth;
         return `<g>${score==null
           ?`<circle cx="${x(i)}" cy="${plotBottom}" r="5" fill="#fff" stroke="#c4d0cb" stroke-width="2"/><text x="${x(i)}" y="${plotBottom-12}" text-anchor="middle" fill="#9aa7a1" font-size="11">—</text>`
           :`<circle cx="${x(i)}" cy="${y(score)}" r="${active?7:6}" fill="${active?'#073f32':'#45b995'}" stroke="#fff" stroke-width="3"><title>${escapeHtml(shortDate(w.start)+'–'+shortDate(w.end)+' · '+number(score,1)+' คะแนน')}</title></circle><text x="${x(i)}" y="${y(score)-13}" text-anchor="middle" fill="#073f32" font-size="12" font-weight="800" font-family="Manrope, sans-serif">${number(score,1)}</text>`}
@@ -2086,8 +2074,8 @@ function renderPodium(rows,rankScope){
       </svg>`;
 
       requestAnimationFrame(()=>{
-        const selectedIndex=selectedWeekKey
-          ?weeks.findIndex(w=>weekKey({weekStart:w.start,weekEnd:w.end})===selectedWeekKey)
+        const selectedIndex=activeWeekStart
+          ?weeks.findIndex(w=>w.start===activeWeekStart)
           :weeks.findIndex(w=>w.month===selectedMonth);
         if(selectedIndex<0)return;
         const target=Math.max(0,x(selectedIndex)-el.trendScroll.clientWidth*.35);
