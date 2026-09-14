@@ -16,7 +16,7 @@
       --bg:#f2f6f3;--card:#fff;--line:#dfe8e3;--soft:#eef4f1;--danger:#c53c4c;
       --shadow:0 14px 36px rgba(20,49,38,.08);--radius:24px
     }
-    *{box-sizing:border-box}html{font-family:"Noto Sans Thai",sans-serif;color:var(--ink);background:var(--bg)}
+    *{box-sizing:border-box}html{scroll-behavior:smooth;font-family:"Noto Sans Thai",sans-serif;color:var(--ink);background:var(--bg)}
     body{margin:0;min-height:100vh;background:var(--bg)}button,select{font:inherit}select{cursor:pointer}
     svg{display:block}
     .app{min-height:100vh;display:grid;grid-template-columns:190px minmax(0,1fr)}
@@ -555,6 +555,245 @@
   font:800 1.25rem Manrope;
   color:var(--forest);
 }
+
+/* =========================
+   ยอดสะสมตั้งแต่ต้นปี
+   ========================= */
+.dashboard-page{
+  min-width:0;
+}
+
+.yearly-page-top{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:18px;
+  margin-bottom:20px;
+}
+
+.yearly-page-top h1{
+  margin:0;
+  font-size:clamp(1.55rem,2.6vw,2.15rem);
+  line-height:1.25;
+  letter-spacing:-.035em;
+}
+
+.yearly-page-top p{
+  margin:6px 0 0;
+  color:var(--muted);
+  font-size:.74rem;
+}
+
+.yearly-page-top p.warning{
+  color:#a36a00;
+  font-weight:700;
+}
+
+.yearly-section{
+  scroll-margin-top:24px;
+  margin-bottom:14px;
+  padding:23px;
+}
+
+.yearly-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:18px;
+  margin-bottom:18px;
+}
+
+.yearly-kicker{
+  display:block;
+  margin-bottom:4px;
+  color:#1d7157;
+  font:800 .65rem Manrope,sans-serif;
+  letter-spacing:.12em;
+}
+
+.yearly-head h2{
+  margin:0;
+  font-size:1.12rem;
+}
+
+.yearly-head p{
+  margin:5px 0 0;
+  color:var(--muted);
+  font-size:.72rem;
+}
+
+.yearly-fixed{
+  flex:none;
+  padding:7px 10px;
+  border-radius:999px;
+  color:#17654c;
+  background:#e7f7f0;
+  font-size:.65rem;
+  font-weight:800;
+  white-space:nowrap;
+}
+
+.yearly-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+}
+
+.yearly-card{
+  position:relative;
+  min-width:0;
+  min-height:142px;
+  padding:18px;
+  overflow:hidden;
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:#f8fbf9;
+}
+
+.yearly-card.score{
+  color:#fff;
+  border-color:transparent;
+  background:linear-gradient(145deg,#092f27 0%,var(--forest-2) 100%);
+}
+
+.yearly-card.general{
+  background:linear-gradient(145deg,#f4fbdd 0%,#edf8cf 100%);
+}
+
+.yearly-card.recycle{
+  background:linear-gradient(145deg,#eef8ff 0%,#e3f2ff 100%);
+}
+
+.yearly-label{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  color:var(--muted);
+  font-size:.72rem;
+  font-weight:700;
+}
+
+.yearly-card.score .yearly-label{
+  color:#b9d0c7;
+}
+
+.yearly-badge{
+  padding:4px 7px;
+  border-radius:999px;
+  color:var(--forest);
+  background:var(--lime);
+  font:800 .58rem Manrope,sans-serif;
+  white-space:nowrap;
+}
+
+.yearly-value{
+  margin-top:19px;
+  color:var(--forest);
+  font:800 clamp(1.65rem,2.5vw,2.25rem)/1 Manrope,sans-serif;
+  letter-spacing:-.045em;
+}
+
+.yearly-card.score .yearly-value{
+  color:#fff;
+}
+
+.yearly-value small{
+  margin-left:5px;
+  font:700 .72rem "Noto Sans Thai",sans-serif;
+  letter-spacing:0;
+}
+
+.yearly-note{
+  margin:10px 0 0;
+  color:var(--muted);
+  font-size:.66rem;
+}
+
+.yearly-card.score .yearly-note{
+  color:#a9c5ba;
+}
+
+.yearly-chart-card{
+  padding:23px;
+}
+
+.yearly-charts{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:14px;
+}
+
+.yearly-chart-card.score-chart{
+  grid-column:1/-1;
+}
+
+.yearly-chart-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:18px;
+  margin-bottom:18px;
+}
+
+.yearly-chart-head h2{
+  margin:0;
+  font-size:1rem;
+}
+
+.yearly-chart-head p{
+  margin:4px 0 0;
+  color:var(--muted);
+  font-size:.7rem;
+}
+
+.yearly-chart-scroll{
+  width:100%;
+  overflow-x:auto;
+  overflow-y:hidden;
+  padding:2px 0 8px;
+  scrollbar-color:#b9d8cd #edf3f0;
+  scrollbar-width:thin;
+}
+
+.yearly-chart-scroll::-webkit-scrollbar{
+  height:8px;
+}
+
+.yearly-chart-scroll::-webkit-scrollbar-track{
+  border-radius:99px;
+  background:#edf3f0;
+}
+
+.yearly-chart-scroll::-webkit-scrollbar-thumb{
+  border-radius:99px;
+  background:#b9d8cd;
+}
+
+.yearly-chart{
+  min-width:100%;
+  min-height:310px;
+}
+
+.yearly-chart svg{
+  display:block;
+  overflow:visible;
+}
+
+.yearly-chart-empty{
+  display:grid;
+  place-items:center;
+  min-height:280px;
+  color:var(--muted);
+  font-size:.78rem;
+}
+
+.yearly-chart-hint{
+  margin:7px 0 0;
+  color:var(--muted);
+  font-size:.64rem;
+  text-align:right;
+}
     
     .main-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(310px,.55fr);gap:14px;margin-bottom:14px}.panel{padding:23px}.panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px}.panel-head h2{margin:0;font-size:1rem}.panel-head p{margin:4px 0 0;color:var(--muted);font-size:.7rem}.pill{padding:6px 10px;border-radius:999px;color:#1b634d;background:#e7f7f0;font-size:.64rem;font-weight:800;white-space:nowrap}
     .trend-actions{display:flex;align-items:center;gap:8px}.trend-nav{width:32px;height:32px;display:grid;place-items:center;padding:0;border:1px solid var(--line);border-radius:10px;color:var(--forest);background:#fff;cursor:pointer;transition:.2s ease}.trend-nav:hover{border-color:#a9d9c7;background:#eff9f5;transform:translateY(-1px)}.trend-nav:active{transform:translateY(0)}.trend-nav svg{width:16px;height:16px}.trend-scroll{width:100%;overflow-x:auto;overflow-y:hidden;padding:2px 0 10px;scroll-behavior:smooth;overscroll-behavior-x:contain;scrollbar-color:#b9d8cd #edf3f0;scrollbar-width:thin}.trend-scroll::-webkit-scrollbar{height:8px}.trend-scroll::-webkit-scrollbar-track{border-radius:99px;background:#edf3f0}.trend-scroll::-webkit-scrollbar-thumb{border-radius:99px;background:#b9d8cd}.trend{min-width:100%;min-height:292px}.trend svg{display:block;overflow:visible}.trend-empty{display:grid;place-items:center;min-height:260px;text-align:center;color:var(--muted);font-size:.78rem}.trend-hint{margin:9px 0 0;color:var(--muted);font-size:.64rem;text-align:right}
@@ -662,6 +901,18 @@
   .formula-card{
     min-height:auto;
   }
+
+  .yearly-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+
+  .yearly-charts{
+    grid-template-columns:1fr;
+  }
+
+  .yearly-chart-card.score-chart{
+    grid-column:auto;
+  }
 }
 
 @media(max-width:590px){
@@ -690,6 +941,29 @@
   .filter select{
     width:auto;
     min-width:140px;
+  }
+
+  .yearly-section{
+    padding:18px;
+  }
+
+  .yearly-head{
+    flex-direction:column;
+    gap:10px;
+  }
+
+  .yearly-page-top,
+  .yearly-chart-head{
+    flex-direction:column;
+    gap:12px;
+  }
+
+  .yearly-chart-card{
+    padding:18px;
+  }
+
+  .yearly-grid{
+    grid-template-columns:1fr;
   }
 
   .bento{
@@ -802,11 +1076,17 @@
     <small>Save Office</small>
   </span>
 </div>
-      <nav class="nav"><a class="nav-item active" href="#overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>ภาพรวม</a><a class="nav-item" href="#ranking"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4Z"/><path d="M7 6H4v2a4 4 0 0 0 4 4M17 6h3v2a4 4 0 0 1-4 4"/></svg>อันดับคะแนน</a><a class="nav-item" href="#method"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>เกณฑ์คะแนน</a></nav>
+      <nav class="nav">
+        <a class="nav-item active" href="#overview" data-page="overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>ภาพรวม</a>
+        <a class="nav-item" href="#ranking" data-page="overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4Z"/><path d="M7 6H4v2a4 4 0 0 0 4 4M17 6h3v2a4 4 0 0 1-4 4"/></svg>อันดับคะแนน</a>
+        <a class="nav-item" href="#method" data-page="overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>เกณฑ์คะแนน</a>
+        <a class="nav-item" href="#yearly" data-page="yearly"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M8 14h3M8 17h7"/></svg>ยอดสะสมทั้งปี</a>
+      </nav>
       <div class="mission"><div class="mission-label">OUR MISSION</div><strong>ลดขยะให้ได้ 100%</strong><p>ทุกการแยกขยะของเรา สร้างการเปลี่ยนแปลงได้</p></div>
     </aside>
 
-    <main class="content" id="overview">
+    <main class="content">
+      <section class="dashboard-page" id="overviewPage">
       <div class="topbar">
         <div class="mobile-brand">
   <span class="brand-mark">
@@ -1012,6 +1292,80 @@
       </section>
 
       <section class="card table-card" id="ranking"><div class="panel-head"><div><h2 id="rankingTitle">อันดับคะแนนทุกชั้น</h2><p id="rankingSubtitle">เรียงตามคะแนนรวมจากมากไปน้อย</p></div><span class="pill" id="rowCount">0 รายการ</span></div><div class="table-wrap"><table class="ranking"><thead><tr><th>อันดับ</th><th>อาคาร / ชั้น</th><th>พนักงาน</th><th>ขยะทั่วไปเฉลี่ย</th><th>คะแนน 80%</th><th>รีไซเคิลเฉลี่ย</th><th>คะแนน 20%</th><th>คะแนนรวม</th><th>สถานะ</th></tr></thead><tbody id="rankingBody"></tbody></table><div class="empty hidden" id="emptyState">ยังไม่มีข้อมูลในช่วงเวลาที่เลือก</div></div></section>
+      </section>
+
+      <!-- หน้าแยก: ยอดสะสมตั้งแต่ต้นปี -->
+      <section class="dashboard-page hidden" id="yearlyPage">
+        <div class="yearly-page-top">
+          <div>
+            <span class="yearly-kicker">YEAR-TO-DATE OVERVIEW</span>
+            <h1>ภาพรวมยอดสะสมทั้งปี</h1>
+            <p id="yearlyPeriod">กำลังโหลดข้อมูลทุกอาคาร...</p>
+          </div>
+          <span class="yearly-fixed">ไม่เปลี่ยนตาม Filter</span>
+        </div>
+
+        <section class="card yearly-section" id="yearly">
+          <div class="yearly-grid">
+            <article class="yearly-card score">
+              <div class="yearly-label">
+                <span>คะแนนเฉลี่ยตั้งแต่ต้นปี</span>
+                <span class="yearly-badge">80 : 20 SCORE</span>
+              </div>
+              <div class="yearly-value" id="yearlyScore">— <small>จาก 100</small></div>
+              <p class="yearly-note">เฉลี่ยจากชั้นที่มีข้อมูลครบตามเกณฑ์</p>
+            </article>
+
+            <article class="yearly-card general">
+              <div class="yearly-label"><span>ขยะทั่วไปสะสม</span></div>
+              <div class="yearly-value" id="yearlyGeneral">— <small>กก.</small></div>
+              <p class="yearly-note">น้ำหนักจริงรวมทุกอาคาร ไม่หารจำนวนพนักงาน</p>
+            </article>
+
+            <article class="yearly-card recycle">
+              <div class="yearly-label"><span>รีไซเคิลสะสม</span></div>
+              <div class="yearly-value" id="yearlyRecycle">— <small>กก.</small></div>
+              <p class="yearly-note">PET และกระป๋องอะลูมิเนียมรวมทุกอาคาร</p>
+            </article>
+          </div>
+        </section>
+
+        <div class="yearly-charts">
+          <section class="card yearly-chart-card score-chart">
+            <div class="yearly-chart-head">
+              <div>
+                <h2>คะแนน 80:20 รายเดือน</h2>
+                <p>คะแนนเฉลี่ยของแต่ละเดือน ตั้งแต่มกราคมถึงเดือนปัจจุบัน</p>
+              </div>
+            </div>
+            <div class="yearly-chart-scroll"><div class="yearly-chart" id="yearlyScoreChart"></div></div>
+            <p class="yearly-chart-hint">คะแนนรายเดือนเต็ม 100 คะแนน</p>
+          </section>
+
+          <section class="card yearly-chart-card">
+            <div class="yearly-chart-head">
+              <div>
+                <h2>ขยะทั่วไปสะสม</h2>
+                <p>น้ำหนักจริงรวมทุกอาคาร ไม่หารจำนวนพนักงาน</p>
+              </div>
+            </div>
+            <div class="yearly-chart-scroll"><div class="yearly-chart" id="yearlyGeneralChart"></div></div>
+            <p class="yearly-chart-hint">ยอดสะสมเพิ่มขึ้นตั้งแต่เดือนมกราคม</p>
+          </section>
+
+          <section class="card yearly-chart-card">
+            <div class="yearly-chart-head">
+              <div>
+                <h2>รีไซเคิลสะสม</h2>
+                <p>PET และกระป๋องอะลูมิเนียมรวมทุกอาคาร</p>
+              </div>
+            </div>
+            <div class="yearly-chart-scroll"><div class="yearly-chart" id="yearlyRecycleChart"></div></div>
+            <p class="yearly-chart-hint">ยอดสะสมเพิ่มขึ้นตั้งแต่เดือนมกราคม</p>
+          </section>
+        </div>
+      </section>
+
       <footer>SAVE EARTH · SAVE OFFICE · ทุกการแยกขยะสร้างการเปลี่ยนแปลงได้</footer>
     </main>
   </div>
@@ -1026,8 +1380,9 @@
       const month=parts.find(part=>part.type==='month').value;
       return `${year}-${month}`;
     }
-    const state={view:'MONTH',month:currentMonthBangkok(),weekKey:'',building:'ALL',data:null,periodData:[],trendRequest:0,trendCache:new Map()};
+    const state={view:'MONTH',month:currentMonthBangkok(),weekKey:'',building:'ALL',data:null,periodData:[],trendRequest:0,trendCache:new Map(),yearlyData:[]};
     const el={
+      overviewPage:document.querySelector('#overviewPage'),yearlyPage:document.querySelector('#yearlyPage'),
       view:document.querySelector('#viewModeFilter'),
       periodFilter:document.querySelector('#periodFilter'),
       building:document.querySelector('#buildingFilter'),
@@ -1036,6 +1391,9 @@
       general:document.querySelector('#generalTotal'),recycle:document.querySelector('#recycleTotal'),average:document.querySelector('#averageScore'),
       scoreRing:document.querySelector('#scoreRing'),floorCount:document.querySelector('#floorCount'),podium:document.querySelector('#podium'),
       metricHint:document.querySelector('#metricPeriodHint'),leaderTitle:document.querySelector('#leaderTitle'),
+      yearlyPeriod:document.querySelector('#yearlyPeriod'),yearlyScore:document.querySelector('#yearlyScore'),
+      yearlyGeneral:document.querySelector('#yearlyGeneral'),yearlyRecycle:document.querySelector('#yearlyRecycle'),
+      yearlyScoreChart:document.querySelector('#yearlyScoreChart'),yearlyGeneralChart:document.querySelector('#yearlyGeneralChart'),yearlyRecycleChart:document.querySelector('#yearlyRecycleChart'),
       rankingTitle:document.querySelector('#rankingTitle'),rankingSubtitle:document.querySelector('#rankingSubtitle'),
       trend:document.querySelector('#trend'),trendScroll:document.querySelector('#trendScroll'),trendPrev:document.querySelector('#trendPrev'),trendNext:document.querySelector('#trendNext'),
       body:document.querySelector('#rankingBody'),empty:document.querySelector('#emptyState'),rowCount:document.querySelector('#rowCount')
@@ -1077,6 +1435,40 @@
       }
       if(failed)throw new Error(`โหลดข้อมูลย้อนหลังไม่ครบ ${failed} เดือน กรุณาลองใหม่อีกครั้ง`);
       return results.sort((a,b)=>a.selectedMonth.localeCompare(b.selectedMonth));
+    }
+
+    async function fetchYearToDate(){
+      const currentMonth=currentMonthBangkok();
+      const currentYear=currentMonth.slice(0,4);
+      const seed=await fetchMonth(currentMonth,'ALL');
+      const months=[...new Set([...(seed.availableMonths||[]),seed.selectedMonth,currentMonth].filter(Boolean))]
+        .filter(month=>month.startsWith(currentYear+'-')&&month<=currentMonth)
+        .sort();
+      const results=[];
+      const failedMonths=[];
+      for(let index=0;index<months.length;index+=3){
+        const batchMonths=months.slice(index,index+3);
+        const batch=await Promise.allSettled(batchMonths.map(month=>fetchMonth(month,'ALL')));
+        batch.forEach((result,offset)=>{
+          if(result.status==='fulfilled'&&result.value&&result.value.ok)results.push(result.value);
+          else failedMonths.push(batchMonths[offset]);
+        });
+      }
+
+      const remainingFailed=[];
+      for(const month of failedMonths){
+        try{
+          const data=await fetchMonth(month,'ALL');
+          if(data&&data.ok)results.push(data);
+          else remainingFailed.push(month);
+        }catch(error){
+          remainingFailed.push(month);
+        }
+      }
+
+      const uniqueResults=[...new Map(results.map(data=>[data.selectedMonth,data])).values()]
+        .sort((a,b)=>a.selectedMonth.localeCompare(b.selectedMonth));
+      return {dataSets:uniqueResults,failedMonths:remainingFailed};
     }
 
     function allWeekly(dataSets){
@@ -1147,6 +1539,108 @@
     function latestUpdate(dataSets){
       const dates=dataSets.map(data=>data.updatedAt).filter(Boolean).map(value=>new Date(value)).filter(value=>!Number.isNaN(value.getTime()));
       return dates.length?new Date(Math.max(...dates.map(value=>value.getTime()))):null;
+    }
+
+    function yearlyPeriodLabel(monthKey){
+      if(!/^\d{4}-\d{2}$/.test(monthKey||''))return 'มกราคม–เดือนปัจจุบัน · ทุกอาคาร';
+      const date=new Date(monthKey+'-01T12:00:00+07:00');
+      const endMonth=new Intl.DateTimeFormat('th-TH',{month:'long'}).format(date);
+      const year=new Intl.DateTimeFormat('th-TH',{year:'numeric'}).format(date).replace(/^พ\.ศ\.\s*/, '');
+      return endMonth==='มกราคม'?`มกราคม ${year} · ทุกอาคาร`:`มกราคม–${endMonth} ${year} · ทุกอาคาร`;
+    }
+
+    function renderYearlySummary(dataSets,failedMonths=[]){
+      const rows=aggregateOverall(dataSets);
+      const general=rows.reduce((sum,row)=>sum+Number(row.generalKg||0),0);
+      const recycle=rows.reduce((sum,row)=>sum+Number(row.recycleKg||0),0);
+      const score=average(rows.filter(row=>row.totalScore!=null).map(row=>row.totalScore));
+      state.yearlyData=dataSets;
+      const missingLabels=failedMonths.map(month=>shortMonth(month)).join(', ');
+      el.yearlyPeriod.textContent=yearlyPeriodLabel(currentMonthBangkok())+(missingLabels?` · ข้อมูลไม่ครบ: ${missingLabels}`:'');
+      el.yearlyPeriod.classList.toggle('warning',failedMonths.length>0);
+      el.yearlyScore.innerHTML=`${score==null?'—':number(score,1)} <small>จาก 100</small>`;
+      el.yearlyGeneral.innerHTML=`${number(general,2)} <small>กก.</small>`;
+      el.yearlyRecycle.innerHTML=`${number(recycle,2)} <small>กก.</small>`;
+      renderYearlyChart(dataSets,'SCORE');
+      renderYearlyChart(dataSets,'GENERAL');
+      renderYearlyChart(dataSets,'RECYCLE');
+    }
+
+    function niceChartMax(value){
+      if(!Number.isFinite(value)||value<=0)return 1;
+      const rough=value/4;
+      const magnitude=Math.pow(10,Math.floor(Math.log10(rough)));
+      const normalized=rough/magnitude;
+      const step=(normalized<=1?1:normalized<=2?2:normalized<=5?5:10)*magnitude;
+      return Math.ceil(value/step)*step;
+    }
+
+    function renderYearlyChart(dataSets,mode){
+      const chartMode=['SCORE','GENERAL','RECYCLE'].includes(mode)?mode:'SCORE';
+      const target=chartMode==='GENERAL'?el.yearlyGeneralChart:chartMode==='RECYCLE'?el.yearlyRecycleChart:el.yearlyScoreChart;
+      if(!target)return;
+      let cumulative=0;
+      const points=(dataSets||[]).map(data=>{
+        const rows=Array.isArray(data.monthly)?data.monthly:[];
+        let value=null;
+        if(chartMode==='SCORE'){
+          value=average(rows.filter(row=>row.totalScore!=null).map(row=>row.totalScore));
+        }else{
+          const field=chartMode==='GENERAL'?'generalKg':'recycleKg';
+          cumulative+=rows.reduce((sum,row)=>sum+Number(row[field]||0),0);
+          value=cumulative;
+        }
+        return {month:data.selectedMonth,value};
+      }).filter(point=>/^\d{4}-\d{2}$/.test(point.month||''));
+
+      if(!points.length){
+        target.innerHTML='<div class="yearly-chart-empty">ยังไม่มีข้อมูลสำหรับแสดงกราฟ</div>';
+        return;
+      }
+
+      const isScore=chartMode==='SCORE';
+      const color=chartMode==='RECYCLE'?'#5fb7ff':chartMode==='GENERAL'?'#91c92f':'#0b6a51';
+      const softColor=chartMode==='RECYCLE'?'#dcefff':chartMode==='GENERAL'?'#ebf7c9':'#dff3eb';
+      const description=isScore?'คะแนนเฉลี่ย 80:20 ของแต่ละเดือน':chartMode==='GENERAL'?'น้ำหนักขยะทั่วไปสะสมตั้งแต่เดือนมกราคม':'น้ำหนักรีไซเคิลสะสมตั้งแต่เดือนมกราคม';
+
+      const left=64,right=34,top=35,bottom=238,height=310;
+      const parentWidth=target.parentElement.clientWidth||720;
+      const pointGap=parentWidth<900?75:105;
+      const width=Math.max(parentWidth-2,left+right+Math.max(1,points.length-1)*pointGap);
+      const values=points.map(point=>point.value).filter(value=>value!=null&&Number.isFinite(Number(value))).map(Number);
+      const maxValue=isScore?100:niceChartMax(Math.max(0,...values));
+      const x=index=>points.length===1?left+(width-left-right)/2:left+index*((width-left-right)/(points.length-1));
+      const y=value=>bottom-(Math.max(0,Math.min(maxValue,Number(value)))/maxValue)*(bottom-top);
+      const tickValues=Array.from({length:5},(_,index)=>maxValue*index/4);
+      const grid=tickValues.map(value=>`<g><line x1="${left}" y1="${y(value)}" x2="${width-right}" y2="${y(value)}" stroke="#e4ece8" stroke-width="1" stroke-dasharray="4 6"/><text x="${left-12}" y="${y(value)+4}" text-anchor="end" fill="#819088" font-size="10" font-family="Manrope, sans-serif">${isScore?number(value,0):number(value,value<10?1:0)}</text></g>`).join('');
+      const plotted=points.map((point,index)=>point.value==null?null:{x:x(index),y:y(point.value)}).filter(Boolean);
+      const linePoints=plotted.map(point=>`${point.x},${point.y}`);
+      const line=linePoints.length>1?`<polyline points="${linePoints.join(' ')}" fill="none" stroke="${color}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`:'';
+      const area=linePoints.length>1?`<polygon points="${plotted[0].x},${bottom} ${linePoints.join(' ')} ${plotted[plotted.length-1].x},${bottom}" fill="${softColor}" opacity=".55"/>`:'';
+      const marks=points.map((point,index)=>{
+        const value=point.value;
+        const monthLabel=new Intl.DateTimeFormat('th-TH',{month:'short'}).format(new Date(point.month+'-01T12:00:00+07:00'));
+        if(value==null)return `<g><circle cx="${x(index)}" cy="${bottom}" r="5" fill="#fff" stroke="#c4d0cb" stroke-width="2"/><text x="${x(index)}" y="${bottom+27}" text-anchor="middle" fill="#819088" font-size="11" font-family="Noto Sans Thai, sans-serif">${escapeHtml(monthLabel)}</text></g>`;
+        const display=isScore?number(value,1):number(value,value<100?1:0);
+        return `<g><circle cx="${x(index)}" cy="${y(value)}" r="6" fill="${color}" stroke="#fff" stroke-width="3"><title>${escapeHtml(monthLabel+' · '+display+(isScore?' คะแนน':' กก.'))}</title></circle><text x="${x(index)}" y="${Math.max(15,y(value)-13)}" text-anchor="middle" fill="#173c31" font-size="11" font-weight="800" font-family="Manrope, sans-serif">${display}</text><text x="${x(index)}" y="${bottom+27}" text-anchor="middle" fill="#65756e" font-size="11" font-weight="700" font-family="Noto Sans Thai, sans-serif">${escapeHtml(monthLabel)}</text></g>`;
+      }).join('');
+      const unit=isScore?'คะแนนเฉลี่ยรายเดือน (เต็ม 100)':'ยอดสะสม (กิโลกรัม)';
+
+      target.innerHTML=`<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="${escapeHtml(description)}"><line x1="${left}" y1="${top}" x2="${left}" y2="${bottom}" stroke="#cdd9d3"/>${grid}${area}${line}${marks}<text x="${left}" y="298" fill="#819088" font-size="10" font-family="Noto Sans Thai, sans-serif">${escapeHtml(unit)}</text></svg>`;
+    }
+
+    async function loadYearlySummary(){
+      try{
+        const {dataSets,failedMonths}=await fetchYearToDate();
+        if(!dataSets.length)throw new Error('ยังไม่มีข้อมูลสะสมของปีปัจจุบัน');
+        renderYearlySummary(dataSets,failedMonths);
+      }catch(error){
+        el.yearlyPeriod.textContent=error.message||'ไม่สามารถโหลดข้อมูลสะสมทั้งปีได้';
+        el.yearlyPeriod.classList.add('warning');
+        [el.yearlyScoreChart,el.yearlyGeneralChart,el.yearlyRecycleChart].forEach(chart=>{
+          chart.innerHTML='<div class="yearly-chart-empty">ไม่สามารถโหลดข้อมูลกราฟได้</div>';
+        });
+      }
     }
 
     function renderSummary(rows,options){
@@ -1439,7 +1933,36 @@ function renderPodium(rows,rankScope){
     });
     el.trendPrev.addEventListener('click',()=>el.trendScroll.scrollBy({left:-Math.max(300,el.trendScroll.clientWidth*.72),behavior:'smooth'}));
     el.trendNext.addEventListener('click',()=>el.trendScroll.scrollBy({left:Math.max(300,el.trendScroll.clientWidth*.72),behavior:'smooth'}));
-    loadDashboard();
+    function showDashboardPage(hash){
+      const target=['#overview','#ranking','#method','#yearly'].includes(hash)?hash:'#overview';
+      const isYearly=target==='#yearly';
+      el.overviewPage.classList.toggle('hidden',isYearly);
+      el.yearlyPage.classList.toggle('hidden',!isYearly);
+      document.querySelectorAll('.nav-item').forEach(link=>link.classList.toggle('active',link.getAttribute('href')===target));
+      requestAnimationFrame(()=>{
+        if(isYearly){
+          window.scrollTo({top:0,behavior:'smooth'});
+          if(state.yearlyData.length){
+            renderYearlyChart(state.yearlyData,'SCORE');
+            renderYearlyChart(state.yearlyData,'GENERAL');
+            renderYearlyChart(state.yearlyData,'RECYCLE');
+          }
+          return;
+        }
+        const targetElement=target==='#overview'?null:document.querySelector(target);
+        if(targetElement)targetElement.scrollIntoView({behavior:'smooth',block:'start'});
+        else window.scrollTo({top:0,behavior:'smooth'});
+      });
+    }
+    document.querySelectorAll('.nav-item').forEach(item=>item.addEventListener('click',event=>{
+      event.preventDefault();
+      const hash=item.getAttribute('href');
+      history.pushState(null,'',hash);
+      showDashboardPage(hash);
+    }));
+    window.addEventListener('popstate',()=>showDashboardPage(location.hash));
+    showDashboardPage(location.hash);
+    loadDashboard().finally(loadYearlySummary);
   </script>
 </body>
 </html>
