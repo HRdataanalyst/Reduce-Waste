@@ -633,6 +633,11 @@
   white-space:nowrap;
 }
 
+.yearly-fixed.warning{
+  color:#8a5a00;
+  background:#fff1d3;
+}
+
 .yearly-grid{
   display:grid;
   grid-template-columns:repeat(4,minmax(0,1fr));
@@ -1306,9 +1311,9 @@
           <div>
             <span class="yearly-kicker">YEAR-TO-DATE OVERVIEW</span>
             <h1>ภาพรวมยอดสะสมทั้งปี</h1>
-            <p id="yearlyPeriod">กำลังโหลดข้อมูลทุกอาคาร...</p>
+            <p>ไม่เปลี่ยนตาม Filter</p>
           </div>
-          <span class="yearly-fixed">ไม่เปลี่ยนตาม Filter</span>
+          <span class="yearly-fixed" id="yearlyPeriod">กำลังโหลดช่วงเวลา...</span>
         </div>
 
         <section class="card yearly-section" id="yearly">
