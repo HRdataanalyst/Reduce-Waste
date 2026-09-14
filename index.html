@@ -635,7 +635,7 @@
 
 .yearly-grid{
   display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
+  grid-template-columns:repeat(4,minmax(0,1fr));
   gap:12px;
 }
 
@@ -658,6 +658,10 @@
 
 .yearly-card.general{
   background:linear-gradient(145deg,#f4fbdd 0%,#edf8cf 100%);
+}
+
+.yearly-card.total{
+  background:linear-gradient(145deg,#fff8e9 0%,#fff0d3 100%);
 }
 
 .yearly-card.recycle{
@@ -724,7 +728,8 @@
   gap:14px;
 }
 
-.yearly-chart-card.score-chart{
+.yearly-chart-card.score-chart,
+.yearly-chart-card.total-chart{
   grid-column:1/-1;
 }
 
@@ -903,14 +908,15 @@
   }
 
   .yearly-grid{
-    grid-template-columns:repeat(3,minmax(0,1fr));
+    grid-template-columns:repeat(2,minmax(0,1fr));
   }
 
   .yearly-charts{
     grid-template-columns:1fr;
   }
 
-  .yearly-chart-card.score-chart{
+  .yearly-chart-card.score-chart,
+  .yearly-chart-card.total-chart{
     grid-column:auto;
   }
 }
@@ -1316,6 +1322,12 @@
               <p class="yearly-note">เฉลี่ยจากชั้นที่มีข้อมูลครบตามเกณฑ์</p>
             </article>
 
+            <article class="yearly-card total">
+              <div class="yearly-label"><span>ยอดขยะสะสมทั้งหมด</span></div>
+              <div class="yearly-value" id="yearlyTotal">— <small>กก.</small></div>
+              <p class="yearly-note">ขยะทั่วไป + รีไซเคิล ตั้งแต่ต้นปี</p>
+            </article>
+
             <article class="yearly-card general">
               <div class="yearly-label"><span>ขยะทั่วไปสะสม</span></div>
               <div class="yearly-value" id="yearlyGeneral">— <small>กก.</small></div>
@@ -1340,6 +1352,17 @@
             </div>
             <div class="yearly-chart-scroll"><div class="yearly-chart" id="yearlyScoreChart"></div></div>
             <p class="yearly-chart-hint">คะแนนรายเดือนเต็ม 100 คะแนน</p>
+          </section>
+
+          <section class="card yearly-chart-card total-chart">
+            <div class="yearly-chart-head">
+              <div>
+                <h2>ยอดขยะรวมรายเดือน</h2>
+                <p>ขยะทั่วไปและรีไซเคิลของแต่ละเดือนรวมทุกอาคาร</p>
+              </div>
+            </div>
+            <div class="yearly-chart-scroll"><div class="yearly-chart" id="yearlyTotalChart"></div></div>
+            <p class="yearly-chart-hint">ยอดรวมรายเดือน = ขยะทั่วไป + รีไซเคิล</p>
           </section>
 
           <section class="card yearly-chart-card">
@@ -1391,9 +1414,9 @@
       general:document.querySelector('#generalTotal'),recycle:document.querySelector('#recycleTotal'),average:document.querySelector('#averageScore'),
       scoreRing:document.querySelector('#scoreRing'),floorCount:document.querySelector('#floorCount'),podium:document.querySelector('#podium'),
       metricHint:document.querySelector('#metricPeriodHint'),leaderTitle:document.querySelector('#leaderTitle'),
-      yearlyPeriod:document.querySelector('#yearlyPeriod'),yearlyScore:document.querySelector('#yearlyScore'),
+      yearlyPeriod:document.querySelector('#yearlyPeriod'),yearlyScore:document.querySelector('#yearlyScore'),yearlyTotal:document.querySelector('#yearlyTotal'),
       yearlyGeneral:document.querySelector('#yearlyGeneral'),yearlyRecycle:document.querySelector('#yearlyRecycle'),
-      yearlyScoreChart:document.querySelector('#yearlyScoreChart'),yearlyGeneralChart:document.querySelector('#yearlyGeneralChart'),yearlyRecycleChart:document.querySelector('#yearlyRecycleChart'),
+      yearlyScoreChart:document.querySelector('#yearlyScoreChart'),yearlyTotalChart:document.querySelector('#yearlyTotalChart'),yearlyGeneralChart:document.querySelector('#yearlyGeneralChart'),yearlyRecycleChart:document.querySelector('#yearlyRecycleChart'),
       rankingTitle:document.querySelector('#rankingTitle'),rankingSubtitle:document.querySelector('#rankingSubtitle'),
       trend:document.querySelector('#trend'),trendScroll:document.querySelector('#trendScroll'),trendPrev:document.querySelector('#trendPrev'),trendNext:document.querySelector('#trendNext'),
       body:document.querySelector('#rankingBody'),empty:document.querySelector('#emptyState'),rowCount:document.querySelector('#rowCount')
@@ -1553,15 +1576,18 @@
       const rows=aggregateOverall(dataSets);
       const general=rows.reduce((sum,row)=>sum+Number(row.generalKg||0),0);
       const recycle=rows.reduce((sum,row)=>sum+Number(row.recycleKg||0),0);
+      const total=general+recycle;
       const score=average(rows.filter(row=>row.totalScore!=null).map(row=>row.totalScore));
       state.yearlyData=dataSets;
       const missingLabels=failedMonths.map(month=>shortMonth(month)).join(', ');
       el.yearlyPeriod.textContent=yearlyPeriodLabel(currentMonthBangkok())+(missingLabels?` · ข้อมูลไม่ครบ: ${missingLabels}`:'');
       el.yearlyPeriod.classList.toggle('warning',failedMonths.length>0);
       el.yearlyScore.innerHTML=`${score==null?'—':number(score,1)} <small>จาก 100</small>`;
+      el.yearlyTotal.innerHTML=`${number(total,2)} <small>กก.</small>`;
       el.yearlyGeneral.innerHTML=`${number(general,2)} <small>กก.</small>`;
       el.yearlyRecycle.innerHTML=`${number(recycle,2)} <small>กก.</small>`;
       renderYearlyChart(dataSets,'SCORE');
+      renderYearlyChart(dataSets,'TOTAL');
       renderYearlyChart(dataSets,'GENERAL');
       renderYearlyChart(dataSets,'RECYCLE');
     }
@@ -1576,14 +1602,16 @@
     }
 
     function renderYearlyChart(dataSets,mode){
-      const chartMode=['SCORE','GENERAL','RECYCLE'].includes(mode)?mode:'SCORE';
-      const target=chartMode==='GENERAL'?el.yearlyGeneralChart:chartMode==='RECYCLE'?el.yearlyRecycleChart:el.yearlyScoreChart;
+      const chartMode=['SCORE','TOTAL','GENERAL','RECYCLE'].includes(mode)?mode:'SCORE';
+      const target=chartMode==='TOTAL'?el.yearlyTotalChart:chartMode==='GENERAL'?el.yearlyGeneralChart:chartMode==='RECYCLE'?el.yearlyRecycleChart:el.yearlyScoreChart;
       if(!target)return;
       const points=(dataSets||[]).map(data=>{
         const rows=Array.isArray(data.monthly)?data.monthly:[];
         let value=null;
         if(chartMode==='SCORE'){
           value=average(rows.filter(row=>row.totalScore!=null).map(row=>row.totalScore));
+        }else if(chartMode==='TOTAL'){
+          value=rows.reduce((sum,row)=>sum+Number(row.generalKg||0)+Number(row.recycleKg||0),0);
         }else{
           const field=chartMode==='GENERAL'?'generalKg':'recycleKg';
           value=rows.reduce((sum,row)=>sum+Number(row[field]||0),0);
@@ -1597,9 +1625,10 @@
       }
 
       const isScore=chartMode==='SCORE';
-      const color=chartMode==='RECYCLE'?'#5fb7ff':chartMode==='GENERAL'?'#91c92f':'#0b6a51';
-      const softColor=chartMode==='RECYCLE'?'#dcefff':chartMode==='GENERAL'?'#ebf7c9':'#dff3eb';
-      const description=isScore?'คะแนนเฉลี่ย 80:20 ของแต่ละเดือน':chartMode==='GENERAL'?'น้ำหนักขยะทั่วไปของแต่ละเดือน':'น้ำหนักรีไซเคิลของแต่ละเดือน';
+      const color=chartMode==='RECYCLE'?'#5fb7ff':chartMode==='GENERAL'?'#91c92f':chartMode==='TOTAL'?'#d99532':'#0b6a51';
+      const softColor=chartMode==='RECYCLE'?'#dcefff':chartMode==='GENERAL'?'#ebf7c9':chartMode==='TOTAL'?'#fff0d3':'#dff3eb';
+      const description=isScore?'คะแนนเฉลี่ย 80:20 ของแต่ละเดือน':chartMode==='TOTAL'?'น้ำหนักขยะรวมของแต่ละเดือน':chartMode==='GENERAL'?'น้ำหนักขยะทั่วไปของแต่ละเดือน':'น้ำหนักรีไซเคิลของแต่ละเดือน';
+      const lineWidth=chartMode==='GENERAL'||chartMode==='RECYCLE'?2.5:4;
 
       const left=64,right=52,top=32,bottom=208,height=280;
       const parentWidth=target.parentElement.clientWidth||720;
@@ -1615,7 +1644,7 @@
       const grid=tickValues.map(value=>`<g><line x1="${left}" y1="${y(value)}" x2="${width-right}" y2="${y(value)}" stroke="#e4ece8" stroke-width="1" stroke-dasharray="4 6"/><text x="${left-12}" y="${y(value)+4}" text-anchor="end" fill="#819088" font-size="10" font-family="Manrope, sans-serif">${isScore?number(value,0):number(value,value<10?1:0)}</text></g>`).join('');
       const plotted=points.map((point,index)=>point.value==null?null:{x:x(index),y:y(point.value)}).filter(Boolean);
       const linePoints=plotted.map(point=>`${point.x},${point.y}`);
-      const line=linePoints.length>1?`<polyline points="${linePoints.join(' ')}" fill="none" stroke="${color}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`:'';
+      const line=linePoints.length>1?`<polyline points="${linePoints.join(' ')}" fill="none" stroke="${color}" stroke-width="${lineWidth}" stroke-linecap="round" stroke-linejoin="round"/>`:'';
       const area=linePoints.length>1?`<polygon points="${plotted[0].x},${bottom} ${linePoints.join(' ')} ${plotted[plotted.length-1].x},${bottom}" fill="${softColor}" opacity=".55"/>`:'';
       const marks=points.map((point,index)=>{
         const value=point.value;
@@ -1624,7 +1653,7 @@
         const display=isScore?number(value,1):number(value,value<100?1:0);
         return `<g><circle cx="${x(index)}" cy="${y(value)}" r="6" fill="${color}" stroke="#fff" stroke-width="3"><title>${escapeHtml(monthLabel+' · '+display+(isScore?' คะแนน':' กก.'))}</title></circle><text x="${x(index)}" y="${Math.max(15,y(value)-13)}" text-anchor="middle" fill="#173c31" font-size="11" font-weight="800" font-family="Manrope, sans-serif">${display}</text><text x="${x(index)}" y="${bottom+27}" text-anchor="middle" fill="#65756e" font-size="11" font-weight="700" font-family="Noto Sans Thai, sans-serif">${escapeHtml(monthLabel)}</text></g>`;
       }).join('');
-      const unit=isScore?'คะแนนเฉลี่ยรายเดือน (เต็ม 100)':'น้ำหนักรายเดือน (กิโลกรัม)';
+      const unit=isScore?'คะแนนเฉลี่ยรายเดือน (เต็ม 100)':chartMode==='TOTAL'?'ยอดขยะรวมรายเดือน (กิโลกรัม)':'น้ำหนักรายเดือน (กิโลกรัม)';
 
       target.innerHTML=`<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="${escapeHtml(description)}"><line x1="${left}" y1="${top}" x2="${left}" y2="${bottom}" stroke="#cdd9d3"/>${grid}${area}${line}${marks}<text x="${left}" y="270" fill="#819088" font-size="10" font-family="Noto Sans Thai, sans-serif">${escapeHtml(unit)}</text></svg>`;
     }
@@ -1637,7 +1666,7 @@
       }catch(error){
         el.yearlyPeriod.textContent=error.message||'ไม่สามารถโหลดข้อมูลสะสมทั้งปีได้';
         el.yearlyPeriod.classList.add('warning');
-        [el.yearlyScoreChart,el.yearlyGeneralChart,el.yearlyRecycleChart].forEach(chart=>{
+        [el.yearlyScoreChart,el.yearlyTotalChart,el.yearlyGeneralChart,el.yearlyRecycleChart].forEach(chart=>{
           chart.innerHTML='<div class="yearly-chart-empty">ไม่สามารถโหลดข้อมูลกราฟได้</div>';
         });
       }
@@ -1944,6 +1973,7 @@ function renderPodium(rows,rankScope){
           window.scrollTo({top:0,behavior:'smooth'});
           if(state.yearlyData.length){
             renderYearlyChart(state.yearlyData,'SCORE');
+            renderYearlyChart(state.yearlyData,'TOTAL');
             renderYearlyChart(state.yearlyData,'GENERAL');
             renderYearlyChart(state.yearlyData,'RECYCLE');
           }
