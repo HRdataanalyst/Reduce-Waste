@@ -1462,7 +1462,7 @@
   <div class="loading" id="loading"><div class="loader"><span class="spinner"></span>กำลังโหลดข้อมูล Dashboard...</div></div>
 
   <script>
-    const CONFIG={apiUrl:'https://script.google.com/macros/s/AKfycbwXm6FMjhg4BBvdLjVaSRyVDsH5_uoV7kOnFgw4OLjo8MwHw-u0UkLvUIFmGZDUXgBs4Q/exec',timeoutMs:20000};
+    const CONFIG={apiUrl:'https://script.google.com/macros/s/AKfycbwXm6FMjhg4BBvdLjVaSRyVDsH5_uoV7kOnFgw4OLjo8MwHw-u0UkLvUIFmGZDUXgBs4Q/exec',timeoutMs:60000};
     function currentMonthBangkok(){
       const parts=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Bangkok',year:'numeric',month:'2-digit'}).formatToParts(new Date());
       const year=parts.find(part=>part.type==='year').value;
@@ -1470,7 +1470,23 @@
       return `${year}-${month}`;
     }
     const TABLE_PAGE_SIZE=15;
-    const state={view:'MONTH',month:currentMonthBangkok(),weekKey:'',building:'ALL',data:null,periodData:[],trendRequest:0,trendCache:new Map(),yearlyData:[],yearlyFailedMonths:[],yearlyBuilding:'ALL',yearlyFloor:'ALL',rankingPage:1,rankingRows:[]};
+    const state = {
+  view: 'MONTH',
+  month: currentMonthBangkok(),
+  weekKey: '',
+  building: 'ALL',
+  data: null,
+  periodData: [],
+  trendRequest: 0,
+  trendCache: new Map(),
+  pendingRequests: new Map(),
+  yearlyData: [],
+  yearlyFailedMonths: [],
+  yearlyBuilding: 'ALL',
+  yearlyFloor: 'ALL',
+  rankingPage: 1,
+  rankingRows: []
+};
     const el={
       overviewPage:document.querySelector('#overviewPage'),yearlyPage:document.querySelector('#yearlyPage'),
       view:document.querySelector('#viewModeFilter'),
@@ -1515,16 +1531,58 @@
     function requestJsonp(params){return new Promise((resolve,reject)=>{if(!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec/.test(CONFIG.apiUrl)){reject(new Error('กรุณาใส่ Apps Script Web App URL ในตัวแปร CONFIG.apiUrl ก่อนนำขึ้น GitHub'));return}const callback='__wasteDashboard_'+Date.now()+'_'+Math.random().toString(36).slice(2),script=document.createElement('script'),timer=setTimeout(()=>finish(new Error('เชื่อมต่อข้อมูลเกินเวลาที่กำหนด กรุณาตรวจสอบ Web App URL')),CONFIG.timeoutMs);function finish(error,data){clearTimeout(timer);delete window[callback];script.remove();error?reject(error):resolve(data)}window[callback]=data=>finish(null,data);const query=new URLSearchParams({action:'dashboard',callback,...params});script.src=CONFIG.apiUrl+(CONFIG.apiUrl.includes('?')?'&':'?')+query.toString();script.onerror=()=>finish(new Error('เชื่อมต่อ Apps Script ไม่สำเร็จ กรุณาตรวจสอบการ Deploy แบบ Anyone'));document.head.appendChild(script)})}
     function cacheKey(building,month){return (building||'ALL')+'|'+month}
 
-    async function fetchMonth(month,building){
-      const selectedBuilding=building||'ALL';
-      const key=cacheKey(selectedBuilding,month);
-      if(month&&state.trendCache.has(key))return state.trendCache.get(key);
-      const data=await requestJsonp({month:month||'',building:selectedBuilding==='ALL'?'':selectedBuilding});
-      if(!data||!data.ok)throw new Error(data&&data.message?data.message:'ไม่พบข้อมูลจากระบบ');
-      const actualBuilding=data.selectedBuilding||'ALL';
-      state.trendCache.set(cacheKey(actualBuilding,data.selectedMonth),data);
+async function fetchMonth(month, building) {
+  const selectedBuilding = building || 'ALL';
+  const requestedMonth = month || '';
+  const cacheMonth = requestedMonth || 'LATEST';
+  const key = cacheKey(selectedBuilding, cacheMonth);
+
+  if (
+    requestedMonth &&
+    state.trendCache.has(cacheKey(selectedBuilding, requestedMonth))
+  ) {
+    return state.trendCache.get(
+      cacheKey(selectedBuilding, requestedMonth)
+    );
+  }
+
+  // ถ้าเดือนเดียวกันกำลังโหลดอยู่ ให้ใช้ Request เดิม
+  if (state.pendingRequests.has(key)) {
+    return state.pendingRequests.get(key);
+  }
+
+  const request = requestJsonp({
+    month: requestedMonth,
+    building: selectedBuilding === 'ALL'
+      ? ''
+      : selectedBuilding
+  })
+    .then(data => {
+      if (!data || !data.ok) {
+        throw new Error(
+          data && data.message
+            ? data.message
+            : 'ไม่พบข้อมูลจากระบบ'
+        );
+      }
+
+      const actualBuilding = data.selectedBuilding || 'ALL';
+
+      state.trendCache.set(
+        cacheKey(actualBuilding, data.selectedMonth),
+        data
+      );
+
       return data;
-    }
+    })
+    .finally(() => {
+      state.pendingRequests.delete(key);
+    });
+
+  state.pendingRequests.set(key, request);
+
+  return request;
+}
 
     async function fetchAllMonths(seed){
       const months=[...new Set([...(seed.availableMonths||[]),seed.selectedMonth].filter(Boolean))].sort();
@@ -1855,7 +1913,9 @@
         populateFilters(seed,dataSets);
         renderCurrentView(seed,dataSets);
         setConnection(true);
-        if(state.view==='MONTH')loadTrendHistory(seed,requestId);
+        if (state.view === 'MONTH') {
+  await loadTrendHistory(seed, requestId);
+}
       }catch(error){
         if(requestId!==state.trendRequest)return;
         showError(error.message||'ไม่สามารถโหลดข้อมูลได้');setConnection(false);
@@ -1952,28 +2012,72 @@ function renderPodium(rows,rankScope){
       return months.slice(start,start+12);
     }
 
-    async function loadTrendHistory(currentData,requestId){
-      const months=getTrendMonths(currentData.availableMonths,currentData.selectedMonth);
-      const selectedBuilding=currentData.selectedBuilding||'ALL';
-      const building=selectedBuilding==='ALL'?'':selectedBuilding;
-      const results=await Promise.allSettled(months.map(month=>{
-        const key=selectedBuilding+'|'+month;
-        const cached=state.trendCache.get(key);
-        if(cached)return Promise.resolve(cached);
-        return requestJsonp({month,building}).then(data=>{
-          if(data&&data.ok)state.trendCache.set(key,data);
-          return data;
-        });
-      }));
-      if(requestId!==state.trendRequest)return;
-      const weekly=[];
-      results.forEach(result=>{
-        if(result.status==='fulfilled'&&result.value&&result.value.ok&&Array.isArray(result.value.weekly)){
-          weekly.push(...result.value.weekly);
-        }
-      });
-      renderTrend(weekly,currentData.selectedMonth,'');
+async function loadTrendHistory(currentData, requestId) {
+  const months = getTrendMonths(
+    currentData.availableMonths,
+    currentData.selectedMonth
+  );
+
+  const selectedBuilding =
+    currentData.selectedBuilding || 'ALL';
+
+  const weekly = [];
+  const failedMonths = [];
+
+  // โหลดครั้งละ 2 เดือน ป้องกัน Apps Script ทำงานหนักเกินไป
+  for (let index = 0; index < months.length; index += 2) {
+    const batchMonths = months.slice(index, index + 2);
+
+    const results = await Promise.allSettled(
+      batchMonths.map(month =>
+        fetchMonth(month, selectedBuilding)
+      )
+    );
+
+    if (requestId !== state.trendRequest) return;
+
+    results.forEach((result, offset) => {
+      if (
+        result.status === 'fulfilled' &&
+        result.value &&
+        result.value.ok &&
+        Array.isArray(result.value.weekly)
+      ) {
+        weekly.push(...result.value.weekly);
+      } else {
+        failedMonths.push(batchMonths[offset]);
+      }
+    });
+  }
+
+  // ลองโหลดเดือนที่พลาดซ้ำอีกครั้งแบบทีละเดือน
+  for (const month of failedMonths) {
+    try {
+      const data = await fetchMonth(
+        month,
+        selectedBuilding
+      );
+
+      if (data && Array.isArray(data.weekly)) {
+        weekly.push(...data.weekly);
+      }
+    } catch (error) {
+      console.error(
+        'โหลดข้อมูลรายสัปดาห์ไม่สำเร็จ:',
+        month,
+        error
+      );
     }
+  }
+
+  if (requestId !== state.trendRequest) return;
+
+  renderTrend(
+    weekly,
+    currentData.selectedMonth,
+    ''
+  );
+}
 
     function calendarTrendWeeks(rows,selectedMonth){
       const fallbackMonth=/^\d{4}-\d{2}$/.test(state.month||'')?state.month:currentMonthBangkok();
