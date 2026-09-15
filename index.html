@@ -1469,12 +1469,30 @@
       const month=parts.find(part=>part.type==='month').value;
       return `${year}-${month}`;
     }
+    const UI_STATE_KEY='save-earth-dashboard-ui-v1';
+    function readUiState(){
+      try{return JSON.parse(localStorage.getItem(UI_STATE_KEY)||'{}')||{}}
+      catch(error){console.warn('อ่านสถานะหน้าล่าสุดไม่สำเร็จ',error);return{}}
+    }
+    function writeUiState(){
+      try{
+        localStorage.setItem(UI_STATE_KEY,JSON.stringify({
+          view:state.view,
+          month:state.month,
+          weekKey:state.weekKey,
+          building:state.building,
+          yearlyBuilding:state.yearlyBuilding,
+          yearlyFloor:state.yearlyFloor
+        }));
+      }catch(error){console.warn('บันทึกสถานะหน้าล่าสุดไม่สำเร็จ',error)}
+    }
+    const savedUiState=readUiState();
     const TABLE_PAGE_SIZE=15;
     const state = {
-  view: 'MONTH',
-  month: currentMonthBangkok(),
-  weekKey: '',
-  building: 'ALL',
+  view: ['OVERALL','MONTH','WEEK'].includes(savedUiState.view)?savedUiState.view:'MONTH',
+  month: /^\d{4}-\d{2}$/.test(savedUiState.month||'')?savedUiState.month:currentMonthBangkok(),
+  weekKey: savedUiState.weekKey||'',
+  building: savedUiState.building||'ALL',
   data: null,
   periodData: [],
   trendRequest: 0,
@@ -1482,8 +1500,8 @@
   pendingRequests: new Map(),
   yearlyData: [],
   yearlyFailedMonths: [],
-  yearlyBuilding: 'ALL',
-  yearlyFloor: 'ALL',
+  yearlyBuilding: savedUiState.yearlyBuilding||'ALL',
+  yearlyFloor: savedUiState.yearlyFloor||'ALL',
   rankingPage: 1,
   rankingRows: []
 };
@@ -1528,8 +1546,66 @@
       return start&&end?shortDate(start)+'–'+shortDate(end)+' '+thaiYear(end):'—';
     }
     function average(values){const a=values.filter(v=>Number.isFinite(Number(v))).map(Number);return a.length?a.reduce((s,v)=>s+v,0)/a.length:null}
-    function requestJsonp(params){return new Promise((resolve,reject)=>{if(!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec/.test(CONFIG.apiUrl)){reject(new Error('กรุณาใส่ Apps Script Web App URL ในตัวแปร CONFIG.apiUrl ก่อนนำขึ้น GitHub'));return}const callback='__wasteDashboard_'+Date.now()+'_'+Math.random().toString(36).slice(2),script=document.createElement('script'),timer=setTimeout(()=>finish(new Error('เชื่อมต่อข้อมูลเกินเวลาที่กำหนด กรุณาตรวจสอบ Web App URL')),CONFIG.timeoutMs);function finish(error,data){clearTimeout(timer);delete window[callback];script.remove();error?reject(error):resolve(data)}window[callback]=data=>finish(null,data);const query=new URLSearchParams({action:'dashboard',callback,...params});script.src=CONFIG.apiUrl+(CONFIG.apiUrl.includes('?')?'&':'?')+query.toString();script.onerror=()=>finish(new Error('เชื่อมต่อ Apps Script ไม่สำเร็จ กรุณาตรวจสอบการ Deploy แบบ Anyone'));document.head.appendChild(script)})}
+    function requestJsonp(params){
+      return new Promise((resolve,reject)=>{
+        if(!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec/.test(CONFIG.apiUrl)){
+          reject(new Error('กรุณาตรวจสอบ Apps Script Web App URL ใน CONFIG.apiUrl'));
+          return;
+        }
+        const callback='__wasteDashboard_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+        const script=document.createElement('script');
+        let finished=false;
+        const timer=setTimeout(()=>finish(new Error('Apps Script ตอบกลับเกินเวลาที่กำหนด ระบบจะลองใช้ข้อมูลล่าสุดที่บันทึกไว้')),CONFIG.timeoutMs);
+        function finish(error,data){
+          if(finished)return;
+          finished=true;
+          clearTimeout(timer);
+          delete window[callback];
+          script.remove();
+          error?reject(error):resolve(data);
+        }
+        window[callback]=data=>finish(null,data);
+        const query=new URLSearchParams({action:'dashboard',callback,...params});
+        script.src=CONFIG.apiUrl+(CONFIG.apiUrl.includes('?')?'&':'?')+query.toString();
+        script.onerror=()=>finish(new Error('ไม่สามารถรับข้อมูลจาก Apps Script ได้ อาจเกิดจากเครือข่ายหรือ API ทำงานหนัก'));
+        document.head.appendChild(script);
+      });
+    }
     function cacheKey(building,month){return (building||'ALL')+'|'+month}
+
+    const LOCAL_CACHE_PREFIX='save-earth-dashboard-data-v2:';
+    function todayBangkok(){
+      const parts=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Bangkok',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
+      const getPart=type=>parts.find(part=>part.type===type)?.value||'';
+      return `${getPart('year')}-${getPart('month')}-${getPart('day')}`;
+    }
+    function monthStorageKey(building,month){
+      return LOCAL_CACHE_PREFIX+encodeURIComponent(cacheKey(building||'ALL',month));
+    }
+    function readMonthCache(building,month,allowStale=false){
+      if(!month)return null;
+      try{
+        const raw=localStorage.getItem(monthStorageKey(building,month));
+        if(!raw)return null;
+        const saved=JSON.parse(raw);
+        if(!saved||!saved.data||!saved.data.ok)return null;
+        if(!allowStale&&saved.cacheDate!==todayBangkok())return null;
+        return saved.data;
+      }catch(error){
+        console.warn('อ่าน Dashboard Cache ไม่สำเร็จ',error);
+        return null;
+      }
+    }
+    function writeMonthCache(building,month,data){
+      if(!month||!data||!data.ok)return;
+      try{
+        localStorage.setItem(monthStorageKey(building,month),JSON.stringify({
+          cacheDate:todayBangkok(),
+          savedAt:Date.now(),
+          data
+        }));
+      }catch(error){console.warn('บันทึก Dashboard Cache ไม่สำเร็จ',error)}
+    }
 
 async function fetchMonth(month, building) {
   const selectedBuilding = building || 'ALL';
@@ -1537,13 +1613,16 @@ async function fetchMonth(month, building) {
   const cacheMonth = requestedMonth || 'LATEST';
   const key = cacheKey(selectedBuilding, cacheMonth);
 
-  if (
-    requestedMonth &&
-    state.trendCache.has(cacheKey(selectedBuilding, requestedMonth))
-  ) {
-    return state.trendCache.get(
-      cacheKey(selectedBuilding, requestedMonth)
-    );
+  if (requestedMonth) {
+    const exactKey = cacheKey(selectedBuilding, requestedMonth);
+    if (state.trendCache.has(exactKey)) {
+      return state.trendCache.get(exactKey);
+    }
+    const storedData = readMonthCache(selectedBuilding, requestedMonth);
+    if (storedData) {
+      state.trendCache.set(exactKey, storedData);
+      return storedData;
+    }
   }
 
   // ถ้าเดือนเดียวกันกำลังโหลดอยู่ ให้ใช้ Request เดิม
@@ -1566,14 +1645,33 @@ async function fetchMonth(month, building) {
         );
       }
 
-      const actualBuilding = data.selectedBuilding || 'ALL';
+      const actualBuilding = data.selectedBuilding || selectedBuilding || 'ALL';
+      const actualMonth = data.selectedMonth || requestedMonth;
 
       state.trendCache.set(
-        cacheKey(actualBuilding, data.selectedMonth),
+        cacheKey(actualBuilding, actualMonth),
         data
       );
 
+      writeMonthCache(actualBuilding, actualMonth, data);
+
       return data;
+    })
+    .catch(error => {
+      const staleData = readMonthCache(
+        selectedBuilding,
+        requestedMonth,
+        true
+      );
+      if (staleData) {
+        console.warn('ใช้ข้อมูล Dashboard ล่าสุดจาก Cache แทน', error);
+        state.trendCache.set(
+          cacheKey(selectedBuilding, requestedMonth),
+          staleData
+        );
+        return staleData;
+      }
+      throw error;
     })
     .finally(() => {
       state.pendingRequests.delete(key);
@@ -1617,20 +1715,9 @@ async function fetchMonth(month, building) {
         });
       }
 
-      const remainingFailed=[];
-      for(const month of failedMonths){
-        try{
-          const data=await fetchMonth(month,'ALL');
-          if(data&&data.ok)results.push(data);
-          else remainingFailed.push(month);
-        }catch(error){
-          remainingFailed.push(month);
-        }
-      }
-
       const uniqueResults=[...new Map(results.map(data=>[data.selectedMonth,data])).values()]
         .sort((a,b)=>a.selectedMonth.localeCompare(b.selectedMonth));
-      return {dataSets:uniqueResults,failedMonths:remainingFailed};
+      return {dataSets:uniqueResults,failedMonths};
     }
 
     function allWeekly(dataSets){
@@ -1906,6 +1993,7 @@ async function fetchMonth(month, building) {
         state.data=seed;
         state.month=seed.selectedMonth;
         state.building=seed.selectedBuilding||'ALL';
+        writeUiState();
         const dataSets=state.view==='MONTH'?[seed]:await fetchAllMonths(seed);
         if(requestId!==state.trendRequest)return;
         if(!dataSets.length)throw new Error('ไม่พบข้อมูลในช่วงเวลาที่เลือก');
@@ -1913,11 +2001,8 @@ async function fetchMonth(month, building) {
         populateFilters(seed,dataSets);
         renderCurrentView(seed,dataSets);
         setConnection(true);
-        if (state.view === 'MONTH') {
-  loadTrendHistory(seed, requestId).catch(error => {
-    console.warn('โหลดกราฟย้อนหลังไม่สำเร็จ:', error);
-  });
-}
+        // เตรียมหน้า YTD ทันทีหลังข้อมูลหลักแสดงแล้ว แต่ไม่บล็อกหน้าเว็บ
+        preloadYearlyData(requestId);
       }catch(error){
         if(requestId!==state.trendRequest)return;
         showError(error.message||'ไม่สามารถโหลดข้อมูลได้');setConnection(false);
@@ -2052,24 +2137,11 @@ async function loadTrendHistory(currentData, requestId) {
     });
   }
 
-  // ลองโหลดเดือนที่พลาดซ้ำอีกครั้งแบบทีละเดือน
-  for (const month of failedMonths) {
-    try {
-      const data = await fetchMonth(
-        month,
-        selectedBuilding
-      );
-
-      if (data && Array.isArray(data.weekly)) {
-        weekly.push(...data.weekly);
-      }
-    } catch (error) {
-      console.error(
-        'โหลดข้อมูลรายสัปดาห์ไม่สำเร็จ:',
-        month,
-        error
-      );
-    }
+  if (failedMonths.length) {
+    console.warn(
+      'ข้ามเดือนที่โหลดกราฟไม่สำเร็จ เพื่อไม่ให้เรียก API ซ้ำ:',
+      failedMonths
+    );
   }
 
   if (requestId !== state.trendRequest) return;
@@ -2253,32 +2325,38 @@ async function loadTrendHistory(currentData, requestId) {
     el.view.addEventListener('change',()=>{
       state.view=el.view.value;
       state.weekKey='';
+      writeUiState();
       loadDashboard();
     });
     el.periodFilter.addEventListener('change',()=>{
       if(state.view==='MONTH'){
         state.month=el.periodFilter.value;
+        writeUiState();
         loadDashboard();
         return;
       }
       if(state.view==='WEEK'){
         state.weekKey=el.periodFilter.value;
+        writeUiState();
         renderCurrentView(state.data,state.periodData);
       }
     });
     el.building.addEventListener('change',()=>{
       state.building=el.building.value;
       state.weekKey='';
+      writeUiState();
       loadDashboard();
     });
     el.yearlyBuilding.addEventListener('change',()=>{
       state.yearlyBuilding=el.yearlyBuilding.value;
       state.yearlyFloor='ALL';
+      writeUiState();
       populateYearlyFilters(state.yearlyData);
       renderYearlyView();
     });
     el.yearlyFloor.addEventListener('change',()=>{
       state.yearlyFloor=el.yearlyFloor.value;
+      writeUiState();
       renderYearlyView();
     });
     el.trendPrev.addEventListener('click',()=>el.trendScroll.scrollBy({left:-Math.max(300,el.trendScroll.clientWidth*.72),behavior:'smooth'}));
@@ -2298,6 +2376,41 @@ async function loadTrendHistory(currentData, requestId) {
       }
       renderTablePage(true);
     });
+    let dashboardLoadingPromise=null;
+    let yearlyLoadingPromise=null;
+    function ensureDashboardLoaded(){
+      if(state.data)return Promise.resolve(state.data);
+      if(!dashboardLoadingPromise){
+        dashboardLoadingPromise=loadDashboard().finally(()=>{dashboardLoadingPromise=null});
+      }
+      return dashboardLoadingPromise;
+    }
+    function ensureYearlyLoaded(){
+      if(state.yearlyData.length){
+        renderYearlyView();
+        return Promise.resolve(state.yearlyData);
+      }
+      if(!yearlyLoadingPromise){
+        yearlyLoadingPromise=loadYearlySummary().finally(()=>{yearlyLoadingPromise=null});
+      }
+      return yearlyLoadingPromise;
+    }
+    async function preloadYearlyData(requestId){
+      try{
+        await ensureYearlyLoaded();
+        if(!state.yearlyData.length)return;
+        if(requestId!==state.trendRequest||state.view!=='MONTH')return;
+
+        // ใช้ข้อมูล YTD ชุดเดียวกันสร้างกราฟย้อนหลัง ลดการเรียก API ซ้ำ
+        const selectedBuilding=state.building||'ALL';
+        const weekly=allWeekly(state.yearlyData).filter(row=>
+          selectedBuilding==='ALL'||String(row.building||'').trim()===selectedBuilding
+        );
+        renderTrend(weekly,state.month,'');
+      }catch(error){
+        console.warn('เตรียมข้อมูลยอดสะสมทั้งปีไม่สำเร็จ:',error);
+      }
+    }
     function showDashboardPage(hash){
       const target=['#overview','#ranking','#method','#yearly'].includes(hash)?hash:'#overview';
       const isYearly=target==='#yearly';
@@ -2305,17 +2418,14 @@ async function loadTrendHistory(currentData, requestId) {
       el.yearlyPage.classList.toggle('hidden',!isYearly);
       document.querySelectorAll('.nav-item').forEach(link=>link.classList.toggle('active',link.getAttribute('href')===target));
       requestAnimationFrame(()=>{
-if (isYearly) {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-
-  if (state.yearlyData.length) {
-    renderYearlyView();
-  } else {
-    loadYearlySummary();
-  }
-
-  return;
-}
+        if(isYearly){
+          window.scrollTo({top:0,behavior:'smooth'});
+          // หน้า YTD มีข้อความสถานะของตัวเอง จึงไม่ใช้ Overlay บังทั้งหน้า
+          setLoading(false);
+          ensureYearlyLoaded();
+          return;
+        }
+        ensureDashboardLoaded();
         const targetElement=target==='#overview'?null:document.querySelector(target);
         if(targetElement)targetElement.scrollIntoView({behavior:'smooth',block:'start'});
         else window.scrollTo({top:0,behavior:'smooth'});
@@ -2329,7 +2439,6 @@ if (isYearly) {
     }));
     window.addEventListener('popstate',()=>showDashboardPage(location.hash));
     showDashboardPage(location.hash);
-    loadDashboard();
   </script>
 </body>
 </html>
