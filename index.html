@@ -1914,7 +1914,9 @@ async function fetchMonth(month, building) {
         renderCurrentView(seed,dataSets);
         setConnection(true);
         if (state.view === 'MONTH') {
-  await loadTrendHistory(seed, requestId);
+  loadTrendHistory(seed, requestId).catch(error => {
+    console.warn('โหลดกราฟย้อนหลังไม่สำเร็จ:', error);
+  });
 }
       }catch(error){
         if(requestId!==state.trendRequest)return;
@@ -2303,13 +2305,17 @@ async function loadTrendHistory(currentData, requestId) {
       el.yearlyPage.classList.toggle('hidden',!isYearly);
       document.querySelectorAll('.nav-item').forEach(link=>link.classList.toggle('active',link.getAttribute('href')===target));
       requestAnimationFrame(()=>{
-        if(isYearly){
-          window.scrollTo({top:0,behavior:'smooth'});
-          if(state.yearlyData.length){
-            renderYearlyView();
-          }
-          return;
-        }
+if (isYearly) {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  if (state.yearlyData.length) {
+    renderYearlyView();
+  } else {
+    loadYearlySummary();
+  }
+
+  return;
+}
         const targetElement=target==='#overview'?null:document.querySelector(target);
         if(targetElement)targetElement.scrollIntoView({behavior:'smooth',block:'start'});
         else window.scrollTo({top:0,behavior:'smooth'});
@@ -2323,7 +2329,7 @@ async function loadTrendHistory(currentData, requestId) {
     }));
     window.addEventListener('popstate',()=>showDashboardPage(location.hash));
     showDashboardPage(location.hash);
-    loadDashboard().finally(loadYearlySummary);
+    loadDashboard();
   </script>
 </body>
 </html>
