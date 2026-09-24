@@ -1203,6 +1203,82 @@
     border-radius:20px;
   }
 }
+    /* กล่องประกาศสถิติกรุงเทพฯ */
+    .stat-banner{
+      position:relative;display:grid;grid-template-columns:42px minmax(0,1fr) auto;
+      align-items:center;gap:16px;margin:0 0 16px;padding:15px 19px;
+      overflow:hidden;border:1px solid #dce9df;border-radius:20px;
+      background:linear-gradient(105deg,#fff 0%,#f9fdf8 65%,#f2fae3 100%);
+      box-shadow:var(--shadow)
+    }
+    .stat-banner:before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:var(--lime)}
+    .stat-banner-icon{display:grid;place-items:center;width:42px;height:42px;border-radius:14px;background:#eaf6ed;color:var(--forest)}
+    .stat-banner-icon svg{width:22px;height:22px}
+    .stat-banner-copy{min-width:0}
+    .stat-banner-eyebrow{display:block;margin-bottom:3px;color:#368262;font-size:.67rem;font-weight:800;letter-spacing:.03em}
+    .stat-banner-marquee{overflow:hidden;white-space:nowrap}
+    .stat-banner-marquee span{display:inline-block;width:max-content;color:#263d32;font-size:.87rem;font-weight:700;animation:statTicker 19s linear infinite}
+    .stat-banner:hover .stat-banner-marquee span{animation-play-state:paused}
+    @keyframes statTicker{from{transform:translateX(0)}to{transform:translateX(-100%)}}
+    .stat-banner-figure{display:flex;align-items:baseline;gap:10px;flex:none;padding:9px 16px;border-radius:13px;background:var(--forest);color:#fff}
+    .stat-banner-figure strong{font:800 1.7rem/1 Manrope,sans-serif;letter-spacing:-.04em;color:var(--lime)}
+    .stat-banner-figure span{font-size:.69rem;font-weight:700;white-space:nowrap}
+    .stat-banner-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media(max-width:590px){
+      .stat-banner{grid-template-columns:34px minmax(0,1fr) auto;gap:9px;padding:12px 10px;border-radius:16px}
+      .stat-banner-icon{width:34px;height:34px;border-radius:10px}
+      .stat-banner-icon svg{width:19px;height:19px}
+      .stat-banner-eyebrow{font-size:.61rem}
+      .stat-banner-marquee span{font-size:.74rem}
+      .stat-banner-figure{display:block;padding:7px 9px;text-align:center}
+      .stat-banner-figure strong{display:block;font-size:1.27rem}
+      .stat-banner-figure span{display:block;margin-top:2px;font-size:.53rem}
+    }
+    @media(prefers-reduced-motion:reduce){
+      .stat-banner-marquee{overflow-x:auto}
+      .stat-banner-marquee span{animation:none}
+    }
+    /* กล่องสถิติและตัวกรองใช้คอลัมน์เท่ากัน */
+    .topbar{display:grid;grid-template-columns:max-content repeat(2,minmax(0,1fr));gap:14px}
+    .topbar .title{min-width:0}
+    .topbar .stat-banner{
+      min-width:0;width:100%;height:56px;margin:0;padding:7px 10px;
+      grid-template-columns:32px minmax(0,1fr) auto;gap:9px;
+      border-radius:15px;box-shadow:0 6px 18px rgba(20,49,38,.05)
+    }
+    .topbar .top-actions{width:100%;min-width:0;height:56px}
+    .topbar .filters{width:100%;height:56px;min-width:0}
+    .topbar .filter{flex:1 1 0;min-width:0}
+    .topbar .filter select{width:100%;min-width:0}
+    .topbar .stat-banner-icon{width:32px;height:32px;border-radius:10px}
+    .topbar .stat-banner-icon svg{width:19px;height:19px}
+    .topbar .stat-banner-eyebrow{margin-bottom:1px;font-size:.59rem}
+    .topbar .stat-banner-marquee span{font-size:.7rem;animation:statNudge 7s ease-in-out infinite alternate}
+    @keyframes statNudge{to{transform:translateX(-24px)}}
+    .topbar .stat-banner-figure{
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      gap:1px;min-width:82px;height:38px;margin:0;padding:0 0 0 11px;
+      border-left:1px solid #dce9df;border-radius:0;background:transparent;color:var(--forest)
+    }
+    .topbar .stat-banner-figure strong{font-size:1.35rem;color:var(--forest)}
+    .topbar .stat-banner-figure span{font-size:.61rem;color:var(--muted)}
+    @media(max-width:1580px){
+      .topbar{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .topbar .title{grid-column:1/-1}
+      .topbar .stat-banner{grid-column:1;grid-row:2}
+      .topbar .top-actions{grid-column:2;grid-row:2}
+    }
+    @media(max-width:1180px){
+      .topbar{grid-template-columns:minmax(0,1fr)}
+      .topbar .title{grid-column:1}
+      .topbar .stat-banner{grid-column:1;grid-row:auto}
+      .topbar .top-actions{grid-column:1;grid-row:auto}
+    }
+    @media(max-width:590px){
+      .topbar .filter{flex:0 0 auto}
+      .topbar .filter select{min-width:140px}
+    }
+    @media(prefers-reduced-motion:reduce){.topbar .stat-banner-marquee span{animation:none}}
   </style>
 </head>
 <body>
@@ -1247,6 +1323,18 @@
   </strong>
 </div>
         <div class="title"><p>WASTE PERFORMANCE DASHBOARD</p><h1>ภาพรวมผลลัพธ์การลดขยะ</h1></div>
+
+      <aside class="stat-banner" aria-label="สถิติการผลิตขยะของกรุงเทพมหานคร">
+        <span class="stat-banner-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="5" r="2.4"/><path d="M8 21v-6l-2-2 2-5h8l2 5-2 2v6M9 12h6M12 8v13"/></svg>
+        </span>
+        <div class="stat-banner-copy">
+          <span class="stat-banner-eyebrow">ข้อมูลสถิติ ปี 2567</span>
+          <div class="stat-banner-marquee" aria-hidden="true"><span>ปัจจุบัน ประชากร 1 คน ผลิตขยะเฉลี่ยวันละ</span></div>
+          <span class="stat-banner-sr">ปัจจุบัน ประชากร 1 คน ผลิตขยะเฉลี่ยวันละ 1.14 กิโลกรัม</span>
+        </div>
+        <div class="stat-banner-figure"><strong>1.14</strong><span>กก. / คน / วัน</span></div>
+      </aside>
         <div class="top-actions">
           <div class="filters">
             <div class="filter">
@@ -1268,6 +1356,7 @@
           </div>
         </div>
       </div>
+
 
       <div class="error-box hidden" id="errorBox" role="alert"></div>
 <section class="bento">
