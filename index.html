@@ -50,6 +50,8 @@
     .mobile-brand{display:none}.title p{margin:0 0 4px;color:var(--muted);font:700 .7rem Manrope,sans-serif;letter-spacing:.13em}.title h1{margin:0;font-size:clamp(1.55rem,2.6vw,2.15rem);line-height:1.25;letter-spacing:-.035em;white-space:nowrap}
     .top-actions{display:flex;align-items:center;gap:10px;min-width:0}
     .filters{display:flex;align-items:center;flex-wrap:nowrap;gap:9px;padding:7px;border:1px solid var(--line);border-radius:15px;background:#fff}
+    .refresh-button{flex:0 0 auto;height:38px;padding:0 12px;border:0;border-radius:10px;background:#e5f6ee;color:#075f42;font:700 .75rem 'Noto Sans Thai',sans-serif;cursor:pointer;white-space:nowrap}
+    .refresh-button:disabled{opacity:.55;cursor:wait}
     .filter{position:relative}.filter svg{position:absolute;left:11px;top:50%;width:16px;color:#72827b;transform:translateY(-50%);pointer-events:none}.filter select{height:38px;min-width:150px;padding:0 33px 0 34px;border:0;border-radius:10px;color:var(--ink);background:#f5f8f6;font-size:.75rem;font-weight:700;outline:0}.filter select:focus{box-shadow:0 0 0 3px rgba(99,215,179,.22)}.filter select:disabled{cursor:not-allowed;color:#87948e;background:#edf2ef;opacity:.88}
 .bento{
   display:grid;
@@ -1382,6 +1384,7 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 21V7l8-4 8 4v14M9 21v-5h6v5M8 10h.01M12 10h.01M16 10h.01"/></svg>
               <select id="buildingFilter" aria-label="เลือกอาคาร"><option value="ALL">ทุกอาคาร</option></select>
             </div>
+            <button type="button" class="refresh-button" id="refreshDashboard" title="อ่าน Weekly Summary และ Monthly Summary ล่าสุด">อัปเดตข้อมูล</button>
           </div>
         </div>
       </div>
@@ -1746,6 +1749,7 @@
       view:document.querySelector('#viewModeFilter'),
       periodFilter:document.querySelector('#periodFilter'),
       building:document.querySelector('#buildingFilter'),
+      refresh:document.querySelector('#refreshDashboard'),
       loading:document.querySelector('#loading'),error:document.querySelector('#errorBox'),
       period:document.querySelector('#periodLabel'),reportPeriod:document.querySelector('#reportPeriod'),updated:document.querySelector('#updatedAt'),
       general:document.querySelector('#generalTotal'),recycle:document.querySelector('#recycleTotal'),average:document.querySelector('#averageScore'),
@@ -1847,13 +1851,13 @@
       }catch(error){console.warn('บันทึก Dashboard Cache ไม่สำเร็จ',error)}
     }
 
-async function fetchMonth(month, building) {
+async function fetchMonth(month, building, fresh=false) {
   const selectedBuilding = building || 'ALL';
   const requestedMonth = month || '';
   const cacheMonth = requestedMonth || 'LATEST';
-  const key = cacheKey(selectedBuilding, cacheMonth);
+  const key = cacheKey(selectedBuilding, cacheMonth)+(fresh?'|fresh':'');
 
-  if (requestedMonth) {
+  if (requestedMonth && !fresh) {
     const exactKey = cacheKey(selectedBuilding, requestedMonth);
     if (state.trendCache.has(exactKey) &&
         Date.now()-(state.trendCacheAt.get(exactKey)||0)<DASHBOARD_CACHE_MS) {
@@ -1874,6 +1878,7 @@ async function fetchMonth(month, building) {
 
   const request = requestJsonp({
     month: requestedMonth,
+    ...(fresh?{fresh:'1'}:{}),
     building: selectedBuilding === 'ALL'
       ? ''
       : selectedBuilding
@@ -1903,7 +1908,7 @@ async function fetchMonth(month, building) {
         requestedMonth,
         true
       );
-      if (staleData) {
+      if (staleData && !fresh) {
         console.warn('ใช้ข้อมูล Dashboard ล่าสุดจาก Cache แทน', error);
         state.trendCache.set(cacheKey(selectedBuilding, requestedMonth), staleData);
         state.trendCacheAt.set(cacheKey(selectedBuilding, requestedMonth), Date.now());
@@ -1920,12 +1925,12 @@ async function fetchMonth(month, building) {
   return request;
 }
 
-    async function fetchAllMonths(seed){
+    async function fetchAllMonths(seed,fresh=false){
       const months=[...new Set([...(seed.availableMonths||[]),seed.selectedMonth].filter(Boolean))].sort();
       const results=[];
       let failed=0;
       for(let index=0;index<months.length;index+=4){
-        const batch=await Promise.allSettled(months.slice(index,index+4).map(month=>fetchMonth(month,state.building)));
+        const batch=await Promise.allSettled(months.slice(index,index+4).map(month=>fetchMonth(month,state.building,fresh)));
         batch.forEach(result=>{
           if(result.status==='fulfilled'&&result.value&&result.value.ok)results.push(result.value);
           else failed+=1;
@@ -2321,17 +2326,17 @@ async function fetchMonth(month, building) {
       renderTrend(seed.weekly||[],seed.selectedMonth,'');
     }
 
-    async function loadDashboard(){
+    async function loadDashboard(fresh=false){
       const requestId=++state.trendRequest;
       setLoading(true);hideError();
       try{
-        const seed=await fetchMonth(state.month,state.building);
+        const seed=await fetchMonth(state.month,state.building,fresh);
         if(requestId!==state.trendRequest)return;
         state.data=seed;
         state.month=seed.selectedMonth;
         state.building=seed.selectedBuilding||'ALL';
         writeUiState();
-        const dataSets=state.view==='MONTH'?[seed]:await fetchAllMonths(seed);
+        const dataSets=state.view==='MONTH'?[seed]:await fetchAllMonths(seed,fresh);
         if(requestId!==state.trendRequest)return;
         if(!dataSets.length)throw new Error('ไม่พบข้อมูลในช่วงเวลาที่เลือก');
         state.periodData=dataSets;
@@ -2652,7 +2657,9 @@ async function loadTrendHistory(currentData, requestId) {
       el.body.innerHTML=pageRows.map(item=>{
         const r=item.row;
         const cls=r.dataStatus!=='OK'?'missing':r.periodStatus==='Complete'?'ok':'wait';
-        const status=r.dataStatus!=='OK'?'ข้อมูลพนักงานไม่ครบ':r.periodStatus==='Complete'?'สรุปแล้ว':'กำลังสะสม';
+        const status=String(r.dataStatus||'').includes('Missing headcount:')?'ข้อมูลพนักงานไม่ครบ'
+          :r.dataStatus!=='OK'?'ข้อมูลชั่งยังไม่ครบ'
+          :r.periodStatus==='Complete'?'สรุปแล้ว':'กำลังสะสม';
         return `<tr><td class="rank-cell">${item.rank==null?'—':item.rank}</td><td class="location"><strong>ชั้น ${escapeHtml(r.floor)}</strong><small>${escapeHtml(r.building)}</small></td><td>${optional(r.headcount,0)}</td><td>${optional(r.generalAverage,2)} กก./คน</td><td><span class="mini green"><span class="mini-track"><i style="width:${Math.max(0,Math.min(100,Number(r.generalScore||0)/80*100))}%"></i></span>${optional(r.generalScore,0)}</span></td><td>${optional(r.recycleAverage,2)} กก./คน</td><td><span class="mini blue"><span class="mini-track"><i style="width:${Math.max(0,Math.min(100,Number(r.recycleScore||0)/20*100))}%"></i></span>${optional(r.recycleScore,0)}</span></td><td><span class="total-score">${optional(r.totalScore,2)}</span></td><td><span class="status ${cls}">${status}</span></td></tr>`;
       }).join('');
       renderRankingPagination(totalPages);
@@ -2665,7 +2672,17 @@ async function loadTrendHistory(currentData, requestId) {
       state.rankingPage=1;
       renderTablePage();
     }
-    function setLoading(active){el.loading.classList.toggle('hidden',!active)}function setConnection(){}function showError(message){el.error.textContent=message;el.error.classList.remove('hidden')}function hideError(){el.error.classList.add('hidden')}
+    function setLoading(active){el.loading.classList.toggle('hidden',!active);el.refresh.disabled=active}function setConnection(){}function showError(message){el.error.textContent=message;el.error.classList.remove('hidden')}function hideError(){el.error.classList.add('hidden')}
+    el.refresh.addEventListener('click',()=>{
+      state.trendCache.clear();
+      state.trendCacheAt.clear();
+      state.yearlyData=[];
+      try{
+        Object.keys(localStorage).filter(key=>key.startsWith(LOCAL_CACHE_PREFIX))
+          .forEach(key=>localStorage.removeItem(key));
+      }catch(error){console.warn('ล้างข้อมูลหน้าเว็บไม่สำเร็จ',error)}
+      loadDashboard(true);
+    });
     el.view.addEventListener('change',()=>{
       state.view=el.view.value;
       state.weekKey='';
