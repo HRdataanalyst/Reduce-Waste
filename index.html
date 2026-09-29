@@ -1732,6 +1732,7 @@
   periodData: [],
   trendRequest: 0,
   trendCache: new Map(),
+  trendCacheAt: new Map(),
   pendingRequests: new Map(),
   yearlyData: [],
   yearlyFailedMonths: [],
@@ -1811,7 +1812,8 @@
     }
     function cacheKey(building,month){return (building||'ALL')+'|'+month}
 
-    const LOCAL_CACHE_PREFIX='save-earth-dashboard-data-v2:';
+    const LOCAL_CACHE_PREFIX='save-earth-dashboard-data-v3:';
+    const DASHBOARD_CACHE_MS=5*60*1000;
     function todayBangkok(){
       const parts=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Bangkok',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
       const getPart=type=>parts.find(part=>part.type===type)?.value||'';
@@ -1827,7 +1829,7 @@
         if(!raw)return null;
         const saved=JSON.parse(raw);
         if(!saved||!saved.data||!saved.data.ok)return null;
-        if(!allowStale&&saved.cacheDate!==todayBangkok())return null;
+        if(!allowStale&&(!Number.isFinite(saved.savedAt)||Date.now()-saved.savedAt>DASHBOARD_CACHE_MS||saved.cacheDate!==todayBangkok()))return null;
         return saved.data;
       }catch(error){
         console.warn('อ่าน Dashboard Cache ไม่สำเร็จ',error);
@@ -1853,12 +1855,14 @@ async function fetchMonth(month, building) {
 
   if (requestedMonth) {
     const exactKey = cacheKey(selectedBuilding, requestedMonth);
-    if (state.trendCache.has(exactKey)) {
+    if (state.trendCache.has(exactKey) &&
+        Date.now()-(state.trendCacheAt.get(exactKey)||0)<DASHBOARD_CACHE_MS) {
       return state.trendCache.get(exactKey);
     }
     const storedData = readMonthCache(selectedBuilding, requestedMonth);
     if (storedData) {
       state.trendCache.set(exactKey, storedData);
+      state.trendCacheAt.set(exactKey, Date.now());
       return storedData;
     }
   }
@@ -1886,10 +1890,8 @@ async function fetchMonth(month, building) {
       const actualBuilding = data.selectedBuilding || selectedBuilding || 'ALL';
       const actualMonth = data.selectedMonth || requestedMonth;
 
-      state.trendCache.set(
-        cacheKey(actualBuilding, actualMonth),
-        data
-      );
+      state.trendCache.set(cacheKey(actualBuilding, actualMonth), data);
+      state.trendCacheAt.set(cacheKey(actualBuilding, actualMonth), Date.now());
 
       writeMonthCache(actualBuilding, actualMonth, data);
 
@@ -1903,10 +1905,8 @@ async function fetchMonth(month, building) {
       );
       if (staleData) {
         console.warn('ใช้ข้อมูล Dashboard ล่าสุดจาก Cache แทน', error);
-        state.trendCache.set(
-          cacheKey(selectedBuilding, requestedMonth),
-          staleData
-        );
+        state.trendCache.set(cacheKey(selectedBuilding, requestedMonth), staleData);
+        state.trendCacheAt.set(cacheKey(selectedBuilding, requestedMonth), Date.now());
         return staleData;
       }
       throw error;
@@ -2020,37 +2020,36 @@ async function fetchMonth(month, building) {
     }
 
     function sortRows(rows,rankMode){
-      const numeric=value=>value!==null&&value!==undefined&&value!==''&&Number.isFinite(Number(value))?Number(value):null;
-      const perPerson=(row,type)=>{
-        const headcount=numeric(row.headcount);
-        const generalKg=numeric(row.generalKg);
-        const recycleKg=numeric(row.recycleKg);
-        if(headcount!==null&&headcount>0){
-          if(type==='waste'&&(generalKg!==null||recycleKg!==null))return ((generalKg??0)+(recycleKg??0))/headcount;
-          if(type==='recycle'&&recycleKg!==null)return recycleKg/headcount;
-        }
-        return numeric(type==='waste'?row.totalWastePerPerson:row.recycleAverage);
-      };
+      const numeric=value=>value!==null&&value!==undefined&&value!==''&&
+        Number.isFinite(Number(value))?Number(value):null;
+      const byLocation=(a,b)=>String(a.building).localeCompare(String(b.building),'th')||
+        String(a.floor).localeCompare(String(b.floor),'th',{numeric:true});
       return [...rows].sort((a,b)=>{
+        if(rankMode==='WEEK'||rankMode==='MONTH'){
+          const aRank=numeric(a.rank),bRank=numeric(b.rank);
+          // Rank จาก Weekly/Monthly Summary เป็นลำดับทางการเมื่อมีคะแนนครบ
+          if(aRank!==null||bRank!==null){
+            if(aRank===null)return 1;
+            if(bRank===null)return -1;
+            if(aRank!==bRank)return aRank-bRank;
+          }
+        }
         const aScore=numeric(a.totalScore),bScore=numeric(b.totalScore);
         if(aScore===null||bScore===null){
           if(aScore===null&&bScore!==null)return 1;
           if(bScore===null&&aScore!==null)return -1;
         }else if(aScore!==bScore)return bScore-aScore;
-        if((rankMode==='WEEK'||rankMode==='MONTH')&&aScore!==null&&bScore!==null){
-          // ใช้ Rank จากชีตเป็นหลัก จึงได้ลำดับเดียวกับ Weekly/Monthly Summary
-          const aRank=numeric(a.rank),bRank=numeric(b.rank);
-          if(aRank!==null&&bRank!==null&&aRank!==bRank)return aRank-bRank;
-          const aWaste=perPerson(a,'waste'),bWaste=perPerson(b,'waste');
-          if(aWaste!==null&&bWaste!==null&&aWaste!==bWaste)return aWaste-bWaste;
-          if(aWaste===null&&bWaste!==null)return 1;
-          if(bWaste===null&&aWaste!==null)return -1;
-          const aRecycle=perPerson(a,'recycle'),bRecycle=perPerson(b,'recycle');
+        if(rankMode==='WEEK'||rankMode==='MONTH'){
+          const aGeneral=numeric(a.generalAverage),bGeneral=numeric(b.generalAverage);
+          if(aGeneral!==null&&bGeneral!==null&&aGeneral!==bGeneral)return aGeneral-bGeneral;
+          if(aGeneral===null&&bGeneral!==null)return 1;
+          if(bGeneral===null&&aGeneral!==null)return -1;
+          const aRecycle=numeric(a.recycleAverage),bRecycle=numeric(b.recycleAverage);
           if(aRecycle!==null&&bRecycle!==null&&aRecycle!==bRecycle)return bRecycle-aRecycle;
           if(aRecycle===null&&bRecycle!==null)return 1;
           if(bRecycle===null&&aRecycle!==null)return -1;
         }
-        return String(a.building).localeCompare(String(b.building),'th')||String(a.floor).localeCompare(String(b.floor),'th',{numeric:true});
+        return byLocation(a,b);
       });
     }
 
@@ -2295,7 +2294,7 @@ async function fetchMonth(month, building) {
       el.floorCount.innerHTML=`<b>${sorted.length.toLocaleString('th-TH')}</b> ชั้น`;
       el.metricHint.textContent=options.metricHint;
       el.leaderTitle.textContent='5 อันดับผู้นำ'+options.rankScope;
-      el.rankingTitle.textContent='อันดับคะแนนทุกชั้น'+options.rankScope;
+      el.rankingTitle.textContent='อันดับตามเกณฑ์ทุกชั้น'+options.rankScope;
       el.rankingSubtitle.textContent=options.rankingSubtitle;
       el.empty.textContent='ยังไม่มีข้อมูล'+options.rankScope;
       renderPodium(sorted,options.rankScope);
@@ -2314,11 +2313,11 @@ async function fetchMonth(month, building) {
         const rows=weekly.filter(row=>weekKey(row)===state.weekKey);
         const selectedWeekStart=state.weekKey?state.weekKey.split('|')[0]:'';
         const selectedMonth=selectedWeekStart?workWeekEnd(selectedWeekStart).slice(0,7):'';
-        renderSummary(rows,{periodLabel:weekLabel(state.weekKey),metricHint:'น้ำหนักสะสมของสัปดาห์',rankScope:'ประจำสัปดาห์',rankMode:'WEEK',rankingSubtitle:'คะแนนเท่ากัน: ขยะรวมต่อคนน้อยกว่า แล้วดูรีไซเคิลต่อคนมากกว่า',dataSets});
+        renderSummary(rows,{periodLabel:weekLabel(state.weekKey),metricHint:'น้ำหนักสะสมของสัปดาห์',rankScope:'ประจำสัปดาห์',rankMode:'WEEK',rankingSubtitle:'เรียงตาม Rank ใน Summary: ขยะทั่วไปต่อคนน้อยกว่า; หากเท่ากันดูรีไซเคิลต่อคนมากกว่า',dataSets});
         renderTrend(weekly,selectedMonth,state.weekKey);
         return;
       }
-      renderSummary(seed.monthly||[],{periodLabel:monthName(seed.selectedMonth),metricHint:'น้ำหนักสะสมของเดือน',rankScope:'ประจำเดือน',rankMode:'MONTH',rankingSubtitle:'คะแนนเท่ากัน: ขยะรวมต่อคนน้อยกว่า แล้วดูรีไซเคิลต่อคนมากกว่า',dataSets:[seed]});
+      renderSummary(seed.monthly||[],{periodLabel:monthName(seed.selectedMonth),metricHint:'น้ำหนักสะสมของเดือน',rankScope:'ประจำเดือน',rankMode:'MONTH',rankingSubtitle:'เรียงตาม Rank ใน Summary: ขยะทั่วไปต่อคนน้อยกว่า; หากเท่ากันดูรีไซเคิลต่อคนมากกว่า',dataSets:[seed]});
       renderTrend(seed.weekly||[],seed.selectedMonth,'');
     }
 
@@ -2603,7 +2602,13 @@ async function loadTrendHistory(currentData, requestId) {
     }
     function rankedTableRows(rows){
       let rank=0;
-      return rows.map(row=>({row,rank:row.totalScore==null?null:++rank}));
+      return rows.map(row=>{
+        const sheetRank=row.rank!==null&&row.rank!==undefined&&row.rank!==''&&
+          Number.isFinite(Number(row.rank))?Number(row.rank):null;
+        if(row.totalScore==null)return {row,rank:null};
+        rank++;
+        return {row,rank:sheetRank??rank};
+      });
     }
 
     function paginationTokens(currentPage,totalPages){
