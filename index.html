@@ -52,7 +52,39 @@
     .filters{display:flex;align-items:center;flex-wrap:nowrap;gap:9px;padding:7px;border:1px solid var(--line);border-radius:15px;background:#fff}
     .refresh-button{flex:0 0 auto;height:38px;padding:0 12px;border:0;border-radius:10px;background:#e5f6ee;color:#075f42;font:700 .75rem 'Noto Sans Thai',sans-serif;cursor:pointer;white-space:nowrap}
     .refresh-button:disabled{opacity:.55;cursor:wait}
-    .filter{position:relative}.filter svg{position:absolute;left:11px;top:50%;width:16px;color:#72827b;transform:translateY(-50%);pointer-events:none}.filter select{height:38px;min-width:150px;padding:0 33px 0 34px;border:0;border-radius:10px;color:var(--ink);background:#f5f8f6;font-size:.75rem;font-weight:700;outline:0}.filter select:focus{box-shadow:0 0 0 3px rgba(99,215,179,.22)}.filter select:disabled{cursor:not-allowed;color:#87948e;background:#edf2ef;opacity:.88}
+    .filter{position:relative;min-width:0}
+.filter svg{
+  position:absolute;
+  z-index:2;
+  left:11px;
+  top:50%;
+  width:16px;
+  height:16px;
+  color:#72827b;
+  transform:translateY(-50%);
+  pointer-events:none
+}
+.filter select{
+  height:38px;
+  min-width:150px;
+  padding:0 33px 0 0;
+  text-indent:34px;
+  border:0;
+  border-radius:10px;
+  color:var(--ink);
+  background:#f5f8f6;
+  font-size:.75rem;
+  font-weight:700;
+  outline:0;
+  cursor:pointer
+}
+.filter select option{
+  padding-left:8px;
+  text-indent:0;
+  font-weight:500
+}
+.filter select:focus{box-shadow:0 0 0 3px rgba(99,215,179,.22)}
+.filter select:disabled{cursor:not-allowed;color:#87948e;background:#edf2ef;opacity:.88}
 .bento{
   display:grid;
   grid-template-columns:
@@ -1309,6 +1341,187 @@
       .category-section>.panel-head{align-items:flex-start}
       .sidebar .nav-item{font-size:.52rem}
     }
+  
+    /* Dropdown option alignment fix: keep opened choices close to the left edge */
+    select option{
+      text-indent:0 !important;
+    }
+
+  
+    /* =========================================================
+       TOP AREA — title + statistic on row 1, filters full row 2
+       ========================================================= */
+    .topbar{
+      display:grid !important;
+      grid-template-columns:minmax(0,1fr) minmax(520px,.95fr) !important;
+      grid-template-areas:
+        "title stat"
+        "filters filters" !important;
+      align-items:center !important;
+      gap:14px 22px !important;
+      margin-bottom:24px !important;
+    }
+
+    .topbar .mobile-brand{
+      grid-area:mobilebrand;
+    }
+
+    .topbar .title{
+      grid-area:title !important;
+      min-width:0;
+    }
+
+    .topbar .stat-banner{
+      grid-area:stat !important;
+      width:100% !important;
+      min-width:0 !important;
+      height:72px !important;
+      margin:0 !important;
+      padding:9px 14px !important;
+      grid-template-columns:38px minmax(0,1fr) auto !important;
+      gap:12px !important;
+      border-radius:18px !important;
+    }
+
+    .topbar .stat-banner-icon{
+      width:38px !important;
+      height:38px !important;
+      border-radius:12px !important;
+    }
+
+    .topbar .stat-banner-icon svg{
+      width:21px !important;
+      height:21px !important;
+    }
+
+    .topbar .stat-banner-eyebrow{
+      margin-bottom:2px !important;
+      font-size:.64rem !important;
+    }
+
+    .topbar .stat-banner-marquee span{
+      font-size:.76rem !important;
+    }
+
+    .topbar .stat-banner-figure{
+      min-width:104px !important;
+      height:46px !important;
+      padding-left:14px !important;
+    }
+
+    .topbar .stat-banner-figure strong{
+      font-size:1.55rem !important;
+    }
+
+    .topbar .stat-banner-figure span{
+      font-size:.62rem !important;
+    }
+
+    .topbar .top-actions{
+      grid-area:filters !important;
+      width:100% !important;
+      min-width:0 !important;
+      height:auto !important;
+    }
+
+    .topbar .filters{
+      display:grid !important;
+      grid-template-columns:
+        minmax(210px,.9fr)
+        minmax(250px,1.1fr)
+        minmax(260px,1.2fr)
+        max-content !important;
+      align-items:center !important;
+      width:100% !important;
+      min-width:0 !important;
+      height:64px !important;
+      gap:10px !important;
+      padding:7px !important;
+    }
+
+    .topbar .filter{
+      width:100% !important;
+      min-width:0 !important;
+    }
+
+    .topbar .filter select{
+      width:100% !important;
+      min-width:0 !important;
+      height:48px !important;
+      font-size:.82rem !important;
+    }
+
+    .topbar .refresh-button{
+      height:48px !important;
+      padding:0 22px !important;
+      font-size:.8rem !important;
+    }
+
+    /* Medium desktop: keep filters wide, statistic remains beside title */
+    @media(max-width:1180px){
+      .topbar{
+        grid-template-columns:minmax(0,1fr) minmax(430px,.95fr) !important;
+        grid-template-areas:
+          "title stat"
+          "filters filters" !important;
+      }
+
+      .topbar .filters{
+        grid-template-columns:
+          minmax(180px,.85fr)
+          minmax(220px,1fr)
+          minmax(230px,1.05fr)
+          max-content !important;
+      }
+    }
+
+    /* Tablet: statistic goes below title, filters still get their own full row */
+    @media(max-width:900px){
+      .topbar{
+        grid-template-columns:1fr !important;
+        grid-template-areas:
+          "mobilebrand"
+          "title"
+          "stat"
+          "filters" !important;
+        gap:12px !important;
+      }
+
+      .topbar .filters{
+        display:flex !important;
+        width:100% !important;
+        overflow-x:auto !important;
+      }
+
+      .topbar .filter{
+        flex:1 0 180px !important;
+      }
+    }
+
+    @media(max-width:590px){
+      .topbar .stat-banner{
+        height:auto !important;
+        min-height:66px !important;
+      }
+
+      .topbar .filters{
+        height:auto !important;
+        min-height:62px !important;
+      }
+
+      .topbar .filter{
+        flex:0 0 165px !important;
+      }
+
+      .topbar .filter select{
+        min-width:0 !important;
+      }
+
+      .topbar .refresh-button{
+        flex:0 0 auto !important;
+      }
+    }
+
   </style>
 </head>
 <body>
