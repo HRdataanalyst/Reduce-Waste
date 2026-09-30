@@ -1980,6 +1980,59 @@
       body:document.querySelector('#rankingBody'),empty:document.querySelector('#emptyState'),rowCount:document.querySelector('#rowCount'),
       rankingPagination:document.querySelector('#rankingPagination'),rankingPageNumbers:document.querySelector('#rankingPageNumbers'),rankingPrev:document.querySelector('#rankingPrev'),rankingNext:document.querySelector('#rankingNext')
     };
+    function dashboardNumberOrNull(value){
+      if(value===null||value===undefined||value==='')return null;
+      const n=Number(value);
+      return Number.isFinite(n)?n:null;
+    }
+
+    function normalizeDashboardRow(row){
+      const r={...(row||{})};
+
+      let headcount=dashboardNumberOrNull(r.headcount);
+      let generalKg=dashboardNumberOrNull(r.generalKg);
+      let recycleKg=dashboardNumberOrNull(r.recycleKg);
+      let generalAverage=dashboardNumberOrNull(r.generalAverage);
+      let recycleAverage=dashboardNumberOrNull(r.recycleAverage);
+
+      // Fallback: if one field is missing, derive it only from values already supplied
+      // by Weekly/Monthly Summary. This prevents individual boxes from showing "—"
+      // when the same summary row contains enough information.
+      if(!(headcount>0)){
+        if(generalKg!==null && generalAverage!==null && generalAverage>0){
+          headcount=Math.round(generalKg/generalAverage);
+        }else if(recycleKg!==null && recycleAverage!==null && recycleAverage>0){
+          headcount=Math.round(recycleKg/recycleAverage);
+        }
+      }
+
+      if(generalAverage===null && generalKg!==null && headcount>0){
+        generalAverage=generalKg/headcount;
+      }
+      if(recycleAverage===null && recycleKg!==null && headcount>0){
+        recycleAverage=recycleKg/headcount;
+      }
+
+      r.headcount=headcount;
+      r.generalKg=generalKg;
+      r.recycleKg=recycleKg;
+      r.generalAverage=generalAverage;
+      r.recycleAverage=recycleAverage;
+      r.generalScore=dashboardNumberOrNull(r.generalScore);
+      r.recycleScore=dashboardNumberOrNull(r.recycleScore);
+      r.totalScore=dashboardNumberOrNull(r.totalScore);
+      r.rank=dashboardNumberOrNull(r.rank);
+
+      return r;
+    }
+
+    function normalizeDashboardPayload(data){
+      const copy={...(data||{})};
+      copy.weekly=(copy.weekly||[]).map(normalizeDashboardRow);
+      copy.monthly=(copy.monthly||[]).map(normalizeDashboardRow);
+      return copy;
+    }
+
     function escapeHtml(v){return String(v==null?'':v).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
     function number(v,d=2){return Number(v||0).toLocaleString('th-TH',{minimumFractionDigits:d,maximumFractionDigits:d})}
     function optional(v,d=3){return v==null?'—':number(v,d)}
@@ -2432,10 +2485,17 @@ async function fetchMonth(month, building, fresh=false) {
         Number.isFinite(Number(value))&&Number(value)>=0?Number(value):null;
     }
     function categoryRows(rows,field){
-      return (rows||[]).map(row=>{
+      return (rows||[]).map(source=>{
+        const row=normalizeDashboardRow(source);
         const kg=validAmount(row[field]);
         const headcount=validAmount(row.headcount);
-        return {...row,categoryKg:kg,categoryRate:kg!==null&&headcount>0?kg/headcount:null};
+        const summaryRate=field==='generalKg'
+          ?validAmount(row.generalAverage)
+          :validAmount(row.recycleAverage);
+        const rate=summaryRate!==null
+          ?summaryRate
+          :(kg!==null&&headcount>0?kg/headcount:null);
+        return {...row,categoryKg:kg,categoryRate:rate};
       }).filter(row=>row.categoryRate!==null);
     }
     function categoryOverallRows(dataSets,field){
@@ -2495,6 +2555,7 @@ async function fetchMonth(month, building, fresh=false) {
     }
 
     function renderSummary(rows,options){
+      rows=(rows||[]).map(normalizeDashboardRow);
       const sorted=sortRows(rows,options.rankMode);
       const buildingLabel=state.building==='ALL'?'ทุกอาคาร':state.building;
       const label=options.periodLabel+' · '+buildingLabel;
@@ -2545,7 +2606,7 @@ async function fetchMonth(month, building, fresh=false) {
       try{
         const seed=await fetchMonth(state.month,state.building,fresh);
         if(requestId!==state.trendRequest)return;
-        state.data=seed;
+        state.data=normalizeDashboardPayload(seed);
         state.month=seed.selectedMonth;
         state.building=seed.selectedBuilding||'ALL';
         writeUiState();
