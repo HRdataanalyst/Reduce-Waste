@@ -2082,7 +2082,7 @@
     }
     function cacheKey(building,month){return (building||'ALL')+'|'+month}
 
-    const LOCAL_CACHE_PREFIX='save-earth-dashboard-data-v3:';
+    const LOCAL_CACHE_PREFIX='save-earth-dashboard-data-v7:';
     const DASHBOARD_CACHE_MS=5*60*1000;
     function todayBangkok(){
       const parts=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Bangkok',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
@@ -2209,8 +2209,8 @@ async function fetchMonth(month, building, fresh=false) {
     async function fetchYearToDate(){
       const currentMonth=currentMonthBangkok();
       const currentYear=currentMonth.slice(0,4);
-      const seed=await fetchMonth(currentMonth,'ALL');
-      const months=[...new Set([...(seed.availableMonths||[]),seed.selectedMonth,currentMonth].filter(Boolean))]
+      const seed=await fetchMonth('', 'ALL');
+      const months=[...new Set([...(seed.availableMonths||[]),seed.selectedMonth].filter(Boolean))]
         .filter(month=>month.startsWith(currentYear+'-')&&month<=currentMonth)
         .sort();
       const results=[];
@@ -2271,7 +2271,7 @@ async function fetchMonth(month, building, fresh=false) {
 
     function aggregateOverall(dataSets){
       const groups=new Map();
-      dataSets.forEach(data=>(data.monthly||[]).forEach(row=>{
+      dataSets.forEach(data=>(data.categoryMonthly||[]).forEach(row=>{
         const key=row.building+'|'+row.floor;
         if(!groups.has(key))groups.set(key,{building:row.building,floor:row.floor,months:0,headcount:[],generalKg:0,recycleKg:0,generalAverage:[],generalScore:[],recycleAverage:[],recycleScore:[],totalScore:[]});
         const group=groups.get(key);
@@ -2539,12 +2539,13 @@ async function fetchMonth(month, building, fresh=false) {
     }
     function renderCategoryRanking(rows,options){
       const overall=state.view==='OVERALL';
+      const categorySource=options.categoryRows||rows;
       const general=sortCategory(overall
         ?categoryOverallRows(options.dataSets||[],'generalKg')
-        :categoryRows(rows,'generalKg'),'general');
+        :categoryRows(categorySource,'generalKg'),'general');
       const recycle=sortCategory(overall
         ?categoryOverallRows(options.dataSets||[],'recycleKg')
-        :categoryRows(rows,'recycleKg'),'recycle');
+        :categoryRows(categorySource,'recycleKg'),'recycle');
       const buildingLabel=state.building==='ALL'?'ทุกอาคาร':state.building;
       el.categoryPeriod.textContent=options.periodLabel+' · '+buildingLabel;
       el.categoryNote.textContent=overall
@@ -2592,11 +2593,11 @@ async function fetchMonth(month, building, fresh=false) {
         const rows=weekly.filter(row=>weekKey(row)===state.weekKey);
         const selectedWeekStart=state.weekKey?state.weekKey.split('|')[0]:'';
         const selectedMonth=selectedWeekStart?workWeekEnd(selectedWeekStart).slice(0,7):'';
-        renderSummary(rows,{periodLabel:weekLabel(state.weekKey),metricHint:'น้ำหนักสะสมของสัปดาห์',rankScope:'ประจำสัปดาห์',rankMode:'WEEK',rankingSubtitle:'เรียงตาม Rank ใน Summary: ขยะทั่วไปต่อคนน้อยกว่า; หากเท่ากันดูรีไซเคิลต่อคนมากกว่า',dataSets});
+        renderSummary(rows,{periodLabel:weekLabel(state.weekKey),metricHint:'น้ำหนักสะสมของสัปดาห์',rankScope:'ประจำสัปดาห์',rankMode:'WEEK',rankingSubtitle:'เรียงตาม Rank ใน Summary: ขยะทั่วไปต่อคนน้อยกว่า; หากเท่ากันดูรีไซเคิลต่อคนมากกว่า',dataSets,categoryRows:dataSets.flatMap(data=>data.categoryWeekly||[]).filter(row=>weekKey(row)===state.weekKey)});
         renderTrend(weekly,selectedMonth,state.weekKey);
         return;
       }
-      renderSummary(seed.monthly||[],{periodLabel:monthName(seed.selectedMonth),metricHint:'น้ำหนักสะสมของเดือน',rankScope:'ประจำเดือน',rankMode:'MONTH',rankingSubtitle:'เรียงตาม Rank ใน Summary: ขยะทั่วไปต่อคนน้อยกว่า; หากเท่ากันดูรีไซเคิลต่อคนมากกว่า',dataSets:[seed]});
+      renderSummary(seed.monthly||[],{periodLabel:monthName(seed.selectedMonth),metricHint:'น้ำหนักสะสมของเดือน',rankScope:'ประจำเดือน',rankMode:'MONTH',rankingSubtitle:'เรียงตาม Rank ใน Summary: ขยะทั่วไปต่อคนน้อยกว่า; หากเท่ากันดูรีไซเคิลต่อคนมากกว่า',dataSets:[seed],categoryRows:seed.categoryMonthly||[]});
       renderTrend(seed.weekly||[],seed.selectedMonth,'');
     }
 
@@ -2610,12 +2611,13 @@ async function fetchMonth(month, building, fresh=false) {
         state.month=seed.selectedMonth;
         state.building=seed.selectedBuilding||'ALL';
         writeUiState();
-        const dataSets=state.view==='MONTH'?[seed]:await fetchAllMonths(seed,fresh);
+        const rawDataSets=state.view==='MONTH'?[seed]:await fetchAllMonths(seed,fresh);
+        const dataSets=rawDataSets.map(normalizeDashboardPayload);
         if(requestId!==state.trendRequest)return;
         if(!dataSets.length)throw new Error('ไม่พบข้อมูลในช่วงเวลาที่เลือก');
         state.periodData=dataSets;
-        populateFilters(seed,dataSets);
-        renderCurrentView(seed,dataSets);
+        populateFilters(state.data,dataSets);
+        renderCurrentView(state.data,dataSets);
         setConnection(true);
         // เตรียมหน้า YTD ทันทีหลังข้อมูลหลักแสดงแล้ว แต่ไม่บล็อกหน้าเว็บ
         preloadYearlyData(requestId);
