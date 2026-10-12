@@ -2075,7 +2075,7 @@
     }
     function cacheKey(building,month){return (building||'ALL')+'|'+month}
 
-    const LOCAL_CACHE_PREFIX='save-earth-dashboard-data-v7:';
+    const LOCAL_CACHE_PREFIX='save-earth-dashboard-data-v8:';
     const DASHBOARD_CACHE_MS=5*60*1000;
     function todayBangkok(){
       const parts=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Bangkok',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
@@ -2554,14 +2554,22 @@ async function fetchMonth(month, building, fresh=false) {
       const buildingLabel=state.building==='ALL'?'ทุกอาคาร':state.building;
       const label=options.periodLabel+' · '+buildingLabel;
       const updated=latestUpdate(options.dataSets||[]);
-      const general=sorted.reduce((sum,row)=>sum+Number(row.generalKg||0),0);
-      const recycle=sorted.reduce((sum,row)=>sum+Number(row.recycleKg||0),0);
+       const generalPresent=sorted.some(row=>dashboardNumberOrNull(row.generalKg)!==null);
+       const recyclePresent=sorted.some(row=>dashboardNumberOrNull(row.recycleKg)!==null);
+       const general=generalPresent?sorted.reduce((sum,row)=>sum+Number(row.generalKg||0),0):null;
+       const recycle=recyclePresent?sorted.reduce((sum,row)=>sum+Number(row.recycleKg||0),0):null;
+       if(sorted.length && (!generalPresent || !recyclePresent)) {
+         console.warn('Dashboard: พบข้อมูลอาคาร/ชั้น แต่ไม่พบตัวเลขน้ำหนักใน API', {
+           selectedView: state.view, period: options.periodLabel,
+           rows: sorted.length, sample: sorted.slice(0,3)
+         });
+       }
       const score=average(sorted.map(row=>row.totalScore));
       el.period.textContent=label;
       el.reportPeriod.textContent=label;
       el.updated.textContent=updated?new Intl.DateTimeFormat('th-TH',{dateStyle:'medium',timeStyle:'short'}).format(updated):'—';
-      el.general.innerHTML=number(general,2)+' <small>กก.</small>';
-      el.recycle.innerHTML=number(recycle,2)+' <small>กก.</small>';
+      el.general.innerHTML=(general===null?'—':number(general,2))+' <small>กก.</small>';
+      el.recycle.innerHTML=(recycle===null?'—':number(recycle,2))+' <small>กก.</small>';
       el.average.innerHTML=`<strong>${score==null?'—':number(score,1)}</strong><small>จาก 100</small>`;
       el.scoreRing.style.setProperty('--score',score==null?0:Math.max(0,Math.min(100,score)));
       el.floorCount.innerHTML=`<b>${sorted.length.toLocaleString('th-TH')}</b> ชั้น`;
