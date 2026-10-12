@@ -1998,14 +1998,7 @@
       // Fallback: if one field is missing, derive it only from values already supplied
       // by Weekly/Monthly Summary. This prevents individual boxes from showing "—"
       // when the same summary row contains enough information.
-      if(!(headcount>0)){
-        if(generalKg!==null && generalAverage!==null && generalAverage>0){
-          headcount=Math.round(generalKg/generalAverage);
-        }else if(recycleKg!==null && recycleAverage!==null && recycleAverage>0){
-          headcount=Math.round(recycleKg/recycleAverage);
-        }
-      }
-
+      // Headcount ใช้ค่าจาก Summary ของเดือนนั้นเท่านั้น ห้ามอนุมานย้อนจากน้ำหนัก
       if(generalAverage===null && generalKg!==null && headcount>0){
         generalAverage=generalKg/headcount;
       }
@@ -2054,7 +2047,7 @@
       const end=workWeekEnd(start);
       return start&&end?shortDate(start)+'–'+shortDate(end)+' '+thaiYear(end):'—';
     }
-    function average(values){const a=values.filter(v=>Number.isFinite(Number(v))).map(Number);return a.length?a.reduce((s,v)=>s+v,0)/a.length:null}
+    function average(values){const a=values.filter(v=>v!==null&&v!==undefined&&v!==''&&Number.isFinite(Number(v))).map(Number);return a.length?a.reduce((s,v)=>s+v,0)/a.length:null}
     function requestJsonp(params){
       return new Promise((resolve,reject)=>{
         if(!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec/.test(CONFIG.apiUrl)){
@@ -2174,7 +2167,7 @@ async function fetchMonth(month, building, fresh=false) {
         requestedMonth,
         true
       );
-      if (staleData && !fresh) {
+      if (false && staleData && !fresh) {
         console.warn('ใช้ข้อมูล Dashboard ล่าสุดจาก Cache แทน', error);
         state.trendCache.set(cacheKey(selectedBuilding, requestedMonth), staleData);
         state.trendCacheAt.set(cacheKey(selectedBuilding, requestedMonth), Date.now());
@@ -2957,6 +2950,7 @@ async function loadTrendHistory(currentData, requestId) {
         Object.keys(localStorage).filter(key=>key.startsWith(LOCAL_CACHE_PREFIX))
           .forEach(key=>localStorage.removeItem(key));
       }catch(error){console.warn('ล้างข้อมูลหน้าเว็บไม่สำเร็จ',error)}
+      state.yearlyFailedMonths=[];
       loadDashboard(true);
     });
     el.view.addEventListener('change',()=>{
