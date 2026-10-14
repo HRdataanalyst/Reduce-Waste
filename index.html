@@ -1607,6 +1607,15 @@
     @media(max-width:600px){#dailyFeature .se-shell{grid-template-columns:1fr}#dailyFeature .se-sidebar{padding:14px 17px;gap:10px}#dailyFeature .se-brand{padding-bottom:0;border:0}#dailyFeature .se-nav{display:flex;flex-wrap:wrap;gap:4px}#dailyFeature .se-nav a{padding:7px 9px;font-size:11px}#dailyFeature .se-nav svg{width:14px;height:14px}#dailyFeature .se-mission{display:none}#dailyFeature .se-main{padding:19px 15px}#dailyFeature .se-title h1{font-size:23px}#dailyFeature .se-bento{grid-template-columns:1fr}#dailyFeature .se-peakmain{grid-template-columns:minmax(0,1fr);gap:20px}#dailyFeature .se-metrics{grid-template-columns:1fr 1fr}#dailyFeature .se-report{grid-column:auto;flex-direction:column}#dailyFeature .se-reportitem+.se-reportitem{border-top:1px solid var(--se-line);border-left:0}#dailyFeature .se-chartpanel{padding:17px 14px}#dailyFeature .se-chartarea{height:205px}#dailyFeature .se-columns,#dailyFeature .se-xlabels{gap:5px}#dailyFeature .se-detailrows{grid-template-columns:1fr}#dailyFeature .se-filter select{font-size:12px}#dailyFeature .se-sectionhead{flex-wrap:wrap}}
 
     #dailyFeature .se-tablewrap{overflow-x:auto} #dailyFeature .se-detailrows svg{width:18px;height:18px} #dailyFeature .se-note{font-size:12px;color:var(--muted);margin:12px 0 18px} #dailyFeature details{margin-top:8px} #dailyFeature details summary{font-size:12px;color:#b9d0c7;cursor:pointer} #dailyFeature .se-recycledetails{display:grid;gap:8px;margin:12px 0;font-size:12px} #dailyFeature .se-recycledetails div{display:flex;justify-content:space-between;gap:12px} #dailyFeature .se-empty{padding:24px;text-align:center;color:var(--muted)} #dailyFeature .se-dayempty{font-size:11px;color:var(--muted);min-height:40px} #dailyFeature .se-chartarea{height:290px} #dailyFeature .se-paginate{display:flex;gap:12px;justify-content:flex-end;padding:12px 18px;align-items:center;font-size:12px} #dailyFeature .se-paginate button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 12px;color:var(--forest)} #dailyFeature .se-paginate button:disabled{opacity:.4} #dailyFeature .se-detail{margin:0} #dailyFeature .se-panel{font-family:inherit} #dailyFeature .se-metricnote{line-height:1.5} #dailyFeature .se-subtitle{line-height:1.6} #dailyFeature .se-peakcopy strong{white-space:normal} @media(max-width:420px){#dailyFeature .se-detailrows{grid-template-columns:1fr}#dailyFeature .se-metrics{grid-template-columns:1fr}}
+    /* WEEKLY REPORT — Step 1: isolated placeholder styling */
+    #weeklyReportPage .weekly-report-header{display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:20px}
+    #weeklyReportPage .weekly-report-header h1{margin:4px 0;font-size:clamp(1.45rem,2.5vw,2.15rem);color:var(--forest)}
+    #weeklyReportPage .weekly-report-header p{margin:0;color:var(--muted);font-size:.78rem}
+    #weeklyReportPage .weekly-report-placeholder{min-height:260px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:32px 20px}
+    #weeklyReportPage .weekly-report-placeholder svg{width:42px;height:42px;color:var(--forest-2)}
+    #weeklyReportPage .weekly-report-placeholder h2{margin:0;font-size:1.12rem}
+    #weeklyReportPage .weekly-report-placeholder p{margin:0;color:var(--muted);font-size:.78rem;line-height:1.7}
+    @media(max-width:590px){.sidebar .nav{grid-template-columns:repeat(6,minmax(76px,1fr));overflow-x:auto}}
   </style>
 </head>
 <body>
@@ -1631,6 +1640,7 @@
         <a class="nav-item" href="#ranking" data-page="overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4Z"/><path d="M7 6H4v2a4 4 0 0 0 4 4M17 6h3v2a4 4 0 0 1-4 4"/></svg>อันดับคะแนน</a>
         <a class="nav-item" href="#category-ranking" data-page="overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h7M4 16v4M7.5 4v12M14 20h7M14 16v4M17.5 4v12"/><path d="m5 7 2.5-3L10 7M15 13l2.5 3 2.5-3"/></svg>อันดับแยกประเภท</a>
         <a class="nav-item" href="#yearly" data-page="yearly"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M8 14h3M8 17h7"/></svg>ยอดสะสมทั้งปี</a>
+        <a class="nav-item" href="#weekly-report" data-page="weekly-report"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8l-5-5h-3"/><path d="M8 3v5h8V3M7 13h10M7 17h7"/></svg>สรุปภาพรวมประจำสัปดาห์</a>
       </nav>
       <div class="mission"><div class="mission-label">OUR MISSION</div><strong>ลดขยะให้ได้ 100%</strong><p>ทุกการแยกขยะของเรา สร้างการเปลี่ยนแปลงได้</p></div>
     </aside>
@@ -2005,6 +2015,23 @@
         </div>
       </section>
 
+      <!-- WEEKLY REPORT — Step 1: independent page; no API calls yet -->
+      <section class="dashboard-page hidden" id="weeklyReportPage" aria-label="สรุปภาพรวมประจำสัปดาห์">
+        <div class="weekly-report-header">
+          <div>
+            <span class="yearly-kicker">WEEKLY WASTE REPORT</span>
+            <h1>สรุปภาพรวมประจำสัปดาห์</h1>
+            <p>รายงานปริมาณขยะสำหรับนำเสนอและส่งออกในรูปแบบ 16:9</p>
+          </div>
+          <span class="yearly-fixed">REPORT · 16:9</span>
+        </div>
+        <div class="card weekly-report-placeholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8l-5-5h-3"/><path d="M8 3v5h8V3M7 13h10M7 17h7"/></svg>
+          <h2>พื้นที่แสดง Weekly Report</h2>
+          <p>ขั้นตอนนี้เป็นการเพิ่มหน้าเมนูเท่านั้น<br>ยังไม่เชื่อมข้อมูล ไม่คำนวณ และยังไม่เปิดปุ่ม Export</p>
+        </div>
+      </section>
+
       <footer>SAVE EARTH · SAVE OFFICE · ทุกการแยกขยะสร้างการเปลี่ยนแปลงได้</footer>
     </main>
   </div>
@@ -2063,7 +2090,7 @@
   rankingRows: []
 };
     const el={
-      overviewPage:document.querySelector('#overviewPage'),yearlyPage:document.querySelector('#yearlyPage'),
+      overviewPage:document.querySelector('#overviewPage'),yearlyPage:document.querySelector('#yearlyPage'),weeklyReportPage:document.querySelector('#weeklyReportPage'),
       view:document.querySelector('#viewModeFilter'),
       periodFilter:document.querySelector('#periodFilter'),
       building:document.querySelector('#buildingFilter'),
@@ -3161,12 +3188,19 @@ async function loadTrendHistory(currentData, requestId) {
       }
     }
     function showDashboardPage(hash){
-      const target=['#overview','#ranking','#category-ranking','#method','#yearly'].includes(hash)?hash:'#overview';
+      const target=['#overview','#ranking','#category-ranking','#method','#yearly','#weekly-report'].includes(hash)?hash:'#overview';
       const isYearly=target==='#yearly';
-      el.overviewPage.classList.toggle('hidden',isYearly);
+      const isWeeklyReport=target==='#weekly-report';
+      el.overviewPage.classList.toggle('hidden',isYearly||isWeeklyReport);
       el.yearlyPage.classList.toggle('hidden',!isYearly);
+      el.weeklyReportPage.classList.toggle('hidden',!isWeeklyReport);
       document.querySelectorAll('.nav-item').forEach(link=>link.classList.toggle('active',link.getAttribute('href')===target));
       requestAnimationFrame(()=>{
+        if(isWeeklyReport){
+          window.scrollTo({top:0,behavior:'smooth'});
+          setLoading(false);
+          return;
+        }
         if(isYearly){
           window.scrollTo({top:0,behavior:'smooth'});
           // หน้า YTD มีข้อความสถานะของตัวเอง จึงไม่ใช้ Overlay บังทั้งหน้า
