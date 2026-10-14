@@ -1848,6 +1848,46 @@
     #weeklyReportPage .wr-exact-name,#weeklyReportPage .wr-exact-cell{transform:translateY(-0.5px);}
     #weeklyReportPage .wr-exact-note {position:absolute; z-index:2; left:65px; top:836px; width:1470px; height:44px; font-family:'Noto Sans Thai',Tahoma,sans-serif; font-size:17px; line-height:1.4; color:#5e665f;}
     #weeklyReportPage .wr-exact-note em {display:block; font-style:normal; color:#d52e2e; font-weight:700;}
+    #weeklyReportPage .wr-slide.wr-exact-bigc {
+      width:1672px!important;height:941px!important;min-width:1672px!important;aspect-ratio:1672/941!important;
+      padding:0!important;border:0!important;border-radius:0!important;background:#fff!important;box-shadow:none!important;overflow:hidden!important;
+    }
+    #weeklyReportPage .wr-slide.wr-exact-bigc::before,
+    #weeklyReportPage .wr-slide.wr-exact-bigc::after {display:none!important;}
+    #weeklyReportPage .wr-bigc-background {position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0;}
+    #weeklyReportPage .wr-bigc-period,
+    #weeklyReportPage .wr-bigc-kpi,
+    #weeklyReportPage .wr-bigc-mini-number,
+    #weeklyReportPage .wr-bigc-mini-percent {position:absolute; z-index:2; font-family:'Noto Sans Thai',Tahoma,sans-serif;}
+    #weeklyReportPage .wr-bigc-period {display:flex;align-items:center;justify-content:center;text-align:center;font-size:21px;font-weight:700;color:#355345;letter-spacing:-.15px;white-space:nowrap;overflow:hidden;}
+    #weeklyReportPage .wr-bigc-kpi {display:flex;align-items:center;justify-content:center;text-align:center;font-size:34px;font-weight:900;line-height:1;color:#0f2e22;letter-spacing:-.6px;white-space:nowrap;overflow:hidden;}
+    #weeklyReportPage .wr-bigc-kpi.general{color:#005da4;}
+    #weeklyReportPage .wr-bigc-kpi.recycle{color:#14281d;}
+    #weeklyReportPage .wr-bigc-kpi.food{color:#075b37;}
+    #weeklyReportPage .wr-bigc-kpi.total{color:#143529;}
+    #weeklyReportPage .wr-bigc-table {position:absolute;left:27px;top:329px;width:1588px;height:364px;z-index:2;display:grid;grid-template-columns:99px 313px 244px 238px 247px 229px 218px;grid-template-rows:repeat(9,35px) 49px;}
+    #weeklyReportPage .wr-bigc-cell {display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:600;color:#173227;line-height:1.15;font-variant-numeric:tabular-nums;}
+    #weeklyReportPage .wr-bigc-cell.floor {font-size:19px;font-weight:800;color:#0f4a2d;}
+    #weeklyReportPage .wr-bigc-cell.department {justify-content:flex-start;padding:0 12px;font-size:13px;line-height:1.15;color:#355548;}
+    #weeklyReportPage .wr-bigc-cell.totalcol {font-size:18px;font-weight:800;}
+    #weeklyReportPage .wr-bigc-cell.avg {font-size:15px;color:#335744;}
+    #weeklyReportPage .wr-bigc-cell.footer {font-size:17px;font-weight:800;}
+    #weeklyReportPage .wr-bigc-cell.footer-label {justify-content:center;font-size:19px;font-weight:800;color:#fff;}
+    #weeklyReportPage .wr-bigc-ratio {position:absolute;left:42px;top:738px;width:730px;height:120px;z-index:2;display:flex;align-items:center;gap:22px;padding:8px 14px;}
+    #weeklyReportPage .wr-bigc-donut {width:102px;height:102px;border-radius:50%;display:grid;place-items:center;flex:none;}
+    #weeklyReportPage .wr-bigc-donut-inner {width:68px;height:68px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;flex-direction:column;font-size:12px;font-weight:800;color:#0a3e2e;line-height:1.1;text-align:center;box-shadow:inset 0 0 0 1px #d9ece0;}
+    #weeklyReportPage .wr-bigc-donut-inner small{font-size:10px;font-weight:700;color:#4d6259;}
+    #weeklyReportPage .wr-bigc-legend {display:grid;gap:8px;font-size:18px;font-weight:700;color:#204234;}
+    #weeklyReportPage .wr-bigc-legend div{display:flex;align-items:center;gap:8px;}
+    #weeklyReportPage .wr-bigc-legend i{display:inline-block;width:12px;height:12px;border-radius:50%;}
+    #weeklyReportPage .wr-bigc-minis {position:absolute;left:800px;top:738px;width:810px;height:121px;z-index:2;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+    #weeklyReportPage .wr-bigc-mini {position:relative;}
+    #weeklyReportPage .wr-bigc-mini-number {display:flex;align-items:center;justify-content:center;text-align:center;font-size:27px;font-weight:900;line-height:1;color:#0c3426;white-space:nowrap;overflow:hidden;}
+    #weeklyReportPage .wr-bigc-mini-percent {display:flex;align-items:center;justify-content:center;text-align:center;font-size:22px;font-weight:900;line-height:1;color:#0c3426;white-space:nowrap;overflow:hidden;}
+    #weeklyReportPage .wr-bigc-mini.general .wr-bigc-mini-number{color:#005da4;}
+    #weeklyReportPage .wr-bigc-mini.recycle .wr-bigc-mini-number,#weeklyReportPage .wr-bigc-mini.recycle .wr-bigc-mini-percent{color:#d39d00;}
+    #weeklyReportPage .wr-bigc-mini.food .wr-bigc-mini-number,#weeklyReportPage .wr-bigc-mini.food .wr-bigc-mini-percent{color:#0a6a40;}
+
 
   </style>
 </head>
@@ -3772,7 +3812,7 @@ async function loadTrendHistory(currentData, requestId) {
       if(!stage||!slide)return;
       const wrap=stage.parentElement;
       const available=Math.max(0,wrap.clientWidth-4);
-      const exact=slide.classList.contains('wr-exact-overview');
+      const exact=slide.classList.contains('wr-exact-overview')||slide.classList.contains('wr-exact-bigc');
       const width=exact?1672:1600, height=exact?941:900;
       const scale=Math.min(1,available/width);
       slide.style.transform='scale('+scale+')';
@@ -3787,8 +3827,8 @@ async function loadTrendHistory(currentData, requestId) {
 
     // This overview uses the exact user-supplied infographic PNG as its background.
     // All figures come from the existing weeklyReport API, never baked into the image.
-    const WR_EXACT_TEMPLATE =
-  './Eco Waste Sorting Infographic.png';
+    const WR_OVERVIEW_TEMPLATE = './Eco Waste Sorting Infographic.png';
+    const WR_BIGC_TEMPLATE = './Big C House Waste Summary Infographic.png';
     function wrExactOverview(data){
       const sums=data.overview||{};
       const start=shortDate(data.weekStart), end=shortDate(data.weekEnd);
@@ -3797,12 +3837,11 @@ async function loadTrendHistory(currentData, requestId) {
       const add=(cls,left,top,width,height,value)=>'<div class="wr-exact-value '+cls+'" style="left:'+left+'px;top:'+top+'px;width:'+width+'px;height:'+height+'px">'+escapeHtml(value)+'</div>';
       const addKpi=(cls,left,top,width,height,value)=>{
         const figure=wrWeight(value);
-        // Make long values fit safely even when the weekly number increases.
         const size=figure.length>=10?28:figure.length>=9?31:35;
         return '<div class="wr-exact-value wr-exact-kpi '+cls+'" style="left:'+left+'px;top:'+top+'px;width:'+width+'px;height:'+height+'px;font-size:'+size+'px"><span class="wr-kpi-number">'+escapeHtml(figure)+'</span><span class="wr-kpi-unit">กก.</span></div>';
       };
       let html='<div class="wr-slide wr-exact-overview" aria-label="สรุปปริมาณขยะสำนักงานประจำสัปดาห์">'+
-        '<img class="wr-exact-background" src="'+WR_EXACT_TEMPLATE+'" alt="Template Infographic สรุปขยะสำนักงาน BJC Big C">';
+        '<img class="wr-exact-background" src="'+WR_OVERVIEW_TEMPLATE+'" alt="Template Infographic สรุปขยะสำนักงาน BJC Big C">';
       html+=add('wr-exact-date',397,108,880,40,period);
       html+=addKpi('general',379,192,159,82,sums.generalKg);
       html+=addKpi('food',921,192,166,82,sums.foodKg);
@@ -3810,21 +3849,94 @@ async function loadTrendHistory(currentData, requestId) {
       const totalFigure=wrWeight(sums.totalKg);
       const totalSize=totalFigure.length>=11?31:totalFigure.length>=9?35:40;
       html+='<div class="wr-exact-value wr-exact-total" style="left:925px;top:329px;width:310px;height:73px;font-size:'+totalSize+'px"><span class="wr-total-number">'+escapeHtml(totalFigure)+'</span><span class="wr-total-unit">กก.</span></div>';
-      // Exact cell boundaries measured against the 1672 x 941 PNG template.
-      // Full-cell coordinates keep every number centered within its own grid cell.
       const rowBounds=[[498,549],[549,601],[601,653],[653,705],[705,757],[757,809]];
       const buildings=(data.buildings||[]);
       buildings.slice(0,6).forEach((b,i)=>{
         const [y,bottom]=rowBounds[i], height=bottom-y;
-        const textY=y+12, textHeight=height-12; // small vertical offset within template cells
+        const textY=y+12, textHeight=height-12;
         html+=add('wr-exact-name',54,textY,302,textHeight,b.building||'');
         html+=add('wr-exact-cell',373,textY,338,textHeight,wrWeight(b.generalKg));
         html+=add('wr-exact-cell',712,textY,321,textHeight,wrWeight(b.foodKg));
         html+=add('wr-exact-cell',1034,textY,322,textHeight,wrWeight(b.recyclableKg));
         html+=add('wr-exact-cell total',1357,textY,255,textHeight,wrWeight(b.totalKg));
       });
-      // Only the requested explanatory note appears; no hazardous-waste line.
       html+='<div class="wr-exact-note">หมายเหตุ: สรุปจากประเภทขยะตามข้อมูลชั่งน้ำหนัก โดยไม่รวมคอลัมน์รายละเอียดที่นับซ้ำกับยอดขยะรีไซเคิล</div>';
+      return html+'</div>';
+    }
+    function wrReportPeriodText(data){
+      const start=shortDate(data.weekStart), end=shortDate(data.weekEnd);
+      const year=thaiYear(data.weekEnd);
+      return 'ระหว่างวันที่ '+start+' – '+end+' '+year+' | หน่วย : กิโลกรัม';
+    }
+    function wrBuildingAverageText(row){
+      const candidates=['avgWastePerPersonPerDay','avgPerPersonPerDay','averagePerPersonPerDay','avgPerPerson','averageKgPerPersonDay','averageKgPerPerson'];
+      for(const key of candidates){
+        const val=Number(row&&row[key]);
+        if(Number.isFinite(val) && val>0)return wrWeight(val);
+      }
+      const headcount=Number(row&&row.headcount);
+      const total=Number(row&&row.totalKg);
+      if(Number.isFinite(headcount) && headcount>0 && Number.isFinite(total))return wrWeight(total/headcount/5);
+      return '—';
+    }
+    function wrExactBigC(data,b){
+      const totals=b||{};
+      const rows=(b&&b.rows)||[];
+      const totalKg=Number(totals.totalKg||0), generalKg=Number(totals.generalKg||0), recycleKg=Number(totals.recyclableKg||0), foodKg=Number(totals.foodKg||0);
+      const generalPct=totalKg?generalKg/totalKg*100:0, recyclePct=totalKg?recycleKg/totalKg*100:0, foodPct=totalKg?foodKg/totalKg*100:0;
+      const period=wrReportPeriodText(data);
+      const fitSize=(value,maxLen,big,mid,small)=>String(value).length>=maxLen?small:(String(value).length>=maxLen-1?mid:big);
+      let html='<div class="wr-slide wr-exact-bigc" aria-label="สรุปปริมาณขยะ Big C House (C) รายชั้น">'+
+        '<img class="wr-bigc-background" src="'+WR_BIGC_TEMPLATE+'" alt="Big C House Waste Summary Infographic">';
+      html+='<div class="wr-bigc-period" style="left:611px;top:157px;width:422px;height:38px">'+escapeHtml(period)+'</div>';
+      html+='<div class="wr-bigc-kpi general" style="left:154px;top:241px;width:190px;height:41px;font-size:'+fitSize(wrWeight(generalKg),9,34,31,28)+'px">'+escapeHtml(wrWeight(generalKg))+'</div>';
+      html+='<div class="wr-bigc-kpi recycle" style="left:561px;top:241px;width:188px;height:41px;font-size:'+fitSize(wrWeight(recycleKg),8,34,31,28)+'px">'+escapeHtml(wrWeight(recycleKg))+'</div>';
+      html+='<div class="wr-bigc-kpi food" style="left:966px;top:241px;width:188px;height:41px;font-size:'+fitSize(wrWeight(foodKg),8,34,31,28)+'px">'+escapeHtml(wrWeight(foodKg))+'</div>';
+      html+='<div class="wr-bigc-kpi total" style="left:1378px;top:241px;width:188px;height:41px;font-size:'+fitSize(wrWeight(totalKg),9,34,31,28)+'px">'+escapeHtml(wrWeight(totalKg))+'</div>';
+      const bodyRows=rows.slice(0,9);
+      while(bodyRows.length<9)bodyRows.push({floor:'',department:'',generalKg:'',recyclableKg:'',foodKg:'',totalKg:'',headcount:'',__blank:true});
+      html+='<div class="wr-bigc-table">';
+      bodyRows.forEach((row,index)=>{
+        const values=[
+          ['floor',row.floor||''],
+          ['department',row.department||''],
+          ['num',row.__blank?'':wrWeight(row.generalKg)],
+          ['num',row.__blank?'':wrWeight(row.recyclableKg)],
+          ['num',row.__blank?'':wrWeight(row.foodKg)],
+          ['num totalcol',row.__blank?'':wrWeight(row.totalKg)],
+          ['avg',row.__blank?'':wrBuildingAverageText(row)]
+        ];
+        values.forEach(([cls,val],colIndex)=>{
+          html+='<div class="wr-bigc-cell '+cls+'" style="grid-column:'+(colIndex+1)+';grid-row:'+(index+1)+';">'+escapeHtml(val||'')+'</div>';
+        });
+      });
+      const footerValues=[['footer-label','รวมทั้งหมด'],['footer',''],['footer',wrWeight(generalKg)],['footer',wrWeight(recycleKg)],['footer',wrWeight(foodKg)],['footer',wrWeight(totalKg)],['footer','']];
+      footerValues.forEach(([cls,val],colIndex)=>{
+        html+='<div class="wr-bigc-cell '+cls+'" style="grid-column:'+(colIndex+1)+';grid-row:10;">'+escapeHtml(val||'')+'</div>';
+      });
+      html+='</div>';
+      const donut='conic-gradient(#1d70ea 0% '+generalPct+'%,#f2c11b '+generalPct+'% '+(generalPct+recyclePct)+'%,#20a453 '+(generalPct+recyclePct)+'% 100%)';
+      html+='<div class="wr-bigc-ratio">'+
+        '<div class="wr-bigc-donut" style="background:'+donut+'"><div class="wr-bigc-donut-inner">'+escapeHtml(wrWeight(totalKg))+'<small>กก.</small></div></div>'+
+        '<div class="wr-bigc-legend">'+
+          '<div><i style="background:#1d70ea"></i>ขยะทั่วไป '+escapeHtml(generalPct.toFixed(1))+'%</div>'+
+          '<div><i style="background:#f2c11b"></i>ขยะรีไซเคิล '+escapeHtml(recyclePct.toFixed(1))+'%</div>'+
+          '<div><i style="background:#20a453"></i>ขยะเศษอาหาร '+escapeHtml(foodPct.toFixed(1))+'%</div>'+
+        '</div></div>';
+      html+='<div class="wr-bigc-minis">';
+      [
+        ['general',generalKg,generalPct,33],
+        ['recycle',recycleKg,recyclePct,25],
+        ['food',foodKg,foodPct,26]
+      ].forEach(([cls,num,pct,left],i)=>{
+        const n=wrWeight(num), p=pct.toFixed(1)+'%';
+        const nSize=n.length>=8?24:27, pSize=21;
+        html+='<div class="wr-bigc-mini '+cls+'" style="grid-column:'+(i+1)+';">'+
+          '<div class="wr-bigc-mini-number" style="left:'+left+'px;top:13px;width:160px;height:30px;font-size:'+nSize+'px">'+escapeHtml(n)+'</div>'+
+          '<div class="wr-bigc-mini-percent" style="left:188px;top:73px;width:76px;height:30px;font-size:'+pSize+'px">'+escapeHtml(p)+'</div>'+
+        '</div>';
+      });
+      html+='</div>';
       return html+'</div>';
     }
     // Exports the source-size slide, not the CSS-scaled screen preview.
@@ -3836,8 +3948,8 @@ async function loadTrendHistory(currentData, requestId) {
       if(document.fonts && document.fonts.ready)await document.fonts.ready;
       // A cross-origin template must explicitly allow browser canvas access.
       // Fail visibly instead of silently exporting an image without its background.
-      if(source.classList.contains('wr-exact-overview')){
-        const bg=source.querySelector('.wr-exact-background');
+      if(source.classList.contains('wr-exact-overview') || source.classList.contains('wr-exact-bigc')){
+        const bg=source.querySelector('.wr-exact-background, .wr-bigc-background');
         if(!bg || !bg.complete || !bg.naturalWidth)throw new Error('ภาพ Template ยังโหลดไม่สำเร็จ');
         try{
           const result=await fetch(bg.currentSrc||bg.src,{mode:'cors',cache:'force-cache'});
@@ -3846,8 +3958,9 @@ async function loadTrendHistory(currentData, requestId) {
           throw new Error('Postimg ไม่อนุญาตให้ Export ภาพข้ามเว็บไซต์ผ่าน Canvas (CORS)');
         }
       }
-      const naturalWidth=source.classList.contains('wr-exact-overview')?1672:1600;
-      const naturalHeight=source.classList.contains('wr-exact-overview')?941:900;
+      const exactSlide=source.classList.contains('wr-exact-overview') || source.classList.contains('wr-exact-bigc');
+      const naturalWidth=exactSlide?1672:1600;
+      const naturalHeight=exactSlide?941:900;
       const canvas=await html2canvas(source,{
         backgroundColor:'#ffffff',useCORS:true,allowTaint:false,logging:false,
         scale:1.5,width:naturalWidth,height:naturalHeight,
@@ -3906,7 +4019,7 @@ async function loadTrendHistory(currentData, requestId) {
         wrStatus('สร้างไฟล์ '+kind.toUpperCase()+' แล้ว · ข้อมูลสัปดาห์ '+week);
       }catch(err){
         console.error('Weekly Report export failed',err);
-        wrStatus('Export ไม่สำเร็จ: '+(err.message||String(err))+' · หากเป็นปัญหาภาพข้ามเว็บไซต์ (CORS) ให้เก็บภาพ Template ใน GitHub Repository แล้วเปลี่ยน WR_EXACT_TEMPLATE เป็น ./assets/Eco-Waste-Sorting-Infographic.png',true);
+        wrStatus('Export ไม่สำเร็จ: '+(err.message||String(err))+' · หากเป็นปัญหาภาพข้ามเว็บไซต์ (CORS) ให้เก็บภาพ Template ใน GitHub Repository แล้วเปลี่ยน WR_OVERVIEW_TEMPLATE เป็น ./assets/Eco-Waste-Sorting-Infographic.png',true);
       }finally{png.disabled=false;pdf.disabled=false;}
     }
     wrElement('wrExportPng').addEventListener('click',()=>wrExport('png'));
@@ -3930,7 +4043,9 @@ async function loadTrendHistory(currentData, requestId) {
       const extra=isOverview?'<div class="wr-totalband"><span class="wr-total-leaf">❧</span>รวมขยะทั้งหมด '+wrWeight(totals.totalKg)+' กก.<span class="wr-total-leaf">❧</span></div>':
         wrRatioAndRanking(b);
       const notes=isOverview?'<div class="wr-overview-notes"><div><strong>🌱 SAVE EARTH · SAVE OFFICE</strong>สรุปปริมาณขยะจริงจากข้อมูลชั่งน้ำหนักประจำสัปดาห์</div><div><strong>ข้อมูลสำหรับการนำเสนอ</strong>รวมเฉพาะขยะทั่วไป รีไซเคิล และเศษอาหาร ไม่รวมขยะอันตราย</div></div>':'';
+      const useBigCExact=!isOverview && buildingName==='Big C House (C)';
       const slide=isOverview?wrExactOverview(data):
+        useBigCExact?wrExactBigC(data,b):
         '<div class="wr-slide '+(rows.length>18?'wr-dense':'')+'">'+
         heading+wrSlideKpis(totals)+wrSlideTable(rows,false)+extra+
         '<div class="wr-slide-bottom"><span>SAVE EARTH · SAVE OFFICE · ลดขยะวันนี้ เพื่อโลกที่ยั่งยืน</span><span>WEEKLY REPORT · '+escapeHtml(data.weekEnd)+'</span></div></div>';
