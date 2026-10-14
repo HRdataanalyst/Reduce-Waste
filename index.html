@@ -1836,7 +1836,7 @@
     #weeklyReportPage .wr-exact-kpi.recycle {color:#16291c;}
     #weeklyReportPage .wr-exact-total {font-size:39px; font-weight:900; color:#07583a;}
     #weeklyReportPage .wr-exact-name {font-size:25px; font-weight:500; justify-content:flex-start; color:#1e2b23; padding-left:33px;}
-    #weeklyReportPage .wr-exact-cell {font-size:25px; font-weight:500; color:#182a20;}
+    #weeklyReportPage .wr-exact-cell {display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important;font-size:25px; font-weight:500; color:#182a20; font-variant-numeric:tabular-nums;}
     #weeklyReportPage .wr-exact-cell.total {font-size:26px; font-weight:900; color:#051b13;}
     #weeklyReportPage .wr-exact-note {position:absolute; z-index:2; left:65px; top:804px; width:1470px; height:62px; font-family:'Noto Sans Thai',Tahoma,sans-serif; font-size:17px; line-height:1.4; color:#5e665f;}
     #weeklyReportPage .wr-exact-note em {display:block; font-style:normal; color:#d52e2e; font-weight:700;}
@@ -3788,15 +3788,17 @@ async function loadTrendHistory(currentData, requestId) {
       html+=add('wr-exact-kpi food',900,191,170,63,wrWeight(sums.foodKg));
       html+=add('wr-exact-kpi recycle',1404,191,181,63,wrWeight(sums.recyclableKg));
       html+=add('wr-exact-total',908,317,297,76,wrWeight(sums.totalKg));
-      const rowY=[492,543,594,645,696,746];
+      // Exact cell boundaries measured against the 1672 x 941 PNG template.
+      // Full-cell coordinates keep every number centered within its own grid cell.
+      const rowBounds=[[491,540],[540,593],[593,643],[643,695],[695,744],[744,796]];
       const buildings=(data.buildings||[]);
       buildings.slice(0,6).forEach((b,i)=>{
-        const y=rowY[i];
-        html+=add('wr-exact-name',54,y,300,43,b.building||'');
-        html+=add('wr-exact-cell',358,y,333,43,wrWeight(b.generalKg));
-        html+=add('wr-exact-cell',695,y,319,43,wrWeight(b.foodKg));
-        html+=add('wr-exact-cell',1017,y,319,43,wrWeight(b.recyclableKg));
-        html+=add('wr-exact-cell total',1340,y,253,43,wrWeight(b.totalKg));
+        const [y,bottom]=rowBounds[i], height=bottom-y;
+        html+=add('wr-exact-name',54,y,302,height,b.building||'');
+        html+=add('wr-exact-cell',357,y,338,height,wrWeight(b.generalKg));
+        html+=add('wr-exact-cell',696,y,321,height,wrWeight(b.foodKg));
+        html+=add('wr-exact-cell',1018,y,322,height,wrWeight(b.recyclableKg));
+        html+=add('wr-exact-cell total',1341,y,255,height,wrWeight(b.totalKg));
       });
       // The underlying template has exactly six empty building rows.
       // Keep notes outside the image background's table, and do not invent hazardous weight.
