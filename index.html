@@ -1830,15 +1830,15 @@
       background:transparent; border:none;
     }
     #weeklyReportPage .wr-exact-date {font-size:29px; font-weight:600; color:#45554d;}
-    #weeklyReportPage .wr-exact-kpi {font-size:37px; font-weight:900; letter-spacing:-.6px;}
+    #weeklyReportPage .wr-exact-kpi {font-size:43px; font-weight:900; letter-spacing:-.6px;}
     #weeklyReportPage .wr-exact-kpi.general {color:#005c9e;}
     #weeklyReportPage .wr-exact-kpi.food {color:#045e37;}
     #weeklyReportPage .wr-exact-kpi.recycle {color:#16291c;}
-    #weeklyReportPage .wr-exact-total {font-size:39px; font-weight:900; color:#07583a;}
+    #weeklyReportPage .wr-exact-total {font-size:48px; font-weight:900; color:#07583a;}
     #weeklyReportPage .wr-exact-name {font-size:25px; font-weight:500; justify-content:flex-start; color:#1e2b23; padding-left:33px;}
     #weeklyReportPage .wr-exact-cell {display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important;font-size:25px; font-weight:500; color:#182a20; font-variant-numeric:tabular-nums;}
     #weeklyReportPage .wr-exact-cell.total {font-size:26px; font-weight:900; color:#051b13;}
-    #weeklyReportPage .wr-exact-note {position:absolute; z-index:2; left:65px; top:804px; width:1470px; height:62px; font-family:'Noto Sans Thai',Tahoma,sans-serif; font-size:17px; line-height:1.4; color:#5e665f;}
+    #weeklyReportPage .wr-exact-note {position:absolute; z-index:2; left:65px; top:820px; width:1470px; height:58px; font-family:'Noto Sans Thai',Tahoma,sans-serif; font-size:17px; line-height:1.4; color:#5e665f;}
     #weeklyReportPage .wr-exact-note em {display:block; font-style:normal; color:#d52e2e; font-weight:700;}
 
   </style>
@@ -3784,21 +3784,22 @@ async function loadTrendHistory(currentData, requestId) {
       let html='<div class="wr-slide wr-exact-overview" aria-label="สรุปปริมาณขยะสำนักงานประจำสัปดาห์">'+
         '<img class="wr-exact-background" src="'+WR_EXACT_TEMPLATE+'" alt="Template Infographic สรุปขยะสำนักงาน BJC Big C">';
       html+=add('wr-exact-date',397,108,880,40,period);
-      html+=add('wr-exact-kpi general',361,191,170,63,wrWeight(sums.generalKg));
-      html+=add('wr-exact-kpi food',900,191,170,63,wrWeight(sums.foodKg));
-      html+=add('wr-exact-kpi recycle',1404,191,181,63,wrWeight(sums.recyclableKg));
-      html+=add('wr-exact-total',908,317,297,76,wrWeight(sums.totalKg));
+      html+=add('wr-exact-kpi general',361,196,170,63,wrWeight(sums.generalKg));
+      html+=add('wr-exact-kpi food',900,196,170,63,wrWeight(sums.foodKg));
+      html+=add('wr-exact-kpi recycle',1404,196,181,63,wrWeight(sums.recyclableKg));
+      html+=add('wr-exact-total',908,320,297,76,wrWeight(sums.totalKg));
       // Exact cell boundaries measured against the 1672 x 941 PNG template.
       // Full-cell coordinates keep every number centered within its own grid cell.
       const rowBounds=[[491,540],[540,593],[593,643],[643,695],[695,744],[744,796]];
       const buildings=(data.buildings||[]);
       buildings.slice(0,6).forEach((b,i)=>{
         const [y,bottom]=rowBounds[i], height=bottom-y;
-        html+=add('wr-exact-name',54,y,302,height,b.building||'');
-        html+=add('wr-exact-cell',357,y,338,height,wrWeight(b.generalKg));
-        html+=add('wr-exact-cell',696,y,321,height,wrWeight(b.foodKg));
-        html+=add('wr-exact-cell',1018,y,322,height,wrWeight(b.recyclableKg));
-        html+=add('wr-exact-cell total',1341,y,255,height,wrWeight(b.totalKg));
+        const textY=y+9, textHeight=height-9; // visually center text lower in each printed template row
+        html+=add('wr-exact-name',54,textY,302,textHeight,b.building||'');
+        html+=add('wr-exact-cell',357,textY,338,textHeight,wrWeight(b.generalKg));
+        html+=add('wr-exact-cell',696,textY,321,textHeight,wrWeight(b.foodKg));
+        html+=add('wr-exact-cell',1018,textY,322,textHeight,wrWeight(b.recyclableKg));
+        html+=add('wr-exact-cell total',1341,textY,255,textHeight,wrWeight(b.totalKg));
       });
       // The underlying template has exactly six empty building rows.
       // Keep notes outside the image background's table, and do not invent hazardous weight.
