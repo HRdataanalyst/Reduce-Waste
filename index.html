@@ -1787,7 +1787,12 @@
     #weeklyReportPage .wr-slide-overview .wr-table td{font-size:22px!important;padding:11px 16px!important}
     #weeklyReportPage .wr-slide-overview .wr-table th{font-size:21px!important;padding:12px!important;height:61px}
     #weeklyReportPage .wr-slide-overview .wr-table tfoot td{font-size:23px!important}
-    #weeklyReportPage .wr-slide-bottom{height:18px;font-size:12px}
+    #weeklyReportPage .wr-kpis.wr-kpis-overview{grid-template-columns:repeat(3,minmax(0,1fr));}
+    #weeklyReportPage .wr-kpis.wr-kpis-overview .wr-kpi{min-height:120px;}
+    #weeklyReportPage .wr-summary-notes{margin-top:10px;padding:0 16px 0 18px;line-height:1.35;}
+    #weeklyReportPage .wr-note-main{font-size:14px;color:#5d635e;margin-bottom:4px;}
+    #weeklyReportPage .wr-note-danger{font-size:14px;color:#d73737;font-weight:800;}
+#weeklyReportPage .wr-slide-bottom{height:18px;font-size:12px}
     #weeklyReportPage .wr-dept-lines{display:block;max-width:100%;line-height:1.16}
     #weeklyReportPage .wr-no-mapping{color:#ad5d05;font-weight:800}
     #weeklyReportPage .wr-slide .wr-table th .wr-hicon{display:inline-block;margin-right:7px;font-size:1.15em;vertical-align:-1px}
@@ -1800,7 +1805,13 @@
     #weeklyReportPage .wr-slogan-image{width:235px;height:91px;object-fit:contain;object-position:right center;display:block}
     #weeklyReportPage .wr-brand-area{overflow:hidden}
     #weeklyReportPage .wr-slogan{text-align:right}
-  </style>
+  
+    /* WEEKLY REPORT PREVIEW FIX — scale only the on-screen preview. */
+    #weeklyReportPage .wr-slide-scroll{width:100%;max-width:100%;overflow:hidden!important;padding:8px 0 16px!important}
+    #weeklyReportPage .wr-slide-stage{position:relative;max-width:100%;margin:0 auto!important;overflow:visible!important}
+    #weeklyReportPage .wr-report{width:100%;min-width:0;max-width:100%}
+    #weeklyReportPage .wr-slide{transform-origin:top left!important;flex-shrink:0}
+</style>
 </head>
 <body>
   <div class="app">
@@ -3667,9 +3678,11 @@ async function loadTrendHistory(currentData, requestId) {
       const symbols={general:'▣',recycle:'♻',food:'❧',total:'∑'};
       return '<span class="wr-kpi-icon" aria-hidden="true">'+symbols[kind]+'</span>';
     }
-    function wrSlideKpis(t){
-      const parts=[['generalKg','ขยะทั่วไป','general'],['recyclableKg','ขยะรีไซเคิล','recycle'],['foodKg','ขยะเศษอาหาร','food'],['totalKg','รวมทั้งหมด','total']];
-      return '<div class="wr-kpis">'+parts.map(([key,label,cls])=>
+    function wrSlideKpis(t, overview){
+      const parts = overview
+        ? [['generalKg','ขยะทั่วไป','general'],['foodKg','ขยะเศษอาหาร','food'],['recyclableKg','ขยะรีไซเคิล','recycle']]
+        : [['generalKg','ขยะทั่วไป','general'],['recyclableKg','ขยะรีไซเคิล','recycle'],['foodKg','ขยะเศษอาหาร','food'],['totalKg','รวมทั้งหมด','total']];
+      return '<div class="wr-kpis '+(overview?'wr-kpis-overview':'')+'">'+parts.map(([key,label,cls])=>
         '<div class="wr-kpi '+cls+'">'+wrIcon(cls)+'<span>'+label+'</span><strong>'+wrWeight(t[key])+' <small>กก.</small></strong></div>'
       ).join('')+'</div>';
     }
@@ -3683,21 +3696,33 @@ async function loadTrendHistory(currentData, requestId) {
       return '<span class="wr-dept-lines">'+escapeHtml(raw)+'</span>';
     }
     function wrSlideTable(rows, overview){
-      const fields=['generalKg','recyclableKg','foodKg','totalKg'];
-      const colgroup=overview?'<colgroup><col style="width:32%"><col style="width:17%"><col style="width:17%"><col style="width:17%"><col style="width:17%"></colgroup>':
+      const cols = overview
+        ? [
+            ['generalKg','wr-general','🗑️ ขยะทั่วไป (กก.)'],
+            ['foodKg','wr-food','🍎 ขยะเศษอาหาร (กก.)'],
+            ['recyclableKg','wr-recycle','♻ ขยะรีไซเคิล (กก.)'],
+            ['totalKg','','รวม (กก.)']
+          ]
+        : [
+            ['generalKg','wr-general','ขยะทั่วไป (กก.)'],
+            ['recyclableKg','wr-recycle','ขยะรีไซเคิล (กก.)'],
+            ['foodKg','wr-food','ขยะเศษอาหาร (กก.)'],
+            ['totalKg','','Total (กก.)']
+          ];
+      const colgroup=overview?'<colgroup><col style="width:32%"><col style="width:22%"><col style="width:21%"><col style="width:17%"><col style="width:18%"></colgroup>':
         '<colgroup><col style="width:8%"><col style="width:33%"><col style="width:14.5%"><col style="width:14.5%"><col style="width:14.5%"><col style="width:15.5%"></colgroup>';
-      const head='<tr><th>'+(overview?'อาคาร':'ชั้น')+'</th>'+(overview?'':'<th>แผนก</th>')+
-        '<th class="wr-general"><span class="wr-hicon">▣</span>ขยะทั่วไป (กก.)</th><th class="wr-recycle"><span class="wr-hicon">♻</span>ขยะรีไซเคิล (กก.)</th><th class="wr-food"><span class="wr-hicon">❧</span>ขยะเศษอาหาร (กก.)</th><th>Total (กก.)</th></tr>';
+      const head='<tr><th>'+(overview?'🏢 อาคาร':'ชั้น')+'</th>'+(overview?'':'<th>แผนก</th>')+
+        cols.map(([,cls,label])=>'<th class="'+cls+'">'+label+'</th>').join('')+'</tr>';
       const body=rows.map(r=>{
         const identity=overview?'<td>'+escapeHtml(r.building)+'</td>':
           '<td class="wr-floor">'+escapeHtml(r.floor)+'</td><td class="wr-dept">'+wrDepartmentHtml(r.department)+'</td>';
-        return '<tr>'+identity+fields.map((f,i)=>'<td class="'+(i===3?'wr-strong ':'')+(!overview&&!r.hasData?'wr-empty-cell':'')+'">'+
+        return '<tr>'+identity+cols.map(([f],i)=>'<td class="'+(f==='totalKg'?'wr-strong ':'')+(!overview&&!r.hasData?'wr-empty-cell':'')+'">'+
           (!overview&&!r.hasData?'—':wrWeight(r[f]))+'</td>').join('')+'</tr>';
       }).join('');
-      const sum=fields.reduce((acc,f)=>{acc[f]=rows.reduce((v,r)=>v+Number(r[f]||0),0);return acc;},{});
+      const sum = cols.reduce((acc,[f])=>{acc[f]=rows.reduce((v,r)=>v+Number(r[f]||0),0);return acc;},{});
       return '<div class="wr-slide-tablebox"><div class="wr-table-scroll"><table class="wr-table">'+colgroup+
         '<thead>'+head+'</thead><tbody>'+(body||'<tr><td colspan="'+(overview?5:6)+'">ยังไม่มีข้อมูล</td></tr>')+'</tbody><tfoot><tr><td colspan="'+(overview?1:2)+'">รวมทั้งหมด</td>'+
-        fields.map(f=>'<td>'+wrWeight(sum[f])+'</td>').join('')+'</tr></tfoot></table></div></div>';
+        cols.map(([f])=>'<td>'+wrWeight(sum[f])+'</td>').join('')+'</tr></tfoot></table></div></div>';
     }
     function wrRatioAndRanking(b){
       const g=Number(b.generalKg||0),r=Number(b.recyclableKg||0),f=Number(b.foodKg||0),t=g+r+f;
@@ -3712,18 +3737,30 @@ async function loadTrendHistory(currentData, requestId) {
         '<div class="wr-legend">'+legend+'</div></div></section><section><h3>🏆 3 อันดับชั้นที่มีปริมาณขยะรวมสูงสุด</h3>'+
         '<div class="wr-rank-grid">'+(rank||'<div>ยังไม่มีข้อมูล</div>')+'</div></section></div>';
     }
+    function wrOverviewNotes(data){
+      const hazardous = Number(((data||{}).overview||{}).hazardousKg || 0);
+      return '<div class="wr-summary-notes">'+
+        '<div class="wr-note-main">หมายเหตุ: สรุปตามคอลัมน์ประเภทขยะในโฟลเดอร์ต้นทาง โดยไม่นำคอลัมน์ขยะรายละเอียดอื่นที่อยู่ซ้ำกับยอดขยะรีไซเคิล</div>'+
+        '<div class="wr-note-danger">*ข้อมูลขยะอันตรายที่บันทึกในช่วงวันที่ดังกล่าว = '+wrWeight(hazardous)+' กก.</div>'+
+      '</div>';
+    }
+
     function wrFitSlide(){
       const stage=wrElement('wrResult').querySelector('.wr-slide-stage');
       const slide=stage&&stage.querySelector('.wr-slide');
       if(!stage||!slide)return;
       const wrap=stage.parentElement;
-      const available=Math.max(0,wrap.clientWidth);
+      const available=Math.max(0,wrap.clientWidth-4);
       const scale=Math.min(1,available/1600);
       slide.style.transform='scale('+scale+')';
       stage.style.height=(900*scale)+'px';
       stage.style.width=(1600*scale)+'px';
     }
     window.addEventListener('resize',wrFitSlide);
+    if(typeof ResizeObserver!=='undefined'){
+      const wrPreviewObserver=new ResizeObserver(()=>wrFitSlide());
+      wrPreviewObserver.observe(wrElement('weeklyReportPage'));
+    }
     function wrRender(){
       if(!wrUI.loaded||!wrUI.data)return;
       const data=wrUI.data;
@@ -3741,11 +3778,11 @@ async function loadTrendHistory(currentData, requestId) {
         '<div class="wr-slogan"><img class="wr-slogan-image" alt="Together for a cleaner greener tomorrow" src="'+WR_SLOGAN+'"></div></div>';
       const extra=isOverview?'<div class="wr-totalband"><span class="wr-total-leaf">❧</span>รวมขยะทั้งหมด '+wrWeight(totals.totalKg)+' กก.<span class="wr-total-leaf">❧</span></div>':
         wrRatioAndRanking(b);
-      const notes=isOverview?'<div class="wr-overview-notes"><div><strong>🌱 SAVE EARTH · SAVE OFFICE</strong>สรุปปริมาณขยะจริงจากข้อมูลชั่งน้ำหนักประจำสัปดาห์</div><div><strong>ข้อมูลสำหรับการนำเสนอ</strong>รวมเฉพาะขยะทั่วไป รีไซเคิล และเศษอาหาร ไม่รวมขยะอันตราย</div></div>':'';
+      const notes=isOverview?'<div class="wr-overview-notes"><div><strong>🌱 SAVE EARTH · SAVE OFFICE</strong>สรุปปริมาณขยะจริงจากข้อมูลชั่งน้ำหนักประจำสัปดาห์</div><div><strong>ข้อมูลสำหรับการนำเสนอ</strong>Template นี้ใช้สำหรับ Preview และ Export โดยตัวเลขจะอัปเดตตามสัปดาห์ที่เลือก</div></div>':'';
       const slide='<div class="wr-slide '+(isOverview?'wr-slide-overview ':'')+(rows.length>18?'wr-dense':'')+'">'+
-        heading+wrSlideKpis(totals)+(isOverview?extra:'')+wrSlideTable(rows,isOverview)+(isOverview?notes:extra)+
+        heading+wrSlideKpis(totals,isOverview)+(isOverview?extra:'')+wrSlideTable(rows,isOverview)+(isOverview?(notes+wrOverviewNotes(data)):extra)+
         '<div class="wr-slide-bottom"><span>SAVE EARTH · SAVE OFFICE · ลดขยะวันนี้ เพื่อโลกที่ยั่งยืน</span><span>WEEKLY REPORT · '+escapeHtml(data.weekEnd)+'</span></div></div>';
-      wrElement('wrResult').innerHTML='<article class="wr-report"><p class="wr-preview-help">ตัวอย่างหน้า Infographic 16:9 · ข้อมูลจริงจาก Google Sheets · ยังไม่เปิดใช้งาน Export</p><div class="wr-slide-scroll">'+slide+'</div></article>';
+      wrElement('wrResult').innerHTML='<article class="wr-report"><p class="wr-preview-help">ตัวอย่างหน้า Infographic 16:9 · ข้อมูลจริงจาก Google Sheets · ยังไม่เปิดใช้งาน Export</p><div class="wr-slide-scroll"><div class="wr-slide-stage">'+slide+'</div></div></article>';
       wrElement('wrResult').classList.remove('hidden');
       wrFitSlide();
       const count=Number(data.matchedRecords||0);
