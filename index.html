@@ -3787,7 +3787,8 @@ async function loadTrendHistory(currentData, requestId) {
 
     // This overview uses the exact user-supplied infographic PNG as its background.
     // All figures come from the existing weeklyReport API, never baked into the image.
-    const WR_EXACT_TEMPLATE='https://i.postimg.cc/dVzpSPFQ/Eco-Waste-Sorting-Infographic.png';
+    const WR_EXACT_TEMPLATE =
+  './Eco Waste Sorting Infographic.png';
     function wrExactOverview(data){
       const sums=data.overview||{};
       const start=shortDate(data.weekStart), end=shortDate(data.weekEnd);
