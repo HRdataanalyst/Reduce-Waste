@@ -3808,7 +3808,7 @@ async function loadTrendHistory(currentData, requestId) {
       html+=addKpi('recycle',1426,192,174,82,sums.recyclableKg);
       const totalFigure=wrWeight(sums.totalKg);
       const totalSize=totalFigure.length>=11?31:totalFigure.length>=9?35:40;
-      html+='<div class="wr-exact-value wr-exact-total" style="left:925px;top:334px;width:310px;height:73px;font-size:'+totalSize+'px"><span class="wr-total-number">'+escapeHtml(totalFigure)+'</span><span class="wr-total-unit">กก.</span></div>';
+      html+='<div class="wr-exact-value wr-exact-total" style="left:925px;top:329px;width:310px;height:73px;font-size:'+totalSize+'px"><span class="wr-total-number">'+escapeHtml(totalFigure)+'</span><span class="wr-total-unit">กก.</span></div>';
       // Exact cell boundaries measured against the 1672 x 941 PNG template.
       // Full-cell coordinates keep every number centered within its own grid cell.
       const rowBounds=[[498,549],[549,601],[601,653],[653,705],[705,757],[757,809]];
@@ -3817,10 +3817,10 @@ async function loadTrendHistory(currentData, requestId) {
         const [y,bottom]=rowBounds[i], height=bottom-y;
         const textY=y+12, textHeight=height-12; // small vertical offset within template cells
         html+=add('wr-exact-name',54,textY,302,textHeight,b.building||'');
-        html+=add('wr-exact-cell',357,textY,338,textHeight,wrWeight(b.generalKg));
-        html+=add('wr-exact-cell',696,textY,321,textHeight,wrWeight(b.foodKg));
-        html+=add('wr-exact-cell',1018,textY,322,textHeight,wrWeight(b.recyclableKg));
-        html+=add('wr-exact-cell total',1341,textY,255,textHeight,wrWeight(b.totalKg));
+        html+=add('wr-exact-cell',373,textY,338,textHeight,wrWeight(b.generalKg));
+        html+=add('wr-exact-cell',712,textY,321,textHeight,wrWeight(b.foodKg));
+        html+=add('wr-exact-cell',1034,textY,322,textHeight,wrWeight(b.recyclableKg));
+        html+=add('wr-exact-cell total',1357,textY,255,textHeight,wrWeight(b.totalKg));
       });
       // Only the requested explanatory note appears; no hazardous-waste line.
       html+='<div class="wr-exact-note">หมายเหตุ: สรุปจากประเภทขยะตามข้อมูลชั่งน้ำหนัก โดยไม่รวมคอลัมน์รายละเอียดที่นับซ้ำกับยอดขยะรีไซเคิล</div>';
