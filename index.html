@@ -1622,6 +1622,8 @@
     #weeklyReportPage .wr-field{display:flex;flex:1 1 210px;flex-direction:column;gap:6px;font-size:.74rem;font-weight:700;color:var(--forest)}
     #weeklyReportPage .wr-field input,#weeklyReportPage .wr-field select{width:100%;height:44px;min-width:0;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:#f8fbf9;color:var(--ink);font-family:inherit;font-size:.78rem}
     #weeklyReportPage #wrLoad{height:44px}
+    #weeklyReportPage #wrExportPng,#weeklyReportPage #wrExportPdf{height:44px;background:#07593d;color:#fff}
+    #weeklyReportPage #wrExportPng:disabled,#weeklyReportPage #wrExportPdf:disabled{opacity:.5;cursor:not-allowed}
     #weeklyReportPage .wr-status{margin:0 0 16px;font-size:.76rem;color:var(--muted)}
     #weeklyReportPage .wr-status.wr-error{color:#a12f3d}
     #weeklyReportPage .wr-report{padding:22px;margin-bottom:16px}
@@ -1830,15 +1832,17 @@
       background:transparent; border:none;
     }
     #weeklyReportPage .wr-exact-date {font-size:29px; font-weight:600; color:#45554d;}
-    #weeklyReportPage .wr-exact-kpi {font-size:43px; font-weight:900; letter-spacing:-.6px;}
+    #weeklyReportPage .wr-exact-kpi {font-size:43px; font-weight:900; letter-spacing:-.8px; display:flex!important; flex-direction:column; gap:0; line-height:1.04;}
+    #weeklyReportPage .wr-exact-kpi .wr-kpi-number{display:block;line-height:1.1;font-weight:900;}
+    #weeklyReportPage .wr-exact-kpi .wr-kpi-unit{display:block;font-size:21px;line-height:1.25;font-weight:700;letter-spacing:0;}
     #weeklyReportPage .wr-exact-kpi.general {color:#005c9e;}
     #weeklyReportPage .wr-exact-kpi.food {color:#045e37;}
     #weeklyReportPage .wr-exact-kpi.recycle {color:#16291c;}
-    #weeklyReportPage .wr-exact-total {font-size:48px; font-weight:900; color:#07583a;}
+    #weeklyReportPage .wr-exact-total {font-size:52px; font-weight:900; color:#07583a;letter-spacing:-1.1px;}
     #weeklyReportPage .wr-exact-name {font-size:25px; font-weight:500; justify-content:flex-start; color:#1e2b23; padding-left:33px;}
     #weeklyReportPage .wr-exact-cell {display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important;font-size:25px; font-weight:500; color:#182a20; font-variant-numeric:tabular-nums;}
     #weeklyReportPage .wr-exact-cell.total {font-size:26px; font-weight:900; color:#051b13;}
-    #weeklyReportPage .wr-exact-note {position:absolute; z-index:2; left:65px; top:820px; width:1470px; height:58px; font-family:'Noto Sans Thai',Tahoma,sans-serif; font-size:17px; line-height:1.4; color:#5e665f;}
+    #weeklyReportPage .wr-exact-note {position:absolute; z-index:2; left:65px; top:836px; width:1470px; height:44px; font-family:'Noto Sans Thai',Tahoma,sans-serif; font-size:17px; line-height:1.4; color:#5e665f;}
     #weeklyReportPage .wr-exact-note em {display:block; font-style:normal; color:#d52e2e; font-weight:700;}
 
   </style>
@@ -2250,7 +2254,10 @@
           <label class="wr-field">วันจันทร์เริ่มสัปดาห์ <input id="wrWeekStart" type="date" /></label>
           <label class="wr-field">อาคาร <select id="wrBuilding"><option value="ALL">ทุกอาคาร — ภาพรวม</option></select></label>
           <button id="wrLoad" type="button" class="refresh-button">แสดงรายงาน</button>
+          <button id="wrExportPng" type="button" class="refresh-button" disabled>Export PNG</button>
+          <button id="wrExportPdf" type="button" class="refresh-button" disabled>Export PDF</button>
         </section>
+        <p class="wr-status">การ Export จะใช้ภาพ Template เต็มขนาดและตัวเลขของสัปดาห์ที่เลือก หากภาพจาก Postimg ไม่อนุญาตการจับภาพ จะมีคำแนะนำให้แก้ไข</p>
         <p id="wrStatus" class="wr-status" role="status" aria-live="polite">เลือกสัปดาห์แล้วกดแสดงรายงาน</p>
         <section id="wrResult" class="hidden" aria-label="ตารางสรุปขยะ"></section>
         <section id="wrWarnings" class="hidden wr-warnings" aria-label="ข้อควรตรวจสอบจากข้อมูล"></section>
@@ -2262,6 +2269,8 @@
 
   <div class="loading" id="loading"><div class="loader"><span class="spinner"></span>กำลังโหลดข้อมูล Dashboard...</div></div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
     const CONFIG={apiUrl:'https://script.google.com/macros/s/AKfycbwXm6FMjhg4BBvdLjVaSRyVDsH5_uoV7kOnFgw4OLjo8MwHw-u0UkLvUIFmGZDUXgBs4Q/exec',timeoutMs:60000};
     function currentMonthBangkok(){
@@ -3774,43 +3783,106 @@ async function loadTrendHistory(currentData, requestId) {
 
     // This overview uses the exact user-supplied infographic PNG as its background.
     // All figures come from the existing weeklyReport API, never baked into the image.
-    const WR_EXACT_TEMPLATE='https://i.postimg.cc/wTc46yDB/Office-Waste-Summary-Infographic-Template.png';
+    const WR_EXACT_TEMPLATE='https://i.postimg.cc/dVzpSPFQ/Eco-Waste-Sorting-Infographic.png';
     function wrExactOverview(data){
       const sums=data.overview||{};
       const start=shortDate(data.weekStart), end=shortDate(data.weekEnd);
       const year=thaiYear(data.weekEnd);
       const period='ระหว่างวันที่ '+start+' – '+end+' '+year+'   |   หน่วย: กิโลกรัม (กก.)';
       const add=(cls,left,top,width,height,value)=>'<div class="wr-exact-value '+cls+'" style="left:'+left+'px;top:'+top+'px;width:'+width+'px;height:'+height+'px">'+escapeHtml(value)+'</div>';
+      const addKpi=(cls,left,top,width,height,value)=>'<div class="wr-exact-value wr-exact-kpi '+cls+'" style="left:'+left+'px;top:'+top+'px;width:'+width+'px;height:'+height+'px"><span class="wr-kpi-number">'+escapeHtml(wrWeight(value))+'</span><span class="wr-kpi-unit">กก.</span></div>';
       let html='<div class="wr-slide wr-exact-overview" aria-label="สรุปปริมาณขยะสำนักงานประจำสัปดาห์">'+
         '<img class="wr-exact-background" src="'+WR_EXACT_TEMPLATE+'" alt="Template Infographic สรุปขยะสำนักงาน BJC Big C">';
       html+=add('wr-exact-date',397,108,880,40,period);
-      html+=add('wr-exact-kpi general',361,196,170,63,wrWeight(sums.generalKg));
-      html+=add('wr-exact-kpi food',900,196,170,63,wrWeight(sums.foodKg));
-      html+=add('wr-exact-kpi recycle',1404,196,181,63,wrWeight(sums.recyclableKg));
-      html+=add('wr-exact-total',908,320,297,76,wrWeight(sums.totalKg));
+      html+=addKpi('general',379,192,159,82,sums.generalKg);
+      html+=addKpi('food',921,192,166,82,sums.foodKg);
+      html+=addKpi('recycle',1426,192,174,82,sums.recyclableKg);
+      html+=add('wr-exact-total',925,334,310,73,wrWeight(sums.totalKg)+' กก.');
       // Exact cell boundaries measured against the 1672 x 941 PNG template.
       // Full-cell coordinates keep every number centered within its own grid cell.
-      const rowBounds=[[491,540],[540,593],[593,643],[643,695],[695,744],[744,796]];
+      const rowBounds=[[498,549],[549,601],[601,653],[653,705],[705,757],[757,809]];
       const buildings=(data.buildings||[]);
       buildings.slice(0,6).forEach((b,i)=>{
         const [y,bottom]=rowBounds[i], height=bottom-y;
-        const textY=y+9, textHeight=height-9; // visually center text lower in each printed template row
+        const textY=y+12, textHeight=height-12; // small vertical offset within template cells
         html+=add('wr-exact-name',54,textY,302,textHeight,b.building||'');
         html+=add('wr-exact-cell',357,textY,338,textHeight,wrWeight(b.generalKg));
         html+=add('wr-exact-cell',696,textY,321,textHeight,wrWeight(b.foodKg));
         html+=add('wr-exact-cell',1018,textY,322,textHeight,wrWeight(b.recyclableKg));
         html+=add('wr-exact-cell total',1341,textY,255,textHeight,wrWeight(b.totalKg));
       });
-      // The underlying template has exactly six empty building rows.
-      // Keep notes outside the image background's table, and do not invent hazardous weight.
-      let hazardLine='ข้อมูลขยะอันตรายไม่รวมในยอดขยะทั้งหมด';
-      if(sums.hazardousKg!==null && sums.hazardousKg!==undefined && sums.hazardousKg!==''){
-        hazardLine='ข้อมูลขยะอันตรายที่บันทึกในช่วงวันที่ดังกล่าว = '+wrWeight(sums.hazardousKg)+' กก. (ไม่รวมในยอดทั้งหมด)';
-      }
-      html+='<div class="wr-exact-note">หมายเหตุ: สรุปจากประเภทขยะตามข้อมูลชั่งน้ำหนัก โดยไม่รวมคอลัมน์รายละเอียดที่นับซ้ำกับยอดขยะรีไซเคิล'+
-        '<em>'+escapeHtml(hazardLine)+'</em></div>';
+      // Only the requested explanatory note appears; no hazardous-waste line.
+      html+='<div class="wr-exact-note">หมายเหตุ: สรุปจากประเภทขยะตามข้อมูลชั่งน้ำหนัก โดยไม่รวมคอลัมน์รายละเอียดที่นับซ้ำกับยอดขยะรีไซเคิล</div>';
       return html+'</div>';
     }
+    // Exports the source-size slide, not the CSS-scaled screen preview.
+    async function wrCaptureReport(){
+      if(!wrUI.loaded || !wrUI.data)throw new Error('กรุณากดแสดงรายงานก่อน Export');
+      const source=wrElement('wrResult').querySelector('.wr-slide');
+      if(!source)throw new Error('ไม่พบ Preview ที่จะ Export');
+      if(typeof html2canvas!=='function')throw new Error('โหลดไลบรารี Export ไม่สำเร็จ กรุณาตรวจสอบอินเทอร์เน็ต');
+      if(document.fonts && document.fonts.ready)await document.fonts.ready;
+      // A cross-origin template must explicitly allow browser canvas access.
+      // Fail visibly instead of silently exporting an image without its background.
+      if(source.classList.contains('wr-exact-overview')){
+        const bg=source.querySelector('.wr-exact-background');
+        if(!bg || !bg.complete || !bg.naturalWidth)throw new Error('ภาพ Template ยังโหลดไม่สำเร็จ');
+        try{
+          const result=await fetch(bg.currentSrc||bg.src,{mode:'cors',cache:'force-cache'});
+          if(!result.ok)throw new Error('HTTP '+result.status);
+        }catch(_){
+          throw new Error('Postimg ไม่อนุญาตให้ Export ภาพข้ามเว็บไซต์ผ่าน Canvas (CORS)');
+        }
+      }
+      const naturalWidth=source.classList.contains('wr-exact-overview')?1672:1600;
+      const naturalHeight=source.classList.contains('wr-exact-overview')?941:900;
+      const canvas=await html2canvas(source,{
+        backgroundColor:'#ffffff',useCORS:true,allowTaint:false,logging:false,
+        scale:1.5,width:naturalWidth,height:naturalHeight,
+        windowWidth:Math.max(document.documentElement.clientWidth,naturalWidth),
+        onclone:(doc)=>{
+          const slide=doc.querySelector('#wrResult .wr-slide');
+          if(slide){slide.style.transform='none';slide.style.transformOrigin='top left';}
+          const stage=doc.querySelector('#wrResult .wr-slide-stage');
+          if(stage){stage.style.width=naturalWidth+'px';stage.style.height=naturalHeight+'px';}
+        }
+      });
+      // Security/taint errors from remote template will be caught by caller.
+      return canvas;
+    }
+    function wrSaveCanvas(canvas,name){
+      return new Promise((resolve,reject)=>{
+        canvas.toBlob(blob=>{
+          if(!blob){reject(new Error('ไม่สามารถสร้างไฟล์ภาพ PNG ได้'));return;}
+          const u=URL.createObjectURL(blob),a=document.createElement('a');
+          a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();
+          setTimeout(()=>URL.revokeObjectURL(u),2000);resolve();
+        },'image/png');
+      });
+    }
+    async function wrExport(kind){
+      const png=wrElement('wrExportPng'),pdf=wrElement('wrExportPdf');
+      png.disabled=true;pdf.disabled=true;
+      wrStatus('กำลังสร้างไฟล์ '+kind.toUpperCase()+'...');
+      try{
+        const canvas=await wrCaptureReport();
+        const week=wrUI.data.weekStart||'weekly';
+        if(kind==='png')await wrSaveCanvas(canvas,'Waste_Report_'+week+'.png');
+        else{
+          if(!window.jspdf || !window.jspdf.jsPDF)throw new Error('โหลดไลบรารี PDF ไม่สำเร็จ');
+          const pdfDoc=new window.jspdf.jsPDF({orientation:'landscape',unit:'px',format:[canvas.width,canvas.height],hotfixes:['px_scaling'],compress:true});
+          pdfDoc.addImage(canvas.toDataURL('image/png'),'PNG',0,0,canvas.width,canvas.height);
+          pdfDoc.save('Waste_Report_'+week+'.pdf');
+        }
+        wrStatus('สร้างไฟล์ '+kind.toUpperCase()+' แล้ว · ข้อมูลสัปดาห์ '+week);
+      }catch(err){
+        console.error('Weekly Report export failed',err);
+        wrStatus('Export ไม่สำเร็จ: '+(err.message||String(err))+' · หากเป็นปัญหาภาพข้ามเว็บไซต์ (CORS) ให้เก็บภาพ Template ใน GitHub Repository แล้วเปลี่ยน WR_EXACT_TEMPLATE เป็น ./assets/Eco-Waste-Sorting-Infographic.png',true);
+      }finally{png.disabled=false;pdf.disabled=false;}
+    }
+    wrElement('wrExportPng').addEventListener('click',()=>wrExport('png'));
+    wrElement('wrExportPdf').addEventListener('click',()=>wrExport('pdf'));
+
     function wrRender(){
       if(!wrUI.loaded||!wrUI.data)return;
       const data=wrUI.data;
@@ -3833,8 +3905,10 @@ async function loadTrendHistory(currentData, requestId) {
         '<div class="wr-slide '+(rows.length>18?'wr-dense':'')+'">'+
         heading+wrSlideKpis(totals)+wrSlideTable(rows,false)+extra+
         '<div class="wr-slide-bottom"><span>SAVE EARTH · SAVE OFFICE · ลดขยะวันนี้ เพื่อโลกที่ยั่งยืน</span><span>WEEKLY REPORT · '+escapeHtml(data.weekEnd)+'</span></div></div>';
-      wrElement('wrResult').innerHTML='<article class="wr-report"><p class="wr-preview-help">Preview ตาม Template ที่ส่งมา · ตัวเลขอัปเดตจาก Google Sheets ตามสัปดาห์ · ยังไม่เปิดใช้งาน Export</p><div class="wr-slide-scroll"><div class="wr-slide-stage">'+slide+'</div></div></article>';
+      wrElement('wrResult').innerHTML='<article class="wr-report"><p class="wr-preview-help">Preview ตาม Template ที่ส่งมา · ตัวเลขอัปเดตจาก Google Sheets ตามสัปดาห์ · พร้อม Export PNG / PDF</p><div class="wr-slide-scroll"><div class="wr-slide-stage">'+slide+'</div></div></article>';
       wrElement('wrResult').classList.remove('hidden');
+      wrElement('wrExportPng').disabled=false;
+      wrElement('wrExportPdf').disabled=false;
       wrFitSlide();
       const count=Number(data.matchedRecords||0);
       wrStatus('โหลดสำเร็จ · '+count.toLocaleString('th-TH')+' รายการชั่งในสัปดาห์ที่เลือก · '+(isOverview?'ทุกอาคาร':b.building));
