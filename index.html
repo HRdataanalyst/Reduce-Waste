@@ -1650,6 +1650,80 @@
     #weeklyReportPage .wr-warnings{padding:14px 18px;border:1px solid #f0daaa;border-radius:14px;background:#fff8e8;color:#7d5500;font-size:.75rem;line-height:1.8}
     @media(max-width:850px){#weeklyReportPage .wr-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
     @media(max-width:480px){#weeklyReportPage .wr-report{padding:14px}#weeklyReportPage .wr-kpis{grid-template-columns:1fr 1fr}#weeklyReportPage .wr-kpi strong{font-size:1.05rem}}
+
+    /* WEEKLY REPORT — STEP 4 INFOGRAPHIC (isolated styles; existing dashboard untouched) */
+    #weeklyReportPage .wr-report{padding:0;margin:0;border:0;background:transparent;box-shadow:none;overflow:visible}
+    #weeklyReportPage .wr-preview-help{margin:0 0 10px;color:#6e7c76;font-size:.73rem}
+    #weeklyReportPage .wr-slide-scroll{width:100%;overflow-x:auto;padding:4px 0 14px}
+    #weeklyReportPage .wr-slide{position:relative;width:100%;min-width:760px;aspect-ratio:16/9;container-type:inline-size;overflow:hidden;border:1px solid #cfe5d4;border-radius:12px;background:linear-gradient(180deg,#ffffff 0%,#ffffff 86%,#e8f6e9 100%);box-shadow:0 14px 34px #153e2620;padding:1.55cqw 2cqw 1.35cqw;display:flex;flex-direction:column;gap:.85cqw}
+    #weeklyReportPage .wr-slide:before{content:'';position:absolute;bottom:-9cqw;left:-7cqw;width:48cqw;height:13cqw;background:#bce5b9;transform:rotate(5deg);border-radius:50%;opacity:.45;pointer-events:none}
+    #weeklyReportPage .wr-slide:after{content:'';position:absolute;bottom:-9cqw;right:-7cqw;width:51cqw;height:13cqw;background:#78c88b;transform:rotate(-5deg);border-radius:50%;opacity:.3;pointer-events:none}
+    #weeklyReportPage .wr-slide>*{position:relative;z-index:1}
+    #weeklyReportPage .wr-slide-head{display:grid;grid-template-columns:17% 1fr 18%;gap:1cqw;align-items:center;flex:none;min-height:7.5cqw}
+    #weeklyReportPage .wr-brand-area{display:flex;align-items:center;gap:.6cqw;white-space:nowrap;color:#07593d;font-family:Georgia,serif}
+    #weeklyReportPage .wr-brand-a{font-size:3.1cqw;font-weight:bold;letter-spacing:-.08em}
+    #weeklyReportPage .wr-brand-divider{width:1px;height:3.2cqw;background:#b7d4c6}
+    #weeklyReportPage .wr-brand-c{font:900 2.4cqw 'Noto Sans Thai',sans-serif;color:#df252c;background:#f5db36;border-radius:.35cqw;padding:.05cqw .5cqw;transform:rotate(-3deg)}
+    #weeklyReportPage .wr-slide-title{text-align:center;min-width:0}
+    #weeklyReportPage .wr-slide-title h2{font:800 3.05cqw/1.16 'Noto Sans Thai',sans-serif!important;margin:0!important;color:#07593d!important;white-space:nowrap;letter-spacing:-.035em}
+    #weeklyReportPage .wr-slide-title .wr-slide-sub{font-size:1.5cqw;line-height:1.35;font-weight:800;color:#07593d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    #weeklyReportPage .wr-slide-title .wr-slide-period{font-size:1.14cqw;color:#45594f;margin-top:.35cqw;font-weight:600}
+    #weeklyReportPage .wr-slogan{text-align:right;font-size:1.12cqw;font-weight:900;line-height:1.27;color:#07593d}
+    #weeklyReportPage .wr-slogan span{display:block;color:#20a054}
+    #weeklyReportPage .wr-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.8cqw;margin:0;flex:none}
+    #weeklyReportPage .wr-kpi{min-height:6.15cqw;padding:.85cqw 1cqw;border:0!important;border-radius:.7cqw;color:#fff;background:#17644b;display:grid;grid-template-columns:3cqw 1fr;grid-template-rows:auto auto;column-gap:.7cqw;align-items:center}
+    #weeklyReportPage .wr-kpi.general{background:#216bd7}
+    #weeklyReportPage .wr-kpi.recycle{background:#e7b70d;color:#1a281c}
+    #weeklyReportPage .wr-kpi.food{background:#15994c}
+    #weeklyReportPage .wr-kpi.total{background:#07593d}
+    #weeklyReportPage .wr-kpi-icon{grid-row:1/3;display:flex;align-items:center;justify-content:center;font-size:2.2cqw;line-height:1}
+    #weeklyReportPage .wr-kpi span{font-size:1.12cqw;font-weight:800;color:inherit}
+    #weeklyReportPage .wr-kpi strong{margin:0;font:800 1.85cqw/1.1 'Noto Sans Thai',sans-serif;color:inherit;white-space:nowrap}
+    #weeklyReportPage .wr-kpi small{font-size:.9cqw;font-weight:500}
+    #weeklyReportPage .wr-totalband{display:flex;align-items:center;justify-content:center;min-height:4.4cqw;padding:.55cqw;background:#dcf5e3;border-radius:2.4cqw;color:#07593d;font-size:2.35cqw;font-weight:900;flex:none}
+    #weeklyReportPage .wr-totalband .wr-total-leaf{font-size:2cqw;margin:0 2.3cqw;color:#29a65b}
+    #weeklyReportPage .wr-slide-tablebox{min-height:0;flex:1 1 0;display:flex;flex-direction:column;overflow:hidden}
+    #weeklyReportPage .wr-slide .wr-table-scroll{flex:1;min-height:0;overflow:hidden}
+    #weeklyReportPage .wr-slide .wr-table{height:100%;width:100%;min-width:0;border-collapse:collapse;table-layout:fixed;font-size:1.05cqw;line-height:1.15}
+    #weeklyReportPage .wr-slide .wr-table th{padding:.5cqw .55cqw;color:#fff;background:#07593d;text-align:center;font-size:1.05cqw;line-height:1.23;font-weight:800;white-space:normal}
+    #weeklyReportPage .wr-slide .wr-table th.wr-general{background:#216bd7}
+    #weeklyReportPage .wr-slide .wr-table th.wr-recycle{background:#edc227;color:#1d2d24}
+    #weeklyReportPage .wr-slide .wr-table th.wr-food{background:#15994c}
+    #weeklyReportPage .wr-slide .wr-table td{padding:.22cqw .62cqw;border-bottom:1px solid #d1e3d8;text-align:right;vertical-align:middle;font-size:1.03cqw;line-height:1.14;font-variant-numeric:tabular-nums}
+    #weeklyReportPage .wr-slide .wr-table td:first-child,#weeklyReportPage .wr-slide .wr-table td:nth-child(2){text-align:left}
+    #weeklyReportPage .wr-slide .wr-table tbody tr:nth-child(even){background:#ebf5ef}
+    #weeklyReportPage .wr-slide .wr-table tbody tr:nth-child(odd){background:#fff}
+    #weeklyReportPage .wr-slide .wr-table .wr-floor{text-align:center!important;font-weight:800;color:#07593d;background:#e0f5e6}
+    #weeklyReportPage .wr-slide .wr-table .wr-dept{font-size:.96cqw;overflow-wrap:anywhere}
+    #weeklyReportPage .wr-slide .wr-table .wr-strong{font-weight:800;color:#07593d;background:#e2f5e7}
+    #weeklyReportPage .wr-slide .wr-table tfoot td{padding:.53cqw .62cqw;background:#bfe5cc;font-weight:900;color:#073f32;border-top:2px solid #075f42;font-size:1.1cqw}
+    #weeklyReportPage .wr-slide .wr-table .wr-empty-cell{color:#8d987f}
+    #weeklyReportPage .wr-slide.wr-dense .wr-table td{font-size:.91cqw;padding:.1cqw .4cqw}
+    #weeklyReportPage .wr-slide.wr-dense .wr-table .wr-dept{font-size:.86cqw}
+    #weeklyReportPage .wr-slide.wr-dense .wr-table th{font-size:.94cqw;padding:.35cqw .4cqw}
+    #weeklyReportPage .wr-slide.wr-dense .wr-table tfoot td{font-size:.95cqw;padding:.34cqw .4cqw}
+    #weeklyReportPage .wr-slide-foot{display:grid;grid-template-columns:1fr 1.2fr;gap:1cqw;flex:none;height:9.4cqw}
+    #weeklyReportPage .wr-slide-foot section{border:1px solid #d5e6da;border-radius:.7cqw;background:#ffffffeb;padding:.65cqw .8cqw;min-width:0;overflow:hidden}
+    #weeklyReportPage .wr-slide-foot h3{font-size:1cqw!important;line-height:1.12;background:#07593d;color:#fff;margin:-.65cqw -.8cqw .5cqw!important;padding:.45cqw .7cqw;font-weight:800}
+    #weeklyReportPage .wr-ratio-layout{display:flex;align-items:center;gap:1.2cqw;height:6cqw}
+    #weeklyReportPage .wr-donut{width:6.2cqw;height:6.2cqw;border-radius:50%;display:grid;place-items:center;flex:none}
+    #weeklyReportPage .wr-donut-inner{width:3.65cqw;height:3.65cqw;border-radius:50%;background:#fff;display:grid;place-items:center;text-align:center;font-weight:800;color:#073f32;font-size:.8cqw;line-height:1.1}
+    #weeklyReportPage .wr-legend{font-size:.88cqw;line-height:1.65;min-width:0}
+    #weeklyReportPage .wr-legend i{display:inline-block;width:.64cqw;height:.64cqw;border-radius:50%;margin-right:.5cqw}
+    #weeklyReportPage .wr-rank-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5cqw;margin-top:.8cqw}
+    #weeklyReportPage .wr-rank{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.4cqw;border-radius:.5cqw;background:#ecf6ed;text-align:center;gap:.3cqw}
+    #weeklyReportPage .wr-rank b{font-size:1.35cqw;color:#07593d}
+    #weeklyReportPage .wr-rank span{font-size:.85cqw;white-space:nowrap}
+    #weeklyReportPage .wr-rank strong{font-size:1.04cqw;color:#102e25;white-space:nowrap}
+    #weeklyReportPage .wr-slide-bottom{flex:none;display:flex;align-items:center;justify-content:space-between;font-size:.72cqw;color:#1a6747;height:1.2cqw}
+    #weeklyReportPage .wr-slide-overview .wr-slide-tablebox{margin-top:.55cqw}
+    #weeklyReportPage .wr-slide-overview .wr-table td{font-size:1.25cqw!important;padding:.7cqw .9cqw!important}
+    #weeklyReportPage .wr-slide-overview .wr-table th{font-size:1.25cqw!important;padding:1cqw .7cqw!important}
+    #weeklyReportPage .wr-overview-notes{min-height:8.8cqw;display:grid;grid-template-columns:1fr 1fr;gap:1cqw;flex:none}
+    #weeklyReportPage .wr-overview-notes>div{background:#e9f6ed;border-radius:.8cqw;padding:1.4cqw;font-size:1.12cqw;color:#07593d}
+    #weeklyReportPage .wr-overview-notes strong{display:block;font-size:1.35cqw;margin-bottom:.5cqw}
+    @media(max-width:590px){#weeklyReportPage .wr-slide-scroll{margin-right:-12px}#weeklyReportPage .wr-report{min-width:0}}
+
   </style>
 </head>
 <body>
@@ -2053,7 +2127,7 @@
       <section class="dashboard-page hidden" id="weeklyReportPage" aria-label="สรุปภาพรวมประจำสัปดาห์">
         <div class="weekly-report-header">
           <div><span class="yearly-kicker">WEEKLY WASTE REPORT</span><h1>สรุปภาพรวมประจำสัปดาห์</h1><p>ตรวจสอบยอดขยะจริงจาก Data Records และชื่อแผนกจาก Department Mapping</p></div>
-          <span class="yearly-fixed">STEP 3 · DATA PREVIEW</span>
+          <span class="yearly-fixed">STEP 4 · INFOGRAPHIC 16:9</span>
         </div>
         <section class="card wr-controls" aria-label="ตัวกรองรายงาน">
           <label class="wr-field">วันจันทร์เริ่มสัปดาห์ <input id="wrWeekStart" type="date" /></label>
@@ -3512,20 +3586,69 @@ async function loadTrendHistory(currentData, requestId) {
         (body||'<tr><td colspan="6">ยังไม่มีข้อมูล</td></tr>')+'</tbody><tfoot><tr><td colspan="'+count+'">รวมทั้งหมด</td>'+
         fields.map(f=>'<td>'+wrWeight(summed[f])+'</td>').join('')+'</tr></tfoot></table></div>';
     }
+    // Step 4: Only the Weekly Report renderer changes. Original data/API/warnings remain unchanged.
+    function wrIcon(kind){
+      const symbols={general:'♜',recycle:'♻',food:'❧',total:'∑'};
+      return '<span class="wr-kpi-icon" aria-hidden="true">'+symbols[kind]+'</span>';
+    }
+    function wrSlideKpis(t){
+      const parts=[['generalKg','ขยะทั่วไป','general'],['recyclableKg','ขยะรีไซเคิล','recycle'],['foodKg','ขยะเศษอาหาร','food'],['totalKg','รวมทั้งหมด','total']];
+      return '<div class="wr-kpis">'+parts.map(([key,label,cls])=>
+        '<div class="wr-kpi '+cls+'">'+wrIcon(cls)+'<span>'+label+'</span><strong>'+wrWeight(t[key])+' <small>กก.</small></strong></div>'
+      ).join('')+'</div>';
+    }
+    function wrSlideTable(rows, overview){
+      const fields=['generalKg','recyclableKg','foodKg','totalKg'];
+      const colgroup=overview?'<colgroup><col style="width:29%"><col style="width:18%"><col style="width:18%"><col style="width:18%"><col style="width:17%"></colgroup>':
+        '<colgroup><col style="width:8%"><col style="width:34%"><col style="width:14.5%"><col style="width:14.5%"><col style="width:14.5%"><col style="width:14.5%"></colgroup>';
+      const head='<tr><th>'+ (overview?'อาคาร':'ชั้น')+'</th>'+(overview?'':'<th>แผนก</th>')+
+        '<th class="wr-general">ขยะทั่วไป (กก.)</th><th class="wr-recycle">ขยะรีไซเคิล (กก.)</th><th class="wr-food">ขยะเศษอาหาร (กก.)</th><th>Total (กก.)</th></tr>';
+      const body=rows.map(r=>{
+        const identity=overview?'<td>'+escapeHtml(r.building)+'</td>':
+          '<td class="wr-floor">'+escapeHtml(r.floor)+'</td><td class="wr-dept">'+escapeHtml(r.department||'—')+'</td>';
+        return '<tr>'+identity+fields.map((f,i)=>'<td class="'+(i===3?'wr-strong ':'')+(!overview&&!r.hasData?'wr-empty-cell':'')+'">'+
+          (!overview&&!r.hasData?'—':wrWeight(r[f]))+'</td>').join('')+'</tr>';
+      }).join('');
+      const sum=fields.reduce((acc,f)=>{acc[f]=rows.reduce((v,r)=>v+Number(r[f]||0),0);return acc;},{});
+      return '<div class="wr-slide-tablebox"><div class="wr-table-scroll"><table class="wr-table">'+colgroup+
+        '<thead>'+head+'</thead><tbody>'+(body||'<tr><td colspan="'+(overview?5:6)+'">ยังไม่มีข้อมูล</td></tr>')+'</tbody><tfoot><tr><td colspan="'+(overview?1:2)+'">รวมทั้งหมด</td>'+
+        fields.map(f=>'<td>'+wrWeight(sum[f])+'</td>').join('')+'</tr></tfoot></table></div></div>';
+    }
+    function wrRatioAndRanking(b){
+      const g=Number(b.generalKg||0),r=Number(b.recyclableKg||0),f=Number(b.foodKg||0),t=g+r+f;
+      const gp=t?g/t*100:0,rp=t?r/t*100:0,fp=t?f/t*100:0;
+      const percentage=n=>n.toFixed(1)+'%';
+      const donut='conic-gradient(#216bd7 0% '+gp+'%,#e7b70d '+gp+'% '+(gp+rp)+'%,#15994c '+(gp+rp)+'% 100%)';
+      const legend=[['#216bd7','ทั่วไป',gp],['#e7b70d','รีไซเคิล',rp],['#15994c','อาหาร',fp]]
+        .map(([color,label,n])=>'<div><i style="background:'+color+'"></i>'+label+' '+percentage(n)+'</div>').join('');
+      const rank=(b.top3||[]).map((x,i)=>'<div class="wr-rank"><b>'+(i+1)+'</b><span>ชั้น '+escapeHtml(x.floor)+'</span><strong>'+wrWeight(x.totalKg)+' กก.</strong></div>').join('');
+      return '<div class="wr-slide-foot"><section><h3>สัดส่วนปริมาณขยะทั้งหมด</h3><div class="wr-ratio-layout">'+
+        '<div class="wr-donut" style="background:'+donut+'"><div class="wr-donut-inner">'+wrWeight(b.totalKg)+'<br>กก.</div></div>'+
+        '<div class="wr-legend">'+legend+'</div></div></section><section><h3>🏆 3 อันดับชั้นที่มีปริมาณขยะรวมสูงสุด</h3>'+
+        '<div class="wr-rank-grid">'+(rank||'<div>ยังไม่มีข้อมูล</div>')+'</div></section></div>';
+    }
     function wrRender(){
       if(!wrUI.loaded||!wrUI.data)return;
       const data=wrUI.data;
       const buildingName=wrElement('wrBuilding').value;
       const b=(data.buildings||[]).find(item=>item.building===buildingName);
       const isOverview=!b;
-      const title=isOverview?'สรุปปริมาณขยะทุกอาคาร':'สรุปปริมาณขยะ · '+b.building+' รายชั้น';
-      const totals=isOverview?data.overview:b;
+      const title=isOverview?'สรุปปริมาณขยะสำนักงาน':'สรุปปริมาณขยะ';
       const period=shortDate(data.weekStart)+'–'+shortDate(data.weekEnd)+' '+thaiYear(data.weekEnd);
+      const totals=isOverview?data.overview:b;
       const rows=isOverview?(data.buildings||[]):(b.rows||[]);
-      const top3=isOverview?'':('<div class="wr-top3"><strong>Top 3 ชั้นที่มีขยะรวมมากที่สุด:</strong> '+
-        ((b.top3||[]).length?b.top3.map((t,i)=>(i+1)+'. ชั้น '+escapeHtml(t.floor)+' — '+wrWeight(t.totalKg)+' กก.').join('　 |　 '):'ยังไม่มีข้อมูลชั่ง')+'</div>');
-      wrElement('wrResult').innerHTML='<article class="card wr-report"><h2>'+escapeHtml(title)+'</h2><p class="wr-meta">'+escapeHtml(period)+' · หน่วย: กิโลกรัม · ไม่รวมขยะอันตราย</p>'+
-        wrKpis(totals)+wrTable(rows,isOverview)+top3+'</article>';
+      const branding='<div class="wr-brand-area" aria-label="BJC Big C"><span class="wr-brand-a">BJC</span><span class="wr-brand-divider"></span><span class="wr-brand-c">Big C</span></div>';
+      const heading='<div class="wr-slide-head">'+branding+'<div class="wr-slide-title"><h2>'+escapeHtml(title)+'</h2>'+
+        '<div class="wr-slide-sub">'+(isOverview?'':escapeHtml(b.building)+' รายชั้น')+'</div>'+
+        '<div class="wr-slide-period">ระหว่างวันที่ '+escapeHtml(period)+' | หน่วย: กิโลกรัม</div></div>'+
+        '<div class="wr-slogan">TOGETHER FOR A<span>CLEANER GREENER</span>TOMORROW 🌿</div></div>';
+      const extra=isOverview?'<div class="wr-totalband"><span class="wr-total-leaf">❧</span>รวมขยะทั้งหมด '+wrWeight(totals.totalKg)+' กก.<span class="wr-total-leaf">❧</span></div>':
+        wrRatioAndRanking(b);
+      const notes=isOverview?'<div class="wr-overview-notes"><div><strong>🌱 SAVE EARTH · SAVE OFFICE</strong>สรุปปริมาณขยะจริงจากข้อมูลชั่งน้ำหนักประจำสัปดาห์</div><div><strong>ข้อมูลสำหรับการนำเสนอ</strong>รวมเฉพาะขยะทั่วไป รีไซเคิล และเศษอาหาร ไม่รวมขยะอันตราย</div></div>':'';
+      const slide='<div class="wr-slide '+(isOverview?'wr-slide-overview ':'')+(rows.length>18?'wr-dense':'')+'">'+
+        heading+wrSlideKpis(totals)+(isOverview?extra:'')+wrSlideTable(rows,isOverview)+(isOverview?notes:extra)+
+        '<div class="wr-slide-bottom"><span>SAVE EARTH · SAVE OFFICE · ลดขยะวันนี้ เพื่อโลกที่ยั่งยืน</span><span>WEEKLY REPORT · '+escapeHtml(data.weekEnd)+'</span></div></div>';
+      wrElement('wrResult').innerHTML='<article class="wr-report"><p class="wr-preview-help">ตัวอย่างหน้า Infographic 16:9 · ข้อมูลจริงจาก Google Sheets · ยังไม่เปิดใช้งาน Export</p><div class="wr-slide-scroll">'+slide+'</div></article>';
       wrElement('wrResult').classList.remove('hidden');
       const count=Number(data.matchedRecords||0);
       wrStatus('โหลดสำเร็จ · '+count.toLocaleString('th-TH')+' รายการชั่งในสัปดาห์ที่เลือก · '+(isOverview?'ทุกอาคาร':b.building));
