@@ -1832,16 +1832,20 @@
       background:transparent; border:none;
     }
     #weeklyReportPage .wr-exact-date {font-size:29px; font-weight:600; color:#45554d;}
-    #weeklyReportPage .wr-exact-kpi {font-size:43px; font-weight:900; letter-spacing:-.8px; display:flex!important; flex-direction:column; gap:0; line-height:1.04;}
-    #weeklyReportPage .wr-exact-kpi .wr-kpi-number{display:block;line-height:1.1;font-weight:900;}
-    #weeklyReportPage .wr-exact-kpi .wr-kpi-unit{display:block;font-size:21px;line-height:1.25;font-weight:700;letter-spacing:0;}
+    #weeklyReportPage .wr-exact-kpi {font-size:35px; font-weight:900; letter-spacing:-.7px; display:flex!important; flex-direction:column; gap:1px; line-height:1.05; overflow:hidden;}
+    #weeklyReportPage .wr-exact-kpi .wr-kpi-number{display:block;max-width:100%;line-height:1.15;font-size:inherit;font-weight:900;white-space:nowrap;}
+    #weeklyReportPage .wr-exact-kpi .wr-kpi-unit{display:block;font-size:16px;line-height:1.1;font-weight:700;letter-spacing:0;}
     #weeklyReportPage .wr-exact-kpi.general {color:#005c9e;}
     #weeklyReportPage .wr-exact-kpi.food {color:#045e37;}
     #weeklyReportPage .wr-exact-kpi.recycle {color:#16291c;}
-    #weeklyReportPage .wr-exact-total {font-size:52px; font-weight:900; color:#07583a;letter-spacing:-1.1px;}
+    #weeklyReportPage .wr-exact-total {font-size:40px; font-weight:900; color:#07583a;letter-spacing:-.9px;display:flex!important;justify-content:center!important;align-items:center!important;gap:7px;white-space:nowrap;}
+    #weeklyReportPage .wr-exact-total .wr-total-number{font-size:inherit;line-height:1.15;font-weight:900;}
+    #weeklyReportPage .wr-exact-total .wr-total-unit{font-size:19px;line-height:1.2;font-weight:800;letter-spacing:0;transform:translateY(9px);}
     #weeklyReportPage .wr-exact-name {font-size:25px; font-weight:500; justify-content:flex-start; color:#1e2b23; padding-left:33px;}
     #weeklyReportPage .wr-exact-cell {display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important;font-size:25px; font-weight:500; color:#182a20; font-variant-numeric:tabular-nums;}
     #weeklyReportPage .wr-exact-cell.total {font-size:26px; font-weight:900; color:#051b13;}
+    /* Move table text up by half a source pixel without moving the background grid. */
+    #weeklyReportPage .wr-exact-name,#weeklyReportPage .wr-exact-cell{transform:translateY(-0.5px);}
     #weeklyReportPage .wr-exact-note {position:absolute; z-index:2; left:65px; top:836px; width:1470px; height:44px; font-family:'Noto Sans Thai',Tahoma,sans-serif; font-size:17px; line-height:1.4; color:#5e665f;}
     #weeklyReportPage .wr-exact-note em {display:block; font-style:normal; color:#d52e2e; font-weight:700;}
 
@@ -3790,14 +3794,21 @@ async function loadTrendHistory(currentData, requestId) {
       const year=thaiYear(data.weekEnd);
       const period='ระหว่างวันที่ '+start+' – '+end+' '+year+'   |   หน่วย: กิโลกรัม (กก.)';
       const add=(cls,left,top,width,height,value)=>'<div class="wr-exact-value '+cls+'" style="left:'+left+'px;top:'+top+'px;width:'+width+'px;height:'+height+'px">'+escapeHtml(value)+'</div>';
-      const addKpi=(cls,left,top,width,height,value)=>'<div class="wr-exact-value wr-exact-kpi '+cls+'" style="left:'+left+'px;top:'+top+'px;width:'+width+'px;height:'+height+'px"><span class="wr-kpi-number">'+escapeHtml(wrWeight(value))+'</span><span class="wr-kpi-unit">กก.</span></div>';
+      const addKpi=(cls,left,top,width,height,value)=>{
+        const figure=wrWeight(value);
+        // Make long values fit safely even when the weekly number increases.
+        const size=figure.length>=10?28:figure.length>=9?31:35;
+        return '<div class="wr-exact-value wr-exact-kpi '+cls+'" style="left:'+left+'px;top:'+top+'px;width:'+width+'px;height:'+height+'px;font-size:'+size+'px"><span class="wr-kpi-number">'+escapeHtml(figure)+'</span><span class="wr-kpi-unit">กก.</span></div>';
+      };
       let html='<div class="wr-slide wr-exact-overview" aria-label="สรุปปริมาณขยะสำนักงานประจำสัปดาห์">'+
         '<img class="wr-exact-background" src="'+WR_EXACT_TEMPLATE+'" alt="Template Infographic สรุปขยะสำนักงาน BJC Big C">';
       html+=add('wr-exact-date',397,108,880,40,period);
       html+=addKpi('general',379,192,159,82,sums.generalKg);
       html+=addKpi('food',921,192,166,82,sums.foodKg);
       html+=addKpi('recycle',1426,192,174,82,sums.recyclableKg);
-      html+=add('wr-exact-total',925,334,310,73,wrWeight(sums.totalKg)+' กก.');
+      const totalFigure=wrWeight(sums.totalKg);
+      const totalSize=totalFigure.length>=11?31:totalFigure.length>=9?35:40;
+      html+='<div class="wr-exact-value wr-exact-total" style="left:925px;top:334px;width:310px;height:73px;font-size:'+totalSize+'px"><span class="wr-total-number">'+escapeHtml(totalFigure)+'</span><span class="wr-total-unit">กก.</span></div>';
       // Exact cell boundaries measured against the 1672 x 941 PNG template.
       // Full-cell coordinates keep every number centered within its own grid cell.
       const rowBounds=[[498,549],[549,601],[601,653],[653,705],[705,757],[757,809]];
@@ -3860,6 +3871,22 @@ async function loadTrendHistory(currentData, requestId) {
         },'image/png');
       });
     }
+    function wrReportFileBase(data){
+      const parse = value => {
+        const match=String(value||'').match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if(!match)return null;
+        return {year:+match[1],month:+match[2],day:+match[3]};
+      };
+      const start=parse(data.weekStart), end=parse(data.weekEnd);
+      if(!start || !end)return 'สรุปรายงานปริมาณขยะ';
+      const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const endLabel=months[end.month-1]||'Month';
+      const shortYear=String(end.year).slice(-2);
+      const range=(start.year===end.year && start.month===end.month)
+        ? start.day+'-'+end.day+' '+endLabel+' '+shortYear
+        : start.day+' '+(months[start.month-1]||'Month')+' - '+end.day+' '+endLabel+' '+shortYear;
+      return 'สรุปรายงานปริมาณขยะ '+range;
+    }
     async function wrExport(kind){
       const png=wrElement('wrExportPng'),pdf=wrElement('wrExportPdf');
       png.disabled=true;pdf.disabled=true;
@@ -3867,12 +3894,13 @@ async function loadTrendHistory(currentData, requestId) {
       try{
         const canvas=await wrCaptureReport();
         const week=wrUI.data.weekStart||'weekly';
-        if(kind==='png')await wrSaveCanvas(canvas,'Waste_Report_'+week+'.png');
+        const fileBase=wrReportFileBase(wrUI.data);
+        if(kind==='png')await wrSaveCanvas(canvas,fileBase+'.png');
         else{
           if(!window.jspdf || !window.jspdf.jsPDF)throw new Error('โหลดไลบรารี PDF ไม่สำเร็จ');
           const pdfDoc=new window.jspdf.jsPDF({orientation:'landscape',unit:'px',format:[canvas.width,canvas.height],hotfixes:['px_scaling'],compress:true});
           pdfDoc.addImage(canvas.toDataURL('image/png'),'PNG',0,0,canvas.width,canvas.height);
-          pdfDoc.save('Waste_Report_'+week+'.pdf');
+          pdfDoc.save(fileBase+'.pdf');
         }
         wrStatus('สร้างไฟล์ '+kind.toUpperCase()+' แล้ว · ข้อมูลสัปดาห์ '+week);
       }catch(err){
