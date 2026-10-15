@@ -1914,6 +1914,12 @@
     #weeklyReportPage .wr-template-ring {position:absolute;z-index:2;border-radius:50%;display:flex;align-items:center;justify-content:center;}
     #weeklyReportPage .wr-template-ring-center {width:65%;height:65%;border-radius:50%;background:white;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#08432f;font-size:13px;font-weight:900;line-height:1.08;}
     #weeklyReportPage .wr-template-ring-center small {font-size:10px;}
+    /* Legends for non-Big-C building infographic templates (C retains its own legend). */
+    #weeklyReportPage .wr-other-building-legend{position:absolute;z-index:3;display:flex;flex-direction:column;
+      justify-content:center;gap:7px;color:#174735;font-family:'Noto Sans Thai',Tahoma,sans-serif;
+      font-weight:800;font-size:16px;line-height:1.15;white-space:nowrap;pointer-events:none;}
+    #weeklyReportPage .wr-other-building-legend .wr-other-building-legend-row{display:flex;align-items:center;gap:9px;}
+    #weeklyReportPage .wr-other-building-legend .wr-other-building-dot{width:12px;height:12px;border-radius:50%;flex:none;}
     /* Big C (C) coordinate-mapped text: overrides ONLY on the Big C slide. */
     #weeklyReportPage .wr-bigc-custom .wr-bigc-overlay{font-family:'Noto Sans Thai',Tahoma,sans-serif;font-weight:850;letter-spacing:-.2px;line-height:1;white-space:nowrap;overflow:hidden;}
     #weeklyReportPage .wr-bigc-custom .bigc-date{font-size:20px;font-weight:700;white-space:nowrap;}
@@ -4014,12 +4020,11 @@ async function loadTrendHistory(currentData, requestId) {
           const rect=[x0+2,centerY-table.rowH/2,x1-x0,table.rowH];
           html+=wrTemplateField('bigc-table-value '+(isDepartment?'bigc-department':'bigc-weight '+kind),rect,val,isDepartment?17:18);
         });
-        // Average is left blank unless the API sends a real average.
+        // Show a visible dash when monthly Headcount is absent (same as other buildings).
         const rowAverage=wrBuildingAverageText(row);
-        if(rowAverage!=='—'){
-          const [x0,x1]=table.cols[5];
-          html+=wrTemplateField('bigc-table-value bigc-weight',[x0+2,centerY-table.rowH/2,x1-x0,table.rowH],rowAverage,16);
-        }
+        const [avgX0,avgX1]=table.cols[5];
+        html+=wrTemplateField('bigc-table-value bigc-weight bigc-average',
+          [avgX0+2,centerY-table.rowH/2,avgX1-avgX0,table.rowH],rowAverage,16);
       });
       // The total caption and floor labels are baked into the PNG background.
       [['generalKg',g],['recyclableKg',r],['foodKg',f],['totalKg',t]].forEach(([key,v],i)=>{
@@ -4058,6 +4063,27 @@ async function loadTrendHistory(currentData, requestId) {
       });
       return html+'</div>';
     }
+    // Draw a category legend alongside the existing donut, inside each template's left summary area.
+    function wrOtherBuildingLegend(templateKey,gp,rp,fp){
+      const positions={
+        'BJC House (A)': [425,756,316,102],
+        'อาคาร BJC1': [425,759,315,98],
+        'อาคาร BJC2': [405,773,320,96],
+        'อาคารจอดรถ D และ B': [402,779,320,91]
+      };
+      const area=positions[templateKey];
+      if(!area)return '';
+      const [left,top,width,height]=area;
+      const types=[
+        ['ทั่วไป',gp,'#176ee4'],
+        ['รีไซเคิล',rp,'#eab508'],
+        ['เศษอาหาร',fp,'#109752']
+      ];
+      return '<div class="wr-other-building-legend" style="left:'+left+'px;top:'+top+'px;width:'+width+'px;height:'+height+'px">'+
+        types.map(([label,pct,color])=>'<div class="wr-other-building-legend-row">'+
+          '<i class="wr-other-building-dot" style="background:'+color+'"></i>'+label+' '+pct.toFixed(1)+'%</div>').join('')+
+        '</div>';
+    }
     function wrBuildingTemplatePreview(templateKey,data,building){
       const path=WR_BUILDING_TEMPLATES[templateKey], layout=WR_TEMPLATE_LAYOUTS[templateKey];
       if(!path||!layout)return '';
@@ -4085,6 +4111,7 @@ async function loadTrendHistory(currentData, requestId) {
       const [cx,cy,diam]=layout.bottom.ring;
       const gradient='conic-gradient(#176ee4 0% '+gp+'%,#eab508 '+gp+'% '+(gp+rp)+'%,#109752 '+(gp+rp)+'% 100%)';
       html+='<div class="wr-template-ring" style="left:'+cx+'px;top:'+cy+'px;width:'+diam+'px;height:'+diam+'px;background:'+gradient+'"><div class="wr-template-ring-center">'+escapeHtml(wrWeight(t))+'<small>กก.</small></div></div>';
+      html+=wrOtherBuildingLegend(templateKey,gp,rp,fp);
       const miniX=[[905,1014],[1168,1279],[1447,1548]];
       [[g,gp],[r,rp],[f,fp]].forEach(([n,pct],i)=>{
         const [x0,x1]=miniX[i],w=x1-x0;
