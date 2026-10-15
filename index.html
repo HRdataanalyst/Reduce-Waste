@@ -1924,9 +1924,9 @@
     #weeklyReportPage .wr-bigc-custom .bigc-table-value{font-weight:650;align-items:center;justify-content:center;padding:0 4px;}
     #weeklyReportPage .wr-bigc-custom .bigc-table-value.bigc-department{font-size:17px;font-weight:700;justify-content:flex-start;padding-left:13px;text-align:left;overflow:hidden;}
     #weeklyReportPage .wr-bigc-custom .bigc-table-value.bigc-weight.total{font-weight:900;}
-    #weeklyReportPage .wr-bigc-custom .bigc-footer{font-size:20px;font-weight:900;}
+    #weeklyReportPage .wr-bigc-custom .bigc-footer{font-size:23px;font-weight:900;}
     #weeklyReportPage .wr-bigc-custom .wr-bigc-ring{z-index:2;}
-    #weeklyReportPage .wr-bigc-custom .wr-bigc-legend-custom{position:absolute;z-index:2;left:530px;top:765px;width:240px;height:83px;display:flex;flex-direction:column;justify-content:center;gap:7px;font-family:'Noto Sans Thai',Tahoma,sans-serif;color:#254735;font-size:15px;font-weight:750;}
+    #weeklyReportPage .wr-bigc-custom .wr-bigc-legend-custom{position:absolute;z-index:2;left:530px;top:765px;width:240px;height:83px;display:flex;flex-direction:column;justify-content:center;gap:7px;font-family:'Noto Sans Thai',Tahoma,sans-serif;color:#254735;font-size:16px;font-weight:750;}
     #weeklyReportPage .wr-bigc-custom .wr-bigc-legend-custom span{display:flex;align-items:center;gap:8px;white-space:nowrap;}
     #weeklyReportPage .wr-bigc-custom .wr-bigc-legend-custom i{display:inline-block;flex:none;width:12px;height:12px;border-radius:50%;}
 
@@ -3934,15 +3934,15 @@ async function loadTrendHistory(currentData, requestId) {
     // not literal text box widths/heights.
     const WR_BIGC_ANCHORS = Object.freeze({
       top: {
-        general: [249+10, 262+4], recycle: [655+10, 259+13],
+        general: [249+10, 262+4], recycle: [655+10, 259+13-2],
         food: [1066+8, 262+6], total: [1483+6, 261+6]
       },
       mini: {
-        general: {number:[966+6,804+5],percent:[915,849+4]},
-        recycle: {number:[1240+7,805+11],percent:[1188,849+4]},
-        food: {number:[1514+12,805+10],percent:[1461+2,848+5]}
+        general: {number:[966+6,804+5+2],percent:[915+2,849+4]},
+        recycle: {number:[1240+7,805+11-1],percent:[1188+2,849+4]},
+        food: {number:[1514+12,805+10],percent:[1461+2+2,848+5]}
       },
-      donut: [463,805]
+      donut: [463,815]
     });
     function wrBigCPoint(className, xy, value, width, height, fontSize){
       if(value===undefined||value===null||value==='')return '';
@@ -3962,7 +3962,7 @@ async function loadTrendHistory(currentData, requestId) {
       const image=WR_BUILDING_TEMPLATES['Big C House (C)'];
       let html='<div class="wr-slide wr-building-template wr-bigc-custom" aria-label="Big C House (C) Weekly Report">'+
         '<img class="wr-building-template-image" src="'+encodeURI(image)+'" alt="Big C House C Template">';
-      html+=wrTemplateField('date bigc-date',[613,156,426,37],period,20);
+      html+=wrTemplateField('date bigc-date',[613,158,426,37],period,20);
       const topValues=[['general',g],['recycle',r],['food',f],['total',t]];
       topValues.forEach(([name,v])=>{
         const text=wrWeight(v), size=text.length>9?26:text.length>7?29:33;
@@ -3972,7 +3972,7 @@ async function loadTrendHistory(currentData, requestId) {
       table.floors.forEach((floor,index)=>{
         const row=byFloor.get(wrFloorKey(floor));
         if(!row)return;
-        const centerY=table.y+(index+0.5)*table.rowH+1;
+        const centerY=table.y+(index+0.5)*table.rowH+3;
         const fields=[
           ['department',String(row.department||'').trim()||'—'],
           ['general',row.hasData===false?'—':wrWeight(row.generalKg)],
@@ -3995,21 +3995,21 @@ async function loadTrendHistory(currentData, requestId) {
       // The total caption and floor labels are baked into the PNG background.
       [['generalKg',g],['recyclableKg',r],['foodKg',f],['totalKg',t]].forEach(([key,v],i)=>{
         const [x0,x1]=table.cols[i+1];
-        html+=wrTemplateField('bigc-footer',[x0,table.footerY+9,x1-x0,table.footerH-6],wrWeight(v),20);
+        html+=wrTemplateField('bigc-footer',[x0,table.footerY+11,x1-x0,table.footerH-6],wrWeight(v),23);
       });
       // Donut centered at the precise requested location, with its own color legend.
       const [cx,cy]=WR_BIGC_ANCHORS.donut;
       const diameter=116;
-      const gradient='conic-gradient(#7b7f83 0% '+gp+'%,#15a551 '+gp+'% '+(gp+rp)+'%,#bd711e '+(gp+rp)+'% 100%)';
+      const gradient='conic-gradient(#1769e8 0% '+gp+'%,#f0bd09 '+gp+'% '+(gp+rp)+'%,#0ea34a '+(gp+rp)+'% 100%)';
       html+='<div class="wr-template-ring wr-bigc-ring" style="left:'+(cx-diameter/2)+'px;top:'+(cy-diameter/2)+'px;width:'+diameter+'px;height:'+diameter+'px;background:'+gradient+'">'+
         '<div class="wr-template-ring-center">'+escapeHtml(wrWeight(t))+'<small>กก.</small></div></div>';
       html+='<div class="wr-bigc-legend-custom">'+
-        '<span><i style="background:#7b7f83"></i>ทั่วไป '+gp.toFixed(1)+'%</span>'+
-        '<span><i style="background:#15a551"></i>รีไซเคิล '+rp.toFixed(1)+'%</span>'+
-        '<span><i style="background:#bd711e"></i>อาหาร '+fp.toFixed(1)+'%</span></div>';
+        '<span><i style="background:#1769e8"></i>ทั่วไป '+gp.toFixed(1)+'%</span>'+
+        '<span><i style="background:#f0bd09"></i>รีไซเคิล '+rp.toFixed(1)+'%</span>'+
+        '<span><i style="background:#0ea34a"></i>อาหาร '+fp.toFixed(1)+'%</span></div>';
       [['general',g,gp],['recycle',r,rp],['food',f,fp]].forEach(([name,num,pct])=>{
         html+=wrBigCPoint('bigc-mini-num '+name,WR_BIGC_ANCHORS.mini[name].number,wrWeight(num),136,29,23);
-        html+=wrBigCPoint('bigc-mini-pct '+name,WR_BIGC_ANCHORS.mini[name].percent,pct.toFixed(1),91,22,18);
+        html+=wrBigCPoint('bigc-mini-pct '+name,WR_BIGC_ANCHORS.mini[name].percent,pct.toFixed(1),91,26,21);
       });
       return html+'</div>';
     }
