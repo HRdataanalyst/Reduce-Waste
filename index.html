@@ -4045,7 +4045,7 @@ async function loadTrendHistory(currentData, requestId) {
         const averageSum=visibleFloorAverages.reduce((sum,value)=>sum+value,0);
         const [x0,x1]=table.cols[5];
         html+=wrTemplateField('bigc-footer bigc-footer-average',
-          [x0+12,table.footerY+15,x1-x0,table.footerH-6],wrWeight(averageSum),23);
+          [x0+22,table.footerY+15,x1-x0,table.footerH-6],wrWeight(averageSum),23);
       }
       // Donut centered at the precise requested location, with its own color legend.
       const [cx,cy]=WR_BIGC_ANCHORS.donut;
