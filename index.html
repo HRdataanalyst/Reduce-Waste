@@ -1848,6 +1848,18 @@
     #weeklyReportPage .wr-exact-name,#weeklyReportPage .wr-exact-cell{transform:translateY(-0.5px);}
     #weeklyReportPage .wr-exact-note {position:absolute; z-index:2; left:65px; top:836px; width:1470px; height:44px; font-family:'Noto Sans Thai',Tahoma,sans-serif; font-size:17px; line-height:1.4; color:#5e665f;}
     #weeklyReportPage .wr-exact-note em {display:block; font-style:normal; color:#d52e2e; font-weight:700;}
+    /* Template routing: keep each image unchanged until its coordinates are calibrated. */
+    #weeklyReportPage .wr-slide.wr-building-template {
+      position:relative!important;width:1672px!important;height:941px!important;
+      min-width:1672px!important;padding:0!important;border:0!important;
+      border-radius:0!important;aspect-ratio:1672/941!important;overflow:hidden!important;
+      background:#fff!important;box-shadow:none!important;
+    }
+    #weeklyReportPage .wr-building-template::before,
+    #weeklyReportPage .wr-building-template::after {display:none!important;}
+    #weeklyReportPage .wr-building-template-image {
+      display:block;position:absolute;inset:0;width:100%;height:100%;object-fit:fill;
+    }
     #weeklyReportPage .wr-slide.wr-exact-bigc {
       width:1672px!important;height:941px!important;min-width:1672px!important;aspect-ratio:1672/941!important;
       padding:0!important;border:0!important;border-radius:0!important;background:#fff!important;box-shadow:none!important;overflow:hidden!important;
@@ -3725,9 +3737,11 @@ async function loadTrendHistory(currentData, requestId) {
         const select=wrElement('wrBuilding');
         const oldValue=select.value;
         const buildings=result.buildings||[];
+        const options=buildings.filter(b=>!wrIsParking(b.building)).map(b=>b.building);
+        if(buildings.some(b=>wrIsParking(b.building)))options.push(WR_PARKING_COMBINED);
         select.innerHTML='<option value="ALL">ทุกอาคาร — ภาพรวม</option>'+
-          buildings.map(b=>'<option value="'+escapeHtml(b.building)+'">'+escapeHtml(b.building)+'</option>').join('');
-        select.value=buildings.some(b=>b.building===oldValue)?oldValue:'ALL';
+          options.map(name=>'<option value="'+escapeHtml(name)+'">'+escapeHtml(name)+'</option>').join('');
+        select.value=options.includes(oldValue)?oldValue:(wrIsParking(oldValue)?WR_PARKING_COMBINED:'ALL');
         wrRender();
       }catch(error){
         if(seq!==wrUI.request)return;
@@ -3813,7 +3827,7 @@ async function loadTrendHistory(currentData, requestId) {
       if(!stage||!slide)return;
       const wrap=stage.parentElement;
       const available=Math.max(0,wrap.clientWidth-4);
-      const exact=slide.classList.contains('wr-exact-overview')||slide.classList.contains('wr-exact-bigc');
+      const exact=slide.classList.contains('wr-exact-overview')||slide.classList.contains('wr-exact-bigc')||slide.classList.contains('wr-building-template');
       const width=exact?1672:1600, height=exact?941:900;
       const scale=Math.min(1,available/width);
       slide.style.transform='scale('+scale+')';
@@ -3829,7 +3843,37 @@ async function loadTrendHistory(currentData, requestId) {
     // This overview uses the exact user-supplied infographic PNG as its background.
     // All figures come from the existing weeklyReport API, never baked into the image.
     const WR_OVERVIEW_TEMPLATE = './Eco Waste Sorting Infographic.png';
-    const WR_BIGC_TEMPLATE = './Big C House Waste Summary Infographic.png';
+    // Template routing (file names must match GitHub exactly).
+    const WR_PARKING_COMBINED = 'อาคารจอดรถ D และ B';
+    const WR_BUILDING_TEMPLATES = Object.freeze({
+      'BJC House (A)': './BJC House (A).png',
+      'Big C House (C)': './Big C House C.png',
+      'อาคาร BJC1': './BJC 1.png',
+      'อาคาร BJC2': './BJC 2.png',
+      [WR_PARKING_COMBINED]: './อาคารจอดรถ D และ B.png'
+    });
+    // Coordinates for the new building images will be calibrated page by page.
+    function wrBuildingTemplatePreview(templateKey){
+      const path=WR_BUILDING_TEMPLATES[templateKey];
+      if(!path)return '';
+      return '<div class="wr-slide wr-building-template" aria-label="Template '+escapeHtml(templateKey)+'">'+
+        '<img class="wr-building-template-image" src="'+encodeURI(path)+'" alt="Template '+escapeHtml(templateKey)+'">'+
+        '</div>';
+    }
+    function wrIsParking(name){
+      return name==='อาคารจอดรถ (B)' || name==='อาคารจอดรถ (D)' ||
+        name==='อาคารจอดรถ B' || name==='อาคารจอดรถ D';
+    }
+    // Combine totals and keep source rows for future placement in the D+B template.
+    function wrCombineParking(buildings){
+      const parts=(buildings||[]).filter(b=>wrIsParking(b.building));
+      const totals=['generalKg','recyclableKg','foodKg','totalKg'];
+      const result={building:WR_PARKING_COMBINED,rows:[]};
+      totals.forEach(key=>{result[key]=parts.reduce((sum,b)=>sum+(Number(b[key])||0),0);});
+      parts.forEach(b=>(b.rows||[]).forEach(row=>result.rows.push({...row,sourceBuilding:b.building})));
+      return result;
+    }
+    const WR_BIGC_TEMPLATE = WR_BUILDING_TEMPLATES['Big C House (C)'];
     function wrExactOverview(data){
       const sums=data.overview||{};
       const start=shortDate(data.weekStart), end=shortDate(data.weekEnd);
@@ -3949,9 +3993,9 @@ async function loadTrendHistory(currentData, requestId) {
       if(document.fonts && document.fonts.ready)await document.fonts.ready;
       // A cross-origin template must explicitly allow browser canvas access.
       // Fail visibly instead of silently exporting an image without its background.
-      if(source.classList.contains('wr-exact-overview') || source.classList.contains('wr-exact-bigc')){
-        const bg=source.querySelector('.wr-exact-background, .wr-bigc-background');
-        if(!bg || !bg.complete || !bg.naturalWidth)throw new Error('ภาพ Template ยังโหลดไม่สำเร็จ');
+      if(source.classList.contains('wr-exact-overview') || source.classList.contains('wr-exact-bigc') || source.classList.contains('wr-building-template')){
+        const bg=source.querySelector('.wr-exact-background, .wr-bigc-background, .wr-building-template-image');
+        if(!bg || !bg.complete || !bg.naturalWidth)throw new Error('ภาพ Template ยังโหลดไม่สำเร็จ ตรวจสอบชื่อไฟล์บน GitHub');
         try{
           const result=await fetch(bg.currentSrc||bg.src,{mode:'cors',cache:'force-cache'});
           if(!result.ok)throw new Error('HTTP '+result.status);
@@ -3959,7 +4003,7 @@ async function loadTrendHistory(currentData, requestId) {
           throw new Error('Postimg ไม่อนุญาตให้ Export ภาพข้ามเว็บไซต์ผ่าน Canvas (CORS)');
         }
       }
-      const exactSlide=source.classList.contains('wr-exact-overview') || source.classList.contains('wr-exact-bigc');
+      const exactSlide=source.classList.contains('wr-exact-overview') || source.classList.contains('wr-exact-bigc') || source.classList.contains('wr-building-template');
       const naturalWidth=exactSlide?1672:1600;
       const naturalHeight=exactSlide?941:900;
       const canvas=await html2canvas(source,{
@@ -4030,8 +4074,10 @@ async function loadTrendHistory(currentData, requestId) {
       if(!wrUI.loaded||!wrUI.data)return;
       const data=wrUI.data;
       const buildingName=wrElement('wrBuilding').value;
-      const b=(data.buildings||[]).find(item=>item.building===buildingName);
-      const isOverview=!b;
+      const b=buildingName===WR_PARKING_COMBINED
+        ?wrCombineParking(data.buildings)
+        :(data.buildings||[]).find(item=>item.building===buildingName);
+      const isOverview=buildingName==='ALL';
       const title=isOverview?'สรุปปริมาณขยะสำนักงาน':'สรุปปริมาณขยะ';
       const period=shortDate(data.weekStart)+'–'+shortDate(data.weekEnd)+' '+thaiYear(data.weekEnd);
       const totals=isOverview?data.overview:b;
@@ -4044,19 +4090,19 @@ async function loadTrendHistory(currentData, requestId) {
       const extra=isOverview?'<div class="wr-totalband"><span class="wr-total-leaf">❧</span>รวมขยะทั้งหมด '+wrWeight(totals.totalKg)+' กก.<span class="wr-total-leaf">❧</span></div>':
         wrRatioAndRanking(b);
       const notes=isOverview?'<div class="wr-overview-notes"><div><strong>🌱 SAVE EARTH · SAVE OFFICE</strong>สรุปปริมาณขยะจริงจากข้อมูลชั่งน้ำหนักประจำสัปดาห์</div><div><strong>ข้อมูลสำหรับการนำเสนอ</strong>รวมเฉพาะขยะทั่วไป รีไซเคิล และเศษอาหาร ไม่รวมขยะอันตราย</div></div>':'';
-      const useBigCExact=!isOverview && buildingName==='Big C House (C)';
+      const templatePath=WR_BUILDING_TEMPLATES[buildingName];
       const slide=isOverview?wrExactOverview(data):
-        useBigCExact?wrExactBigC(data,b):
+        templatePath?wrBuildingTemplatePreview(buildingName):
         '<div class="wr-slide '+(rows.length>18?'wr-dense':'')+'">'+
         heading+wrSlideKpis(totals)+wrSlideTable(rows,false)+extra+
         '<div class="wr-slide-bottom"><span>SAVE EARTH · SAVE OFFICE · ลดขยะวันนี้ เพื่อโลกที่ยั่งยืน</span><span>WEEKLY REPORT · '+escapeHtml(data.weekEnd)+'</span></div></div>';
-      wrElement('wrResult').innerHTML='<article class="wr-report"><p class="wr-preview-help">Preview ตาม Template ที่ส่งมา · ตัวเลขอัปเดตจาก Google Sheets ตามสัปดาห์ · พร้อม Export PNG / PDF</p><div class="wr-slide-scroll"><div class="wr-slide-stage">'+slide+'</div></div></article>';
+      wrElement('wrResult').innerHTML='<article class="wr-report"><p class="wr-preview-help">'+(templatePath?'Template ของ '+escapeHtml(buildingName)+' · โหลดข้อมูลแล้ว · รอการกำหนดพิกัดก่อนเติมตัวเลขและเปิด Export':'Preview ตาม Template ที่ส่งมา · ตัวเลขอัปเดตจาก Google Sheets ตามสัปดาห์ · พร้อม Export PNG / PDF')+'</p><div class="wr-slide-scroll"><div class="wr-slide-stage">'+slide+'</div></div></article>';
       wrElement('wrResult').classList.remove('hidden');
-      wrElement('wrExportPng').disabled=false;
-      wrElement('wrExportPdf').disabled=false;
+      wrElement('wrExportPng').disabled=Boolean(templatePath);
+      wrElement('wrExportPdf').disabled=Boolean(templatePath);
       wrFitSlide();
       const count=Number(data.matchedRecords||0);
-      wrStatus('โหลดสำเร็จ · '+count.toLocaleString('th-TH')+' รายการชั่งในสัปดาห์ที่เลือก · '+(isOverview?'ทุกอาคาร':b.building));
+      wrStatus('โหลดสำเร็จ · '+count.toLocaleString('th-TH')+' รายการชั่งในสัปดาห์ที่เลือก · '+(isOverview?'ทุกอาคาร':b.building)+(templatePath?' · Template พร้อม รอวัดพิกัดตัวเลขก่อน Export':''));
       const warnings=data.warnings||{};
       const parts=[];
       if(warnings.invalidDateRows)parts.push('วันที่ผิดรูปแบบ '+warnings.invalidDateRows+' แถว');
