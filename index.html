@@ -1926,7 +1926,7 @@
     #weeklyReportPage .wr-bigc-custom .bigc-table-value.bigc-weight.total{font-weight:900;}
     #weeklyReportPage .wr-bigc-custom .bigc-footer{font-size:23px;font-weight:900;}
     #weeklyReportPage .wr-bigc-custom .wr-bigc-ring{z-index:2;}
-    #weeklyReportPage .wr-bigc-custom .wr-bigc-legend-custom{position:absolute;z-index:2;left:530px;top:774px;width:240px;height:83px;display:flex;flex-direction:column;justify-content:center;gap:7px;font-family:'Noto Sans Thai',Tahoma,sans-serif;color:#254735;font-size:16px;font-weight:750;}
+    #weeklyReportPage .wr-bigc-custom .wr-bigc-legend-custom{position:absolute;z-index:2;left:540px;top:774px;width:240px;height:83px;display:flex;flex-direction:column;justify-content:center;gap:7px;font-family:'Noto Sans Thai',Tahoma,sans-serif;color:#254735;font-size:16px;font-weight:750;}
     #weeklyReportPage .wr-bigc-custom .wr-bigc-legend-custom span{display:flex;align-items:center;gap:8px;white-space:nowrap;}
     #weeklyReportPage .wr-bigc-custom .wr-bigc-legend-custom i{display:inline-block;flex:none;width:12px;height:12px;border-radius:50%;}
 
@@ -3929,7 +3929,7 @@ async function loadTrendHistory(currentData, requestId) {
       });
       return html;
     }
-    // BIG C HOUSE (C) POSITION REVISION v4 — 2026-10-15. Only C positions changed.
+    // BIG C HOUSE (C) POSITION REVISION v5 — 2026-10-15. Only C positions changed.
     // Big C House (C) ONLY. Overlay positions use source-image coordinates (1672 x 941).
     // Picker values supplied as very small areas are interpreted as anchor points plus offsets,
     // not literal text box widths/heights.
@@ -3939,11 +3939,11 @@ async function loadTrendHistory(currentData, requestId) {
         food: [1066+8, 262+6], total: [1483+6, 261+6]
       },
       mini: {
-        general: {number:[966+6,804+5+4],percent:[915+2,849+6]},
-        recycle: {number:[1240+7,805+11-1],percent:[1188+2,849+6]},
-        food: {number:[1514+12,805+10],percent:[1461+2+2,848+7]}
+        general: {number:[966+6,804+5+4],percent:[915+2+2,849+6]},
+        recycle: {number:[1240+7,805+11-1],percent:[1188+2+2,849+6]},
+        food: {number:[1514+12,805+10],percent:[1461+2+2+2,848+7]}
       },
-      donut: [451,815]
+      donut: [439,815]
     });
     function wrBigCPoint(className, xy, value, width, height, fontSize){
       if(value===undefined||value===null||value==='')return '';
@@ -3973,7 +3973,7 @@ async function loadTrendHistory(currentData, requestId) {
       table.floors.forEach((floor,index)=>{
         const row=byFloor.get(wrFloorKey(floor));
         if(!row)return;
-        const centerY=table.y+(index+0.5)*table.rowH+5;
+        const centerY=table.y+(index+0.5)*table.rowH+6;
         const fields=[
           ['department',String(row.department||'').trim()||'—'],
           ['general',row.hasData===false?'—':wrWeight(row.generalKg)],
