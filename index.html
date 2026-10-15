@@ -1902,6 +1902,18 @@
     #weeklyReportPage .wr-bigc-mini.food .wr-bigc-mini-number,#weeklyReportPage .wr-bigc-mini.food .wr-bigc-mini-percent{color:#0a6a40;}
 
 
+
+    /* Overlay data only; PNG designs and the Overview are never modified. */
+    #weeklyReportPage .wr-template-field {position:absolute;z-index:2;display:flex;align-items:center;justify-content:center;box-sizing:border-box;text-align:center;white-space:nowrap;overflow:hidden;padding:0 3px;margin:0;background:transparent;color:#12382b;font-family:'Noto Sans Thai',Tahoma,sans-serif;font-variant-numeric:tabular-nums;line-height:1.1;font-weight:700;}
+    #weeklyReportPage .wr-template-field.date {font-size:20px;font-weight:700;color:#24513b;}
+    #weeklyReportPage .wr-template-field.kpi {font-size:30px;font-weight:900;color:#073c2c;}
+    #weeklyReportPage .wr-template-field.department {justify-content:flex-start;text-align:left;font-size:12px;font-weight:600;padding-left:8px;color:#305646;}
+    #weeklyReportPage .wr-template-field.cell {font-size:16px;font-weight:600;}
+    #weeklyReportPage .wr-template-field.total {font-size:17px;font-weight:800;}
+    #weeklyReportPage .wr-template-field.percent {font-size:18px;font-weight:800;}
+    #weeklyReportPage .wr-template-ring {position:absolute;z-index:2;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+    #weeklyReportPage .wr-template-ring-center {width:65%;height:65%;border-radius:50%;background:white;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#08432f;font-size:13px;font-weight:900;line-height:1.08;}
+    #weeklyReportPage .wr-template-ring-center small {font-size:10px;}
   </style>
 </head>
 <body>
@@ -3852,13 +3864,88 @@ async function loadTrendHistory(currentData, requestId) {
       'อาคาร BJC2': './BJC 2.png',
       [WR_PARKING_COMBINED]: './อาคารจอดรถ D และ B.png'
     });
-    // Coordinates for the new building images will be calibrated page by page.
-    function wrBuildingTemplatePreview(templateKey){
-      const path=WR_BUILDING_TEMPLATES[templateKey];
-      if(!path)return '';
-      return '<div class="wr-slide wr-building-template" aria-label="Template '+escapeHtml(templateKey)+'">'+
-        '<img class="wr-building-template-image" src="'+encodeURI(path)+'" alt="Template '+escapeHtml(templateKey)+'">'+
-        '</div>';
+    // Coordinates are measured in source-image pixels (1672×941).
+    // Fine alignment can be calibrated independently per building with Coordinate Picker.
+    const WR_TEMPLATE_LAYOUTS = Object.freeze({
+      'BJC House (A)': {period:[615,157,420,36],kpiY:244, table:{floors:['G','M','2','3','4','5','6','7','8','9','10','11','12','12A','14','15','16','17','18','19'],y:329,rowH:17.7,footerY:682,footerH:35,cols:[[126,439],[439,683],[683,921],[921,1165],[1165,1397],[1397,1621]]},bottom:{ring:[285,789,102],minisY:797,pctY:843}},
+      'Big C House (C)': {period:[615,157,420,36],kpiY:244, table:{floors:['B1','G','2','3','4','5','6','7','8'],y:330,rowH:33.5,footerY:631,footerH:49,cols:[[126,439],[439,683],[683,921],[921,1165],[1165,1397],[1397,1621]]},bottom:{ring:[285,779,104],minisY:797,pctY:842}},
+      'อาคาร BJC1': {period:[555,158,540,36],kpiY:246, table:{floors:['G','2','3','5'],y:353,rowH:69.3,footerY:630,footerH:65,cols:[[128,485],[485,713],[713,944],[944,1181],[1181,1405],[1405,1621]]},bottom:{ring:[285,782,104],minisY:797,pctY:838}},
+      'อาคาร BJC2': {period:[603,186,444,41],kpiY:280,table:{floors:['G','5','8','9','10','11','12','16','โซนอาคารจอดรถ'],y:382,rowH:32,footerY:670,footerH:59,cols:[[145,439],[439,683],[683,921],[921,1165],[1165,1397],[1397,1621]]},bottom:{ring:[285,796,97],minisY:818,pctY:858}},
+      'อาคารจอดรถ D และ B': {period:[615,157,420,36],kpiY:245,bottom:{ring:[285,801,82],minisY:817,pctY:854}, sections:[
+        {building:'D',floors:['3','4','5','6','โซนอาคารจอดรถ'],y:379,rowH:29.1,footerY:525,footerH:37,cols:[[188,463],[463,692],[692,925],[925,1162],[1162,1393],[1393,1621]]},
+        {building:'B',floors:['7.1 (Wellness)','โซนอาคารจอดรถ'],y:654,rowH:28.5,footerY:711,footerH:35,cols:[[188,463],[463,692],[692,925],[925,1162],[1162,1393],[1393,1621]]}
+      ]}
+    });
+    function wrFloorKey(value){
+      return String(value??'').trim().toLowerCase().replace(/^ชั้น\s*/,'').replace(/\s+/g,' ').replace(/zone office/g,'wellness').replace(/\(wellness center\)/g,'(wellness)').replace(/\(zone wellness\)/g,'(wellness)');
+    }
+    function wrTemplateField(cls,rect,value,size){
+      if(value===undefined||value===null||value==='')return '';
+      const [x,y,w,h]=rect;
+      return '<div class="wr-template-field '+cls+'" style="left:'+x+'px;top:'+y+'px;width:'+w+'px;height:'+h+'px'+(size?';font-size:'+size+'px':'')+'">'+escapeHtml(String(value))+'</div>';
+    }
+    function wrTemplateRowFields(row,columns,y,h){
+      if(!row)return '';
+      const keys=['department','generalKg','recyclableKg','foodKg','totalKg','average'];
+      let html='';
+      keys.forEach((key,i)=>{
+        let val;
+        if(key==='average'){
+          const candidates=['avgWastePerPersonPerDay','avgPerPersonPerDay','averagePerPersonPerDay','avgPerPerson','averageKgPerPersonDay','averageKgPerPerson'];
+          const found=candidates.find(k=>row[k]!==undefined&&row[k]!==null&&row[k]!==''&&Number.isFinite(Number(row[k])));
+          val=found?wrWeight(row[found]):'—';
+        }else if(key==='department')val=String(row.department||'').trim()||'—';
+        else val=row.hasData===false?'—':wrWeight(row[key]);
+        const [x0,x1]=columns[i];
+        html+=wrTemplateField(i===0?'department':'cell'+(key==='totalKg'?' total':''),[x0,y,x1-x0,h],val,i===0?(h<26?11:13):(h<26?14:16));
+      });
+      return html;
+    }
+    function wrTemplateSection(section,rows,totals){
+      const rowMap=new Map();
+      rows.forEach(r=>{const key=wrFloorKey(r.floor);if(!rowMap.has(key))rowMap.set(key,r);});
+      let html='';
+      section.floors.forEach((floor,i)=>{const row=rowMap.get(wrFloorKey(floor));if(row)html+=wrTemplateRowFields(row,section.cols,section.y+i*section.rowH,section.rowH);});
+      const sums=totals||{};
+      ['generalKg','recyclableKg','foodKg','totalKg'].forEach((key,i)=>{
+        const [x0,x1]=section.cols[i+1];
+        html+=wrTemplateField('total',[x0,section.footerY,x1-x0,section.footerH],wrWeight(sums[key]),18);
+      });
+      return html;
+    }
+    function wrBuildingTemplatePreview(templateKey,data,building){
+      const path=WR_BUILDING_TEMPLATES[templateKey], layout=WR_TEMPLATE_LAYOUTS[templateKey];
+      if(!path||!layout)return '';
+      const sums=building||{};
+      const g=Number(sums.generalKg)||0,r=Number(sums.recyclableKg)||0,f=Number(sums.foodKg)||0,t=Number(sums.totalKg)||0;
+      const period=wrReportPeriodText(data);
+      let html='<div class="wr-slide wr-building-template" aria-label="รายงาน '+escapeHtml(templateKey)+'">'+
+        '<img class="wr-building-template-image" src="'+encodeURI(path)+'" alt="Template '+escapeHtml(templateKey)+'">';
+      html+=wrTemplateField('date',layout.period,period,period.length>60?18:20);
+      const kpiColumns=[[156,345],[555,749],[961,1157],[1375,1566]];
+      [g,r,f,t].forEach((num,i)=>{
+        const [x0,x1]=kpiColumns[i],v=wrWeight(num);
+        html+=wrTemplateField('kpi',[x0,layout.kpiY,x1-x0,35],v,v.length>=9?25:v.length>=7?28:32);
+      });
+      if(layout.sections){
+        layout.sections.forEach(section=>{
+          const relevant=(building.rows||[]).filter(row=>String(row.sourceBuilding||'').includes('('+section.building+')'));
+          const sectionTotals={};
+          ['generalKg','recyclableKg','foodKg','totalKg'].forEach(key=>sectionTotals[key]=relevant.reduce((sum,row)=>sum+(Number(row[key])||0),0));
+          html+=wrTemplateSection(section,relevant,sectionTotals);
+        });
+      }else html+=wrTemplateSection(layout.table,building.rows||[],sums);
+      const gp=t?g/t*100:0,rp=t?r/t*100:0,fp=t?f/t*100:0;
+      const [cx,cy,diam]=layout.bottom.ring;
+      const gradient='conic-gradient(#176ee4 0% '+gp+'%,#eab508 '+gp+'% '+(gp+rp)+'%,#109752 '+(gp+rp)+'% 100%)';
+      html+='<div class="wr-template-ring" style="left:'+cx+'px;top:'+cy+'px;width:'+diam+'px;height:'+diam+'px;background:'+gradient+'"><div class="wr-template-ring-center">'+escapeHtml(wrWeight(t))+'<small>กก.</small></div></div>';
+      const miniX=[[905,1014],[1168,1279],[1447,1548]];
+      [[g,gp],[r,rp],[f,fp]].forEach(([n,pct],i)=>{
+        const [x0,x1]=miniX[i],w=x1-x0;
+        html+=wrTemplateField('total',[x0,layout.bottom.minisY,w,27],wrWeight(n),21);
+        html+=wrTemplateField('percent',[x0,layout.bottom.pctY,w,22],pct.toFixed(1),17);
+      });
+      return html+'</div>';
     }
     function wrIsParking(name){
       return name==='อาคารจอดรถ (B)' || name==='อาคารจอดรถ (D)' ||
@@ -4053,7 +4140,8 @@ async function loadTrendHistory(currentData, requestId) {
       try{
         const canvas=await wrCaptureReport();
         const week=wrUI.data.weekStart||'weekly';
-        const fileBase=wrReportFileBase(wrUI.data);
+        const chosen=wrElement('wrBuilding').value;
+        const fileBase=wrReportFileBase(wrUI.data)+(chosen==='ALL'?'':' - '+chosen.replace(/[\\/:*?"<>|]/g,' '));
         if(kind==='png')await wrSaveCanvas(canvas,fileBase+'.png');
         else{
           if(!window.jspdf || !window.jspdf.jsPDF)throw new Error('โหลดไลบรารี PDF ไม่สำเร็จ');
@@ -4092,17 +4180,17 @@ async function loadTrendHistory(currentData, requestId) {
       const notes=isOverview?'<div class="wr-overview-notes"><div><strong>🌱 SAVE EARTH · SAVE OFFICE</strong>สรุปปริมาณขยะจริงจากข้อมูลชั่งน้ำหนักประจำสัปดาห์</div><div><strong>ข้อมูลสำหรับการนำเสนอ</strong>รวมเฉพาะขยะทั่วไป รีไซเคิล และเศษอาหาร ไม่รวมขยะอันตราย</div></div>':'';
       const templatePath=WR_BUILDING_TEMPLATES[buildingName];
       const slide=isOverview?wrExactOverview(data):
-        templatePath?wrBuildingTemplatePreview(buildingName):
+        templatePath?wrBuildingTemplatePreview(buildingName,data,b):
         '<div class="wr-slide '+(rows.length>18?'wr-dense':'')+'">'+
         heading+wrSlideKpis(totals)+wrSlideTable(rows,false)+extra+
         '<div class="wr-slide-bottom"><span>SAVE EARTH · SAVE OFFICE · ลดขยะวันนี้ เพื่อโลกที่ยั่งยืน</span><span>WEEKLY REPORT · '+escapeHtml(data.weekEnd)+'</span></div></div>';
-      wrElement('wrResult').innerHTML='<article class="wr-report"><p class="wr-preview-help">'+(templatePath?'Template ของ '+escapeHtml(buildingName)+' · โหลดข้อมูลแล้ว · รอการกำหนดพิกัดก่อนเติมตัวเลขและเปิด Export':'Preview ตาม Template ที่ส่งมา · ตัวเลขอัปเดตจาก Google Sheets ตามสัปดาห์ · พร้อม Export PNG / PDF')+'</p><div class="wr-slide-scroll"><div class="wr-slide-stage">'+slide+'</div></div></article>';
+      wrElement('wrResult').innerHTML='<article class="wr-report"><p class="wr-preview-help">'+(templatePath?'Template ของ '+escapeHtml(buildingName)+' · แสดงข้อมูลจริงจาก Google Sheets · ตรวจตำแหน่งก่อน Export':'Preview ตาม Template ที่ส่งมา · ตัวเลขอัปเดตจาก Google Sheets ตามสัปดาห์ · พร้อม Export PNG / PDF')+'</p><div class="wr-slide-scroll"><div class="wr-slide-stage">'+slide+'</div></div></article>';
       wrElement('wrResult').classList.remove('hidden');
-      wrElement('wrExportPng').disabled=Boolean(templatePath);
-      wrElement('wrExportPdf').disabled=Boolean(templatePath);
+      wrElement('wrExportPng').disabled=false;
+      wrElement('wrExportPdf').disabled=false;
       wrFitSlide();
       const count=Number(data.matchedRecords||0);
-      wrStatus('โหลดสำเร็จ · '+count.toLocaleString('th-TH')+' รายการชั่งในสัปดาห์ที่เลือก · '+(isOverview?'ทุกอาคาร':b.building)+(templatePath?' · Template พร้อม รอวัดพิกัดตัวเลขก่อน Export':''));
+      wrStatus('โหลดสำเร็จ · '+count.toLocaleString('th-TH')+' รายการชั่งในสัปดาห์ที่เลือก · '+(isOverview?'ทุกอาคาร':b.building)+(templatePath?' · ข้อมูลแสดงบน Template แล้ว':''));
       const warnings=data.warnings||{};
       const parts=[];
       if(warnings.invalidDateRows)parts.push('วันที่ผิดรูปแบบ '+warnings.invalidDateRows+' แถว');
