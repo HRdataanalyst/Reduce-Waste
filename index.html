@@ -3929,6 +3929,7 @@ async function loadTrendHistory(currentData, requestId) {
       });
       return html;
     }
+    // BIG C HOUSE (C) POSITION REVISION v4 — 2026-10-15. Only C positions changed.
     // Big C House (C) ONLY. Overlay positions use source-image coordinates (1672 x 941).
     // Picker values supplied as very small areas are interpreted as anchor points plus offsets,
     // not literal text box widths/heights.
@@ -3982,20 +3983,20 @@ async function loadTrendHistory(currentData, requestId) {
         ];
         fields.forEach(([kind,val],i)=>{
           const [x0,x1]=table.cols[i], isDepartment=i===0;
-          const rect=[x0+2,centerY-table.rowH/2,x1-x0-4,table.rowH];
+          const rect=[x0+2,centerY-table.rowH/2,x1-x0,table.rowH];
           html+=wrTemplateField('bigc-table-value '+(isDepartment?'bigc-department':'bigc-weight '+kind),rect,val,isDepartment?17:18);
         });
         // Average is left blank unless the API sends a real average.
         const rowAverage=wrBuildingAverageText(row);
         if(rowAverage!=='—'){
           const [x0,x1]=table.cols[5];
-          html+=wrTemplateField('bigc-table-value bigc-weight',[x0+2,centerY-table.rowH/2,x1-x0-4,table.rowH],rowAverage,16);
+          html+=wrTemplateField('bigc-table-value bigc-weight',[x0+2,centerY-table.rowH/2,x1-x0,table.rowH],rowAverage,16);
         }
       });
       // The total caption and floor labels are baked into the PNG background.
       [['generalKg',g],['recyclableKg',r],['foodKg',f],['totalKg',t]].forEach(([key,v],i)=>{
         const [x0,x1]=table.cols[i+1];
-        html+=wrTemplateField('bigc-footer',[x0+2,table.footerY+13,x1-x0-4,table.footerH-6],wrWeight(v),23);
+        html+=wrTemplateField('bigc-footer',[x0+2,table.footerY+13,x1-x0,table.footerH-6],wrWeight(v),23);
       });
       // Donut centered at the precise requested location, with its own color legend.
       const [cx,cy]=WR_BIGC_ANCHORS.donut;
