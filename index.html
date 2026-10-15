@@ -1926,7 +1926,7 @@
     #weeklyReportPage .wr-bigc-custom .bigc-table-value.bigc-weight.total{font-weight:900;}
     #weeklyReportPage .wr-bigc-custom .bigc-footer{font-size:23px;font-weight:900;}
     #weeklyReportPage .wr-bigc-custom .wr-bigc-ring{z-index:2;}
-    #weeklyReportPage .wr-bigc-custom .wr-bigc-legend-custom{position:absolute;z-index:2;left:530px;top:765px;width:240px;height:83px;display:flex;flex-direction:column;justify-content:center;gap:7px;font-family:'Noto Sans Thai',Tahoma,sans-serif;color:#254735;font-size:16px;font-weight:750;}
+    #weeklyReportPage .wr-bigc-custom .wr-bigc-legend-custom{position:absolute;z-index:2;left:530px;top:774px;width:240px;height:83px;display:flex;flex-direction:column;justify-content:center;gap:7px;font-family:'Noto Sans Thai',Tahoma,sans-serif;color:#254735;font-size:16px;font-weight:750;}
     #weeklyReportPage .wr-bigc-custom .wr-bigc-legend-custom span{display:flex;align-items:center;gap:8px;white-space:nowrap;}
     #weeklyReportPage .wr-bigc-custom .wr-bigc-legend-custom i{display:inline-block;flex:none;width:12px;height:12px;border-radius:50%;}
 
@@ -3934,15 +3934,15 @@ async function loadTrendHistory(currentData, requestId) {
     // not literal text box widths/heights.
     const WR_BIGC_ANCHORS = Object.freeze({
       top: {
-        general: [249+10, 262+4], recycle: [655+10, 259+13-2],
+        general: [249+10, 262+4], recycle: [655+10, 259+13-3],
         food: [1066+8, 262+6], total: [1483+6, 261+6]
       },
       mini: {
-        general: {number:[966+6,804+5+2],percent:[915+2,849+4]},
-        recycle: {number:[1240+7,805+11-1],percent:[1188+2,849+4]},
-        food: {number:[1514+12,805+10],percent:[1461+2+2,848+5]}
+        general: {number:[966+6,804+5+4],percent:[915+2,849+6]},
+        recycle: {number:[1240+7,805+11-1],percent:[1188+2,849+6]},
+        food: {number:[1514+12,805+10],percent:[1461+2+2,848+7]}
       },
-      donut: [463,815]
+      donut: [451,815]
     });
     function wrBigCPoint(className, xy, value, width, height, fontSize){
       if(value===undefined||value===null||value==='')return '';
@@ -3962,7 +3962,7 @@ async function loadTrendHistory(currentData, requestId) {
       const image=WR_BUILDING_TEMPLATES['Big C House (C)'];
       let html='<div class="wr-slide wr-building-template wr-bigc-custom" aria-label="Big C House (C) Weekly Report">'+
         '<img class="wr-building-template-image" src="'+encodeURI(image)+'" alt="Big C House C Template">';
-      html+=wrTemplateField('date bigc-date',[613,158,426,37],period,20);
+      html+=wrTemplateField('date bigc-date',[615,158,426,37],period,20);
       const topValues=[['general',g],['recycle',r],['food',f],['total',t]];
       topValues.forEach(([name,v])=>{
         const text=wrWeight(v), size=text.length>9?26:text.length>7?29:33;
@@ -3972,7 +3972,7 @@ async function loadTrendHistory(currentData, requestId) {
       table.floors.forEach((floor,index)=>{
         const row=byFloor.get(wrFloorKey(floor));
         if(!row)return;
-        const centerY=table.y+(index+0.5)*table.rowH+3;
+        const centerY=table.y+(index+0.5)*table.rowH+5;
         const fields=[
           ['department',String(row.department||'').trim()||'—'],
           ['general',row.hasData===false?'—':wrWeight(row.generalKg)],
@@ -3982,20 +3982,20 @@ async function loadTrendHistory(currentData, requestId) {
         ];
         fields.forEach(([kind,val],i)=>{
           const [x0,x1]=table.cols[i], isDepartment=i===0;
-          const rect=[x0,centerY-table.rowH/2,x1-x0,table.rowH];
+          const rect=[x0+2,centerY-table.rowH/2,x1-x0-4,table.rowH];
           html+=wrTemplateField('bigc-table-value '+(isDepartment?'bigc-department':'bigc-weight '+kind),rect,val,isDepartment?17:18);
         });
         // Average is left blank unless the API sends a real average.
         const rowAverage=wrBuildingAverageText(row);
         if(rowAverage!=='—'){
           const [x0,x1]=table.cols[5];
-          html+=wrTemplateField('bigc-table-value bigc-weight',[x0,centerY-table.rowH/2,x1-x0,table.rowH],rowAverage,16);
+          html+=wrTemplateField('bigc-table-value bigc-weight',[x0+2,centerY-table.rowH/2,x1-x0-4,table.rowH],rowAverage,16);
         }
       });
       // The total caption and floor labels are baked into the PNG background.
       [['generalKg',g],['recyclableKg',r],['foodKg',f],['totalKg',t]].forEach(([key,v],i)=>{
         const [x0,x1]=table.cols[i+1];
-        html+=wrTemplateField('bigc-footer',[x0,table.footerY+11,x1-x0,table.footerH-6],wrWeight(v),23);
+        html+=wrTemplateField('bigc-footer',[x0+2,table.footerY+13,x1-x0-4,table.footerH-6],wrWeight(v),23);
       });
       // Donut centered at the precise requested location, with its own color legend.
       const [cx,cy]=WR_BIGC_ANCHORS.donut;
