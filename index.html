@@ -1877,16 +1877,16 @@
     #weeklyReportPage .wr-bigc-kpi.recycle{color:#9a7600;}
     #weeklyReportPage .wr-bigc-kpi.food{color:#0b6a3f;}
     #weeklyReportPage .wr-bigc-kpi.total{color:#143529;}
-    #weeklyReportPage .wr-bigc-table {position:absolute;left:31px;top:333px;width:1582px;height:360px;z-index:2;display:grid;grid-template-columns:99px 314px 245px 244px 244px 211px 225px;grid-template-rows:repeat(9,35px) 52px;}
+    #weeklyReportPage .wr-bigc-table {position:absolute;left:31px;top:335px;width:1582px;height:360px;z-index:2;display:grid;grid-template-columns:99px 314px 245px 244px 244px 211px 225px;grid-template-rows:repeat(9,35px) 52px;}
     #weeklyReportPage .wr-bigc-cell {display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:600;color:#173227;line-height:1.08;font-variant-numeric:tabular-nums;}
     #weeklyReportPage .wr-bigc-cell.floor {font-size:0;color:transparent;}
     #weeklyReportPage .wr-bigc-cell.department {justify-content:flex-start;padding:0 16px;font-size:13px;line-height:1.08;color:#355548;}
     #weeklyReportPage .wr-bigc-cell.num {padding-top:2px;}
     #weeklyReportPage .wr-bigc-cell.totalcol {font-size:18px;font-weight:800;padding-top:2px;}
     #weeklyReportPage .wr-bigc-cell.avg {font-size:15px;color:#335744;padding-top:2px;}
-    #weeklyReportPage .wr-bigc-cell.footer {font-size:17px;font-weight:800;padding-top:4px;}
+    #weeklyReportPage .wr-bigc-cell.footer {font-size:21px;font-weight:900;padding-top:4px;}
     #weeklyReportPage .wr-bigc-cell.footer-label {font-size:0;color:transparent;}
-    #weeklyReportPage .wr-bigc-ratio {position:absolute;left:34px;top:744px;width:734px;height:112px;z-index:2;display:flex;align-items:center;gap:18px;padding:2px 16px 2px 18px;}
+    #weeklyReportPage .wr-bigc-ratio {position:absolute;left:34px;top:752px;width:734px;height:112px;z-index:2;display:flex;align-items:center;gap:18px;padding:2px 16px 2px 18px;}
     #weeklyReportPage .wr-bigc-donut {width:96px;height:96px;border-radius:50%;display:grid;place-items:center;flex:none;margin-left:4px;}
     #weeklyReportPage .wr-bigc-donut-inner {width:66px;height:66px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;flex-direction:column;font-size:12px;font-weight:800;color:#0a3e2e;line-height:1.05;text-align:center;box-shadow:inset 0 0 0 1px #d9ece0;}
     #weeklyReportPage .wr-bigc-donut-inner small{font-size:10px;font-weight:700;color:#4d6259;}
@@ -4121,9 +4121,9 @@ async function loadTrendHistory(currentData, requestId) {
       const fitSize=(value,maxLen,big,mid,small)=>String(value).length>=maxLen?small:(String(value).length>=maxLen-1?mid:big);
       let html='<div class="wr-slide wr-exact-bigc" aria-label="สรุปปริมาณขยะ Big C House (C) รายชั้น">'+
         '<img class="wr-bigc-background" src="'+WR_BIGC_TEMPLATE+'" alt="Big C House Waste Summary Infographic">';
-      html+='<div class="wr-bigc-period" style="left:610px;top:159px;width:424px;height:34px">'+escapeHtml(period)+'</div>';
+      html+='<div class="wr-bigc-period" style="left:610px;top:161px;width:424px;height:34px">'+escapeHtml(period)+'</div>';
       html+='<div class="wr-bigc-kpi general" style="left:153px;top:242px;width:191px;height:38px;font-size:'+fitSize(wrWeight(generalKg),9,34,31,28)+'px">'+escapeHtml(wrWeight(generalKg))+'</div>';
-      html+='<div class="wr-bigc-kpi recycle" style="left:560px;top:242px;width:189px;height:38px;font-size:'+fitSize(wrWeight(recycleKg),8,34,31,28)+'px">'+escapeHtml(wrWeight(recycleKg))+'</div>';
+      html+='<div class="wr-bigc-kpi recycle" style="left:560px;top:240px;width:189px;height:38px;font-size:'+fitSize(wrWeight(recycleKg),8,34,31,28)+'px">'+escapeHtml(wrWeight(recycleKg))+'</div>';
       html+='<div class="wr-bigc-kpi food" style="left:965px;top:242px;width:189px;height:38px;font-size:'+fitSize(wrWeight(foodKg),8,34,31,28)+'px">'+escapeHtml(wrWeight(foodKg))+'</div>';
       html+='<div class="wr-bigc-kpi total" style="left:1377px;top:242px;width:190px;height:38px;font-size:'+fitSize(wrWeight(totalKg),9,34,31,28)+'px">'+escapeHtml(wrWeight(totalKg))+'</div>';
       const bodyRows=rows.slice(0,9);
@@ -4163,10 +4163,11 @@ async function loadTrendHistory(currentData, requestId) {
         ['food',foodKg,foodPct]
       ].forEach(([cls,num,pct],i)=>{
         const n=wrWeight(num), p=pct.toFixed(1);
-        const nSize=n.length>=8?21:22, pSize=16;
+        const nSize=n.length>=8?21:22, pSize=19;
+        const numberTop=cls==='general'?12:(cls==='recycle'?9:10);
         html+='<div class="wr-bigc-mini '+cls+'" style="grid-column:'+(i+1)+';">'+
-          '<div class="wr-bigc-mini-number" style="left:64px;top:10px;width:150px;height:24px;font-size:'+nSize+'px">'+escapeHtml(n)+'</div>'+
-          '<div class="wr-bigc-mini-percent" style="left:66px;top:72px;width:146px;height:18px;font-size:'+pSize+'px">'+escapeHtml(p)+'</div>'+
+          '<div class="wr-bigc-mini-number" style="left:64px;top:'+numberTop+'px;width:150px;height:24px;font-size:'+nSize+'px">'+escapeHtml(n)+'</div>'+
+          '<div class="wr-bigc-mini-percent" style="left:68px;top:72px;width:146px;height:22px;font-size:'+pSize+'px">'+escapeHtml(p)+'</div>'+
         '</div>';
       });
       html+='</div>';
