@@ -4024,7 +4024,7 @@ async function loadTrendHistory(currentData, requestId) {
         const rowAverage=wrBuildingAverageText(row);
         const [avgX0,avgX1]=table.cols[5];
         html+=wrTemplateField('bigc-table-value bigc-weight bigc-average',
-  [avgX0+12,centerY-table.rowH/2,avgX1-avgX0,table.rowH],rowAverage,18);
+  [avgX0+22,centerY-table.rowH/2,avgX1-avgX0,table.rowH],rowAverage,18);
       });
       // The total caption and floor labels are baked into the PNG background.
       [['generalKg',g],['recyclableKg',r],['foodKg',f],['totalKg',t]].forEach(([key,v],i)=>{
@@ -4045,7 +4045,7 @@ async function loadTrendHistory(currentData, requestId) {
         const averageSum=visibleFloorAverages.reduce((sum,value)=>sum+value,0);
         const [x0,x1]=table.cols[5];
         html+=wrTemplateField('bigc-footer bigc-footer-average',
-          [x0+2,table.footerY+15,x1-x0,table.footerH-6],wrWeight(averageSum),23);
+          [x0+12,table.footerY+15,x1-x0,table.footerH-6],wrWeight(averageSum),23);
       }
       // Donut centered at the precise requested location, with its own color legend.
       const [cx,cy]=WR_BIGC_ANCHORS.donut;
