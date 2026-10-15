@@ -3907,15 +3907,35 @@ async function loadTrendHistory(currentData, requestId) {
       keys.forEach((key,i)=>{
         let val;
         if(key==='average'){
-          const candidates=['avgWastePerPersonPerDay','avgPerPersonPerDay','averagePerPersonPerDay','avgPerPerson','averageKgPerPersonDay','averageKgPerPerson'];
-          const found=candidates.find(k=>row[k]!==undefined&&row[k]!==null&&row[k]!==''&&Number.isFinite(Number(row[k])));
-          val=found?wrWeight(row[found]):'—';
+          val=wrBuildingAverageText(row);
         }else if(key==='department')val=String(row.department||'').trim()||'—';
         else val=row.hasData===false?'—':wrWeight(row[key]);
         const [x0,x1]=columns[i];
         html+=wrTemplateField(i===0?'department':'cell'+(key==='totalKg'?' total':''),[x0,y,x1-x0,h],val,i===0?(h<26?11:13):(h<26?14:16));
       });
       return html;
+    }
+    // Sum only the per-floor averages displayed in this template section.
+    // Each monthly headcount is already supplied by the weeklyReport API.
+    // This is the sum of floor averages, NOT total building kg / total headcount.
+    function wrTemplateAverageTotal(section,rows){
+      const byFloor=new Map();
+      (rows||[]).forEach(row=>{
+        const key=wrFloorKey(row.floor);
+        if(!byFloor.has(key))byFloor.set(key,row);
+      });
+      let count=0, sum=0;
+      (section.floors||[]).forEach(floor=>{
+        const row=byFloor.get(wrFloorKey(floor));
+        if(!row)return;
+        const displayed=wrBuildingAverageText(row);
+        if(displayed==='—')return;
+        const amount=Number(String(displayed).replace(/,/g,''));
+        if(!Number.isFinite(amount))return;
+        sum+=amount;
+        count++;
+      });
+      return count?wrWeight(sum):'—';
     }
     function wrTemplateSection(section,rows,totals){
       const rowMap=new Map();
@@ -3927,6 +3947,14 @@ async function loadTrendHistory(currentData, requestId) {
         const [x0,x1]=section.cols[i+1];
         html+=wrTemplateField('total',[x0,section.footerY,x1-x0,section.footerH],wrWeight(sums[key]),18);
       });
+      // Column 7: add the per-floor averages for this building/parking section.
+      // Keep the original PNG, typography, row coordinates and other totals unchanged.
+      const averageTotal=wrTemplateAverageTotal(section,rows);
+      if(averageTotal!=='—' && section.cols[5]){
+        const [x0,x1]=section.cols[5];
+        html+=wrTemplateField('total wr-average-footer',
+          [x0,section.footerY,x1-x0,section.footerH],averageTotal,18);
+      }
       return html;
     }
     // BIG C HOUSE (C) POSITION REVISION v6 — 2026-10-15. Only C positions changed.
@@ -3998,6 +4026,22 @@ async function loadTrendHistory(currentData, requestId) {
         const [x0,x1]=table.cols[i+1];
         html+=wrTemplateField('bigc-footer',[x0+2,table.footerY+15,x1-x0,table.footerH-6],wrWeight(v),23);
       });
+      // Big C House (C) only: sum the displayed per-floor averages in the last column.
+      // Floors without a valid monthly headcount are excluded (they display blank).
+      const visibleFloorAverages=table.floors.map(floor=>{
+        const row=byFloor.get(wrFloorKey(floor));
+        if(!row)return null;
+        const value=wrBuildingAverageText(row);
+        if(value==='—')return null;
+        const amount=Number(String(value).replace(/,/g,''));
+        return Number.isFinite(amount)?amount:null;
+      }).filter(value=>value!==null);
+      if(visibleFloorAverages.length){
+        const averageSum=visibleFloorAverages.reduce((sum,value)=>sum+value,0);
+        const [x0,x1]=table.cols[5];
+        html+=wrTemplateField('bigc-footer bigc-footer-average',
+          [x0+2,table.footerY+15,x1-x0,table.footerH-6],wrWeight(averageSum),23);
+      }
       // Donut centered at the precise requested location, with its own color legend.
       const [cx,cy]=WR_BIGC_ANCHORS.donut;
       const diameter=116;
@@ -4103,14 +4147,14 @@ async function loadTrendHistory(currentData, requestId) {
       return 'ระหว่างวันที่ '+start+' – '+end+' '+year+' | หน่วย : กิโลกรัม';
     }
     function wrBuildingAverageText(row){
-      const candidates=['avgWastePerPersonPerDay','avgPerPersonPerDay','averagePerPersonPerDay','avgPerPerson','averageKgPerPersonDay','averageKgPerPerson'];
+      const candidates=['avgWastePerPerson','avgPerPerson','averageKgPerPerson','avgWastePerPersonPerDay','avgPerPersonPerDay','averagePerPersonPerDay','averageKgPerPersonDay','averageKgPerPerson'];
       for(const key of candidates){
         const val=Number(row&&row[key]);
         if(Number.isFinite(val) && val>0)return wrWeight(val);
       }
       const headcount=Number(row&&row.headcount);
       const total=Number(row&&row.totalKg);
-      if(Number.isFinite(headcount) && headcount>0 && Number.isFinite(total))return wrWeight(total/headcount/5);
+      if(Number.isFinite(headcount) && headcount>0 && Number.isFinite(total))return wrWeight(total/headcount);
       return '—';
     }
     function wrExactBigC(data,b){
