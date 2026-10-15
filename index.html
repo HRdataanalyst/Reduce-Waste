@@ -1914,6 +1914,22 @@
     #weeklyReportPage .wr-template-ring {position:absolute;z-index:2;border-radius:50%;display:flex;align-items:center;justify-content:center;}
     #weeklyReportPage .wr-template-ring-center {width:65%;height:65%;border-radius:50%;background:white;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#08432f;font-size:13px;font-weight:900;line-height:1.08;}
     #weeklyReportPage .wr-template-ring-center small {font-size:10px;}
+    /* Big C (C) coordinate-mapped text: overrides ONLY on the Big C slide. */
+    #weeklyReportPage .wr-bigc-custom .wr-bigc-overlay{font-family:'Noto Sans Thai',Tahoma,sans-serif;font-weight:850;letter-spacing:-.2px;line-height:1;white-space:nowrap;overflow:hidden;}
+    #weeklyReportPage .wr-bigc-custom .bigc-date{font-size:20px;font-weight:700;white-space:nowrap;}
+    #weeklyReportPage .wr-bigc-custom .bigc-top.general,#weeklyReportPage .wr-bigc-custom .bigc-mini-num.general,#weeklyReportPage .wr-bigc-custom .bigc-mini-pct.general{color:#005da4;}
+    #weeklyReportPage .wr-bigc-custom .bigc-top.recycle,#weeklyReportPage .wr-bigc-custom .bigc-mini-num.recycle,#weeklyReportPage .wr-bigc-custom .bigc-mini-pct.recycle{color:#9a7000;}
+    #weeklyReportPage .wr-bigc-custom .bigc-top.food,#weeklyReportPage .wr-bigc-custom .bigc-mini-num.food,#weeklyReportPage .wr-bigc-custom .bigc-mini-pct.food{color:#0b6a3f;}
+    #weeklyReportPage .wr-bigc-custom .bigc-top.total{color:#123c2c;}
+    #weeklyReportPage .wr-bigc-custom .bigc-table-value{font-weight:650;align-items:center;justify-content:center;padding:0 4px;}
+    #weeklyReportPage .wr-bigc-custom .bigc-table-value.bigc-department{font-size:17px;font-weight:700;justify-content:flex-start;padding-left:13px;text-align:left;overflow:hidden;}
+    #weeklyReportPage .wr-bigc-custom .bigc-table-value.bigc-weight.total{font-weight:900;}
+    #weeklyReportPage .wr-bigc-custom .bigc-footer{font-size:20px;font-weight:900;}
+    #weeklyReportPage .wr-bigc-custom .wr-bigc-ring{z-index:2;}
+    #weeklyReportPage .wr-bigc-custom .wr-bigc-legend-custom{position:absolute;z-index:2;left:530px;top:765px;width:240px;height:83px;display:flex;flex-direction:column;justify-content:center;gap:7px;font-family:'Noto Sans Thai',Tahoma,sans-serif;color:#254735;font-size:15px;font-weight:750;}
+    #weeklyReportPage .wr-bigc-custom .wr-bigc-legend-custom span{display:flex;align-items:center;gap:8px;white-space:nowrap;}
+    #weeklyReportPage .wr-bigc-custom .wr-bigc-legend-custom i{display:inline-block;flex:none;width:12px;height:12px;border-radius:50%;}
+
   </style>
 </head>
 <body>
@@ -3913,9 +3929,94 @@ async function loadTrendHistory(currentData, requestId) {
       });
       return html;
     }
+    // Big C House (C) ONLY. Overlay positions use source-image coordinates (1672 x 941).
+    // Picker values supplied as very small areas are interpreted as anchor points plus offsets,
+    // not literal text box widths/heights.
+    const WR_BIGC_ANCHORS = Object.freeze({
+      top: {
+        general: [249+10, 262+4], recycle: [655+10, 259+13],
+        food: [1066+8, 262+6], total: [1483+6, 261+6]
+      },
+      mini: {
+        general: {number:[966+6,804+5],percent:[915,849+4]},
+        recycle: {number:[1240+7,805+11],percent:[1188,849+4]},
+        food: {number:[1514+12,805+10],percent:[1461+2,848+5]}
+      },
+      donut: [463,805]
+    });
+    function wrBigCPoint(className, xy, value, width, height, fontSize){
+      if(value===undefined||value===null||value==='')return '';
+      const x=xy[0]-width/2, y=xy[1]-height/2;
+      return '<div class="wr-template-field wr-bigc-overlay '+className+'" style="left:'+x+'px;top:'+y+'px;width:'+width+'px;height:'+height+'px;font-size:'+fontSize+'px">'+escapeHtml(String(value))+'</div>';
+    }
+    function wrBigCOnlyPreview(data, building){
+      const layout=WR_TEMPLATE_LAYOUTS['Big C House (C)'];
+      const b=building||{}, g=Number(b.generalKg)||0, r=Number(b.recyclableKg)||0;
+      const f=Number(b.foodKg)||0, t=Number(b.totalKg)||0;
+      const gp=t?g/t*100:0, rp=t?r/t*100:0, fp=t?f/t*100:0;
+      const allRows=b.rows||[];
+      const byFloor=new Map();
+      allRows.forEach(row=>{const key=wrFloorKey(row.floor);if(!byFloor.has(key))byFloor.set(key,row);});
+      const start=shortDate(data.weekStart),end=shortDate(data.weekEnd),year=thaiYear(data.weekEnd);
+      const period='ระหว่างวันที่ '+start+' – '+end+' '+year;
+      const image=WR_BUILDING_TEMPLATES['Big C House (C)'];
+      let html='<div class="wr-slide wr-building-template wr-bigc-custom" aria-label="Big C House (C) Weekly Report">'+
+        '<img class="wr-building-template-image" src="'+encodeURI(image)+'" alt="Big C House C Template">';
+      html+=wrTemplateField('date bigc-date',[613,156,426,37],period,20);
+      const topValues=[['general',g],['recycle',r],['food',f],['total',t]];
+      topValues.forEach(([name,v])=>{
+        const text=wrWeight(v), size=text.length>9?26:text.length>7?29:33;
+        html+=wrBigCPoint('bigc-top '+name,WR_BIGC_ANCHORS.top[name],text,174,38,size);
+      });
+      const table=layout.table;
+      table.floors.forEach((floor,index)=>{
+        const row=byFloor.get(wrFloorKey(floor));
+        if(!row)return;
+        const centerY=table.y+(index+0.5)*table.rowH+1;
+        const fields=[
+          ['department',String(row.department||'').trim()||'—'],
+          ['general',row.hasData===false?'—':wrWeight(row.generalKg)],
+          ['recycle',row.hasData===false?'—':wrWeight(row.recyclableKg)],
+          ['food',row.hasData===false?'—':wrWeight(row.foodKg)],
+          ['total',row.hasData===false?'—':wrWeight(row.totalKg)]
+        ];
+        fields.forEach(([kind,val],i)=>{
+          const [x0,x1]=table.cols[i], isDepartment=i===0;
+          const rect=[x0,centerY-table.rowH/2,x1-x0,table.rowH];
+          html+=wrTemplateField('bigc-table-value '+(isDepartment?'bigc-department':'bigc-weight '+kind),rect,val,isDepartment?17:18);
+        });
+        // Average is left blank unless the API sends a real average.
+        const rowAverage=wrBuildingAverageText(row);
+        if(rowAverage!=='—'){
+          const [x0,x1]=table.cols[5];
+          html+=wrTemplateField('bigc-table-value bigc-weight',[x0,centerY-table.rowH/2,x1-x0,table.rowH],rowAverage,16);
+        }
+      });
+      // The total caption and floor labels are baked into the PNG background.
+      [['generalKg',g],['recyclableKg',r],['foodKg',f],['totalKg',t]].forEach(([key,v],i)=>{
+        const [x0,x1]=table.cols[i+1];
+        html+=wrTemplateField('bigc-footer',[x0,table.footerY+9,x1-x0,table.footerH-6],wrWeight(v),20);
+      });
+      // Donut centered at the precise requested location, with its own color legend.
+      const [cx,cy]=WR_BIGC_ANCHORS.donut;
+      const diameter=116;
+      const gradient='conic-gradient(#7b7f83 0% '+gp+'%,#15a551 '+gp+'% '+(gp+rp)+'%,#bd711e '+(gp+rp)+'% 100%)';
+      html+='<div class="wr-template-ring wr-bigc-ring" style="left:'+(cx-diameter/2)+'px;top:'+(cy-diameter/2)+'px;width:'+diameter+'px;height:'+diameter+'px;background:'+gradient+'">'+
+        '<div class="wr-template-ring-center">'+escapeHtml(wrWeight(t))+'<small>กก.</small></div></div>';
+      html+='<div class="wr-bigc-legend-custom">'+
+        '<span><i style="background:#7b7f83"></i>ทั่วไป '+gp.toFixed(1)+'%</span>'+
+        '<span><i style="background:#15a551"></i>รีไซเคิล '+rp.toFixed(1)+'%</span>'+
+        '<span><i style="background:#bd711e"></i>อาหาร '+fp.toFixed(1)+'%</span></div>';
+      [['general',g,gp],['recycle',r,rp],['food',f,fp]].forEach(([name,num,pct])=>{
+        html+=wrBigCPoint('bigc-mini-num '+name,WR_BIGC_ANCHORS.mini[name].number,wrWeight(num),136,29,23);
+        html+=wrBigCPoint('bigc-mini-pct '+name,WR_BIGC_ANCHORS.mini[name].percent,pct.toFixed(1),91,22,18);
+      });
+      return html+'</div>';
+    }
     function wrBuildingTemplatePreview(templateKey,data,building){
       const path=WR_BUILDING_TEMPLATES[templateKey], layout=WR_TEMPLATE_LAYOUTS[templateKey];
       if(!path||!layout)return '';
+      if(templateKey==='Big C House (C)')return wrBigCOnlyPreview(data,building);
       const sums=building||{};
       const g=Number(sums.generalKg)||0,r=Number(sums.recyclableKg)||0,f=Number(sums.foodKg)||0,t=Number(sums.totalKg)||0;
       const period=wrReportPeriodText(data);
