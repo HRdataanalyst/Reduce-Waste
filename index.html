@@ -1935,6 +1935,16 @@
     #weeklyReportPage .wr-bigc-custom .wr-bigc-legend-custom{position:absolute;z-index:2;left:552px;top:774px;width:240px;height:83px;display:flex;flex-direction:column;justify-content:center;gap:7px;font-family:'Noto Sans Thai',Tahoma,sans-serif;color:#254735;font-size:16px;font-weight:750;}
     #weeklyReportPage .wr-bigc-custom .wr-bigc-legend-custom span{display:flex;align-items:center;gap:8px;white-space:nowrap;}
     #weeklyReportPage .wr-bigc-custom .wr-bigc-legend-custom i{display:inline-block;flex:none;width:12px;height:12px;border-radius:50%;}
+    /* TYPOGRAPHY SYNC v7: non-Big-C buildings only. Keep template grid coordinates unchanged. */
+    #weeklyReportPage .wr-other-custom .wr-template-field.date{font-weight:700;}
+    #weeklyReportPage .wr-other-custom .wr-template-field.kpi{font-weight:900;letter-spacing:-.2px;}
+    #weeklyReportPage .wr-other-custom .wr-template-field.department{font-weight:700;line-height:1;}
+    #weeklyReportPage .wr-other-custom .wr-template-field.cell{font-weight:650;line-height:1;}
+    #weeklyReportPage .wr-other-custom .wr-template-field.cell.total{font-weight:900;}
+    #weeklyReportPage .wr-other-custom .wr-template-field.total{font-weight:900;}
+    #weeklyReportPage .wr-other-custom .wr-template-field.percent{font-weight:900;}
+    #weeklyReportPage .wr-other-custom .wr-other-building-legend{gap:9px;font-size:16px;line-height:1.1;}
+    #weeklyReportPage .wr-other-custom .wr-other-building-legend-row{gap:9px;}
 
   </style>
 </head>
@@ -3917,7 +3927,10 @@ async function loadTrendHistory(currentData, requestId) {
         }else if(key==='department')val=String(row.department||'').trim()||'—';
         else val=row.hasData===false?'—':wrWeight(row[key]);
         const [x0,x1]=columns[i];
-        html+=wrTemplateField(i===0?'department':'cell'+(key==='totalKg'?' total':''),[x0,y,x1-x0,h],val,i===0?(h<26?11:13):(h<26?14:16));
+        // Match Big C's type hierarchy, while respecting A's exceptionally short fixed rows.
+        // Only font size changes; x/y/width/height remain exactly as supplied by each template.
+        const fontSize=i===0?(h<21?16:17):(h<21?17:18);
+        html+=wrTemplateField(i===0?'department':'cell'+(key==='totalKg'?' total':''),[x0,y,x1-x0,h],val,fontSize);
       });
       return html;
     }
@@ -3951,7 +3964,7 @@ async function loadTrendHistory(currentData, requestId) {
       const sums=totals||{};
       ['generalKg','recyclableKg','foodKg','totalKg'].forEach((key,i)=>{
         const [x0,x1]=section.cols[i+1];
-        html+=wrTemplateField('total',[x0,section.footerY,x1-x0,section.footerH],wrWeight(sums[key]),18);
+        html+=wrTemplateField('total',[x0,section.footerY,x1-x0,section.footerH],wrWeight(sums[key]),23);
       });
       // Column 7: add the per-floor averages for this building/parking section.
       // Keep the original PNG, typography, row coordinates and other totals unchanged.
@@ -3959,7 +3972,7 @@ async function loadTrendHistory(currentData, requestId) {
       if(averageTotal!=='—' && section.cols[5]){
         const [x0,x1]=section.cols[5];
         html+=wrTemplateField('total wr-average-footer',
-          [x0,section.footerY,x1-x0,section.footerH],averageTotal,18);
+          [x0,section.footerY,x1-x0,section.footerH],averageTotal,23);
       }
       return html;
     }
@@ -4091,13 +4104,13 @@ async function loadTrendHistory(currentData, requestId) {
       const sums=building||{};
       const g=Number(sums.generalKg)||0,r=Number(sums.recyclableKg)||0,f=Number(sums.foodKg)||0,t=Number(sums.totalKg)||0;
       const period=wrReportPeriodText(data);
-      let html='<div class="wr-slide wr-building-template" aria-label="รายงาน '+escapeHtml(templateKey)+'">'+
+      let html='<div class="wr-slide wr-building-template wr-other-custom" aria-label="รายงาน '+escapeHtml(templateKey)+'">'+
         '<img class="wr-building-template-image" src="'+encodeURI(path)+'" alt="Template '+escapeHtml(templateKey)+'">';
-      html+=wrTemplateField('date',layout.period,period,period.length>60?18:20);
+      html+=wrTemplateField('date',layout.period,period,20);
       const kpiColumns=[[156,345],[555,749],[961,1157],[1375,1566]];
       [g,r,f,t].forEach((num,i)=>{
         const [x0,x1]=kpiColumns[i],v=wrWeight(num);
-        html+=wrTemplateField('kpi',[x0,layout.kpiY,x1-x0,35],v,v.length>=9?25:v.length>=7?28:32);
+        html+=wrTemplateField('kpi',[x0,layout.kpiY,x1-x0,35],v,v.length>9?26:v.length>7?29:33);
       });
       if(layout.sections){
         layout.sections.forEach(section=>{
@@ -4115,8 +4128,8 @@ async function loadTrendHistory(currentData, requestId) {
       const miniX=[[905,1014],[1168,1279],[1447,1548]];
       [[g,gp],[r,rp],[f,fp]].forEach(([n,pct],i)=>{
         const [x0,x1]=miniX[i],w=x1-x0;
-        html+=wrTemplateField('total',[x0,layout.bottom.minisY,w,27],wrWeight(n),21);
-        html+=wrTemplateField('percent',[x0,layout.bottom.pctY,w,22],pct.toFixed(1),17);
+        html+=wrTemplateField('total',[x0,layout.bottom.minisY,w,27],wrWeight(n),23);
+        html+=wrTemplateField('percent',[x0,layout.bottom.pctY,w,22],pct.toFixed(1),21);
       });
       return html+'</div>';
     }
