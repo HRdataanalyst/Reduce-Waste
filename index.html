@@ -3939,9 +3939,9 @@ async function loadTrendHistory(currentData, requestId) {
         food: [1066+8, 262+6], total: [1483+6, 261+6]
       },
       mini: {
-        general: {number:[966+6,804+5+4],percent:[915+2+2+3+15,849+6]},
-        recycle: {number:[1240+7,805+11-1],percent:[1188+2+2+3+50,849+6]},
-        food: {number:[1514+12,805+10],percent:[1461+2+2+2+3+50,848+7]}
+        general: {number:[966+6,804+5+4],percent:[915+2+2+3+12,849+6]},
+        recycle: {number:[1240+7,805+11-1],percent:[1188+2+2+3+12,849+6]},
+        food: {number:[1514+12,805+10],percent:[1461+2+2+2+3+12,848+7]}
       },
       donut: [424,815]
     });
@@ -3973,7 +3973,7 @@ async function loadTrendHistory(currentData, requestId) {
       table.floors.forEach((floor,index)=>{
         const row=byFloor.get(wrFloorKey(floor));
         if(!row)return;
-        const centerY=table.y+(index+0.5)*table.rowH+7;
+        const centerY=table.y+(index+0.5)*table.rowH+9;
         const fields=[
           ['department',String(row.department||'').trim()||'—'],
           ['general',row.hasData===false?'—':wrWeight(row.generalKg)],
