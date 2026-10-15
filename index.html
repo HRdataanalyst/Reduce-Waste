@@ -4024,7 +4024,7 @@ async function loadTrendHistory(currentData, requestId) {
         const rowAverage=wrBuildingAverageText(row);
         const [avgX0,avgX1]=table.cols[5];
         html+=wrTemplateField('bigc-table-value bigc-weight bigc-average',
-          [avgX0+2,centerY-table.rowH/2,avgX1-avgX0,table.rowH],rowAverage,16);
+  [avgX0+12,centerY-table.rowH/2,avgX1-avgX0,table.rowH],rowAverage,18);
       });
       // The total caption and floor labels are baked into the PNG background.
       [['generalKg',g],['recyclableKg',r],['foodKg',f],['totalKg',t]].forEach(([key,v],i)=>{
