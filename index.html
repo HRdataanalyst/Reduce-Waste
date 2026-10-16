@@ -3958,7 +3958,7 @@ async function loadTrendHistory(currentData, requestId) {
     const WR_TEMPLATE_LAYOUTS = Object.freeze({
       'BJC House (A)': {period:[615,157,420,36],kpiY:244, table:{floors:['G','M','2','3','4','5','6','7','8','9','10','11','12','12A','14','15','16','17','18','19'],y:329,rowH:17.7,footerY:682,footerH:35,cols:[[126,439],[439,683],[683,921],[921,1165],[1165,1397],[1397,1621]]},bottom:{ring:[285,789,102],minisY:797,pctY:843}},
       'Big C House (C)': {period:[615,157,420,36],kpiY:244, table:{floors:['B1','G','2','3','4','5','6','7','8'],y:330,rowH:33.5,footerY:631,footerH:49,cols:[[126,439],[439,683],[683,921],[921,1165],[1165,1397],[1397,1621]]},bottom:{ring:[285,779,104],minisY:797,pctY:842}},
-      'อาคาร BJC1': {period:[566,163,540,36],kpiY:246, table:{
+      'อาคาร BJC1': {period:[555,158,540,36],kpiY:246, table:{
   floors:['G','2','3','5'],
   y:353,
   rowH:69.3,
@@ -3974,6 +3974,530 @@ async function loadTrendHistory(currentData, requestId) {
         {building:'B',floors:['7.1 (Wellness)','โซนอาคารจอดรถ'],y:654,rowH:28.5,footerY:711,footerH:35,cols:[[188,463],[463,692],[692,925],[925,1162],[1162,1393],[1393,1621]]}
       ]}
     });
+    // ===============================================================
+    // SOURCE OF TRUTH: WR_COORDINATE_MAP (template image coordinates 1672x941)
+    // Coordinate Picker v3 syncs this exact JSON object from GitHub.
+    // Edit positions ONLY in this object. Data, API and export are unchanged.
+    // Keys: overall,a,c,bjc1,bjc2,park (parking D & B share one PNG).
+    // ===============================================================
+    const WR_COORDINATE_MAP = Object.freeze({
+  "overall": {
+    "period": [
+      397,
+      108,
+      880,
+      40
+    ],
+    "kpi": [
+      [
+        379,
+        192,
+        159,
+        82
+      ],
+      [
+        921,
+        192,
+        166,
+        82
+      ],
+      [
+        1426,
+        192,
+        174,
+        82
+      ]
+    ],
+    "total": [
+      925,
+      329,
+      310,
+      73
+    ],
+    "row": [
+      54,
+      510,
+      1470,
+      39
+    ],
+    "note": [
+      65,
+      836,
+      1470,
+      44
+    ]
+  },
+  "a": {
+    "period": [
+      615,
+      157,
+      420,
+      36
+    ],
+    "kpi": [
+      [
+        156,
+        244,
+        189,
+        35
+      ],
+      [
+        555,
+        244,
+        194,
+        35
+      ],
+      [
+        961,
+        244,
+        196,
+        35
+      ],
+      [
+        1375,
+        244,
+        191,
+        35
+      ]
+    ],
+    "table": {
+      "y": 329,
+      "rowH": 17.7,
+      "footerY": 682
+    },
+    "ring": [
+      285,
+      789,
+      102
+    ],
+    "legend": [
+      425,
+      756,
+      316,
+      102
+    ],
+    "mini": [
+      {
+        "number": [
+          905,
+          797,
+          109,
+          27
+        ],
+        "percent": [
+          905,
+          843,
+          109,
+          22
+        ]
+      },
+      {
+        "number": [
+          1168,
+          797,
+          111,
+          27
+        ],
+        "percent": [
+          1168,
+          843,
+          111,
+          22
+        ]
+      },
+      {
+        "number": [
+          1447,
+          797,
+          101,
+          27
+        ],
+        "percent": [
+          1447,
+          843,
+          101,
+          22
+        ]
+      }
+    ]
+  },
+  "c": {
+    "date": [
+      615,
+      158,
+      426,
+      37
+    ],
+    "top": [
+      [
+        259,
+        266
+      ],
+      [
+        665,
+        269
+      ],
+      [
+        1074,
+        268
+      ],
+      [
+        1489,
+        267
+      ]
+    ],
+    "table": {
+      "y": 330,
+      "rowH": 33.5,
+      "footerY": 631,
+      "rowOffsetY": 9,
+      "rowOffsetX": 2,
+      "averageOffsetX": 22,
+      "footerOffsetY": 15
+    },
+    "donut": [
+      424,
+      815
+    ],
+    "legend": [
+      552,
+      774,
+      240,
+      83
+    ],
+    "mini": [
+      {
+        "number": [
+          972,
+          813
+        ],
+        "percent": [
+          934,
+          855
+        ]
+      },
+      {
+        "number": [
+          1247,
+          815
+        ],
+        "percent": [
+          1207,
+          855
+        ]
+      },
+      {
+        "number": [
+          1526,
+          815
+        ],
+        "percent": [
+          1480,
+          855
+        ]
+      }
+    ]
+  },
+  "bjc1": {
+    "period": [
+      555,
+      158,
+      540,
+      36
+    ],
+    "kpi": [
+      [
+        156,
+        246,
+        189,
+        35
+      ],
+      [
+        555,
+        246,
+        194,
+        35
+      ],
+      [
+        961,
+        246,
+        196,
+        35
+      ],
+      [
+        1375,
+        246,
+        191,
+        35
+      ]
+    ],
+    "table": {
+      "y": 353,
+      "rowH": 69.3,
+      "footerY": 630,
+      "fontSize": 21,
+      "departmentFontSize": 20
+    },
+    "ring": [
+      285,
+      782,
+      104
+    ],
+    "legend": [
+      425,
+      759,
+      315,
+      98
+    ],
+    "mini": [
+      {
+        "number": [
+          905,
+          797,
+          109,
+          27
+        ],
+        "percent": [
+          905,
+          838,
+          109,
+          22
+        ]
+      },
+      {
+        "number": [
+          1168,
+          797,
+          111,
+          27
+        ],
+        "percent": [
+          1168,
+          838,
+          111,
+          22
+        ]
+      },
+      {
+        "number": [
+          1447,
+          797,
+          101,
+          27
+        ],
+        "percent": [
+          1447,
+          838,
+          101,
+          22
+        ]
+      }
+    ]
+  },
+  "bjc2": {
+    "date": [
+      822,
+      205
+    ],
+    "kpi": [
+      [
+        248,
+        297
+      ],
+      [
+        655,
+        297
+      ],
+      [
+        1066,
+        298
+      ],
+      [
+        1485,
+        297
+      ]
+    ],
+    "table": {
+      "tableX": 2,
+      "tableY": 3,
+      "footerY": 5
+    },
+    "ring": [
+      365,
+      755,
+      116
+    ],
+    "legend": [
+      545,
+      775,
+      240,
+      83
+    ],
+    "mini": [
+      {
+        "number": [
+          965,
+          832
+        ],
+        "percent": [
+          938,
+          868
+        ]
+      },
+      {
+        "number": [
+          1242,
+          832
+        ],
+        "percent": [
+          1217,
+          867
+        ]
+      },
+      {
+        "number": [
+          1515,
+          832
+        ],
+        "percent": [
+          1479,
+          867
+        ]
+      }
+    ]
+  },
+  "park": {
+    "period": [
+      630,
+      157,
+      420,
+      36
+    ],
+    "kpi": [
+      [
+        159,
+        254,
+        189,
+        35
+      ],
+      [
+        567,
+        253,
+        194,
+        35
+      ],
+      [
+        979,
+        254,
+        196,
+        35
+      ],
+      [
+        1398,
+        253,
+        192,
+        35
+      ]
+    ],
+    "sections": {
+      "D": {
+        "tableX": 11,
+        "tableY": 8,
+        "departmentX": 12,
+        "footerX": 10,
+        "footerY": 9,
+        "hideDepartment": false
+      },
+      "B": {
+        "tableX": 13,
+        "tableY": 13,
+        "departmentX": 6,
+        "footerX": 12,
+        "footerY": 11,
+        "hideDepartment": true
+      }
+    },
+    "ring": [
+      286,
+      800,
+      96
+    ],
+    "legend": [
+      471,
+      799,
+      294,
+      94
+    ],
+    "mini": [
+      {
+        "number": [
+          913,
+          833,
+          109,
+          27
+        ],
+        "percent": [
+          890,
+          871,
+          109,
+          22
+        ]
+      },
+      {
+        "number": [
+          1185,
+          834,
+          111,
+          27
+        ],
+        "percent": [
+          1160,
+          870,
+          111,
+          22
+        ]
+      },
+      {
+        "number": [
+          1467,
+          833,
+          101,
+          27
+        ],
+        "percent": [
+          1406,
+          871,
+          101,
+          22
+        ]
+      }
+    ]
+  }
+});
+    const WR_COORDINATE_PAGE = Object.freeze({
+      'BJC House (A)':'a','Big C House (C)':'c',
+      'อาคาร BJC1':'bjc1','อาคาร BJC2':'bjc2',
+      'อาคารจอดรถ D และ B':'park'
+    });
+    function wrCoordinateLayout(templateKey){
+      const base=WR_TEMPLATE_LAYOUTS[templateKey];
+      if(!base)return null;
+      const settings=WR_COORDINATE_MAP[WR_COORDINATE_PAGE[templateKey]];
+      if(!settings)return base;
+      const table=base.table?{...base.table,...(settings.table||{})}:null;
+      const sections=base.sections?base.sections.map(section=>({...section})):null;
+      return {...base,period:settings.period||base.period,table:table||base.table,sections,
+        bottom:{...base.bottom,ring:settings.ring||base.bottom.ring}};
+    }
+    function wrCoordinateBjc2(){
+      const c=WR_COORDINATE_MAP.bjc2;
+      return {...c,tableX:c.table.tableX,tableY:c.table.tableY,footerY:c.table.footerY};
+    }
+    function wrCoordinateBigC(){
+      const c=WR_COORDINATE_MAP.c;
+      return {top:Object.fromEntries(['general','recycle','food','total'].map((k,i)=>[k,c.top[i]])),
+       mini:Object.fromEntries(['general','recycle','food'].map((k,i)=>[k,c.mini[i]])),donut:c.donut};
+    }
     function wrFloorKey(value){
       return String(value??'').trim().toLowerCase().replace(/^ชั้น\s*/,'').replace(/\s+/g,' ').replace(/zone office/g,'wellness').replace(/\(wellness center\)/g,'(wellness)').replace(/\(zone wellness\)/g,'(wellness)');
     }
@@ -4053,25 +4577,14 @@ async function loadTrendHistory(currentData, requestId) {
     // Big C House (C) ONLY. Overlay positions use source-image coordinates (1672 x 941).
     // Picker values supplied as very small areas are interpreted as anchor points plus offsets,
     // not literal text box widths/heights.
-    const WR_BIGC_ANCHORS = Object.freeze({
-      top: {
-        general: [249+10, 262+4], recycle: [655+10, 259+13-3],
-        food: [1066+8, 262+6], total: [1483+6, 261+6]
-      },
-      mini: {
-        general: {number:[966+6,804+5+4],percent:[915+2+2+3+12,849+6]},
-        recycle: {number:[1240+7,805+11-1],percent:[1188+2+2+3+12,849+6]},
-        food: {number:[1514+12,805+10],percent:[1461+2+2+2+3+12,848+7]}
-      },
-      donut: [424,815]
-    });
+    const WR_BIGC_ANCHORS = wrCoordinateBigC();
     function wrBigCPoint(className, xy, value, width, height, fontSize){
       if(value===undefined||value===null||value==='')return '';
       const x=xy[0]-width/2, y=xy[1]-height/2;
       return '<div class="wr-template-field wr-bigc-overlay '+className+'" style="left:'+x+'px;top:'+y+'px;width:'+width+'px;height:'+height+'px;font-size:'+fontSize+'px">'+escapeHtml(String(value))+'</div>';
     }
     function wrBigCOnlyPreview(data, building){
-      const layout=WR_TEMPLATE_LAYOUTS['Big C House (C)'];
+      const layout=wrCoordinateLayout('Big C House (C)');
       const b=building||{}, g=Number(b.generalKg)||0, r=Number(b.recyclableKg)||0;
       const f=Number(b.foodKg)||0, t=Number(b.totalKg)||0;
       const gp=t?g/t*100:0, rp=t?r/t*100:0, fp=t?f/t*100:0;
@@ -4083,7 +4596,7 @@ async function loadTrendHistory(currentData, requestId) {
       const image=WR_BUILDING_TEMPLATES['Big C House (C)'];
       let html='<div class="wr-slide wr-building-template wr-bigc-custom" aria-label="Big C House (C) Weekly Report">'+
         '<img class="wr-building-template-image" src="'+encodeURI(image)+'" alt="Big C House C Template">';
-      html+=wrTemplateField('date bigc-date',[615,158,426,37],period,20);
+      html+=wrTemplateField('date bigc-date',WR_COORDINATE_MAP.c.date,period,20);
       const topValues=[['general',g],['recycle',r],['food',f],['total',t]];
       topValues.forEach(([name,v])=>{
         const text=wrWeight(v), size=text.length>9?26:text.length>7?29:33;
@@ -4093,7 +4606,7 @@ async function loadTrendHistory(currentData, requestId) {
       table.floors.forEach((floor,index)=>{
         const row=byFloor.get(wrFloorKey(floor));
         if(!row)return;
-        const centerY=table.y+(index+0.5)*table.rowH+9;
+        const centerY=table.y+(index+0.5)*table.rowH+(table.rowOffsetY??9);
         const fields=[
           ['department',String(row.department||'').trim()||'—'],
           ['general',row.hasData===false?'—':wrWeight(row.generalKg)],
@@ -4103,19 +4616,19 @@ async function loadTrendHistory(currentData, requestId) {
         ];
         fields.forEach(([kind,val],i)=>{
           const [x0,x1]=table.cols[i], isDepartment=i===0;
-          const rect=[x0+2,centerY-table.rowH/2,x1-x0,table.rowH];
+          const rect=[x0+(table.rowOffsetX??2),centerY-table.rowH/2,x1-x0,table.rowH];
           html+=wrTemplateField('bigc-table-value '+(isDepartment?'bigc-department':'bigc-weight '+kind),rect,val,isDepartment?17:18);
         });
         // Show a visible dash when monthly Headcount is absent (same as other buildings).
         const rowAverage=wrBuildingAverageText(row);
         const [avgX0,avgX1]=table.cols[5];
         html+=wrTemplateField('bigc-table-value bigc-weight bigc-average',
-  [avgX0+22,centerY-table.rowH/2,avgX1-avgX0,table.rowH],rowAverage,18);
+  [avgX0+(table.averageOffsetX??22),centerY-table.rowH/2,avgX1-avgX0,table.rowH],rowAverage,18);
       });
       // The total caption and floor labels are baked into the PNG background.
       [['generalKg',g],['recyclableKg',r],['foodKg',f],['totalKg',t]].forEach(([key,v],i)=>{
         const [x0,x1]=table.cols[i+1];
-        html+=wrTemplateField('bigc-footer',[x0+2,table.footerY+15,x1-x0,table.footerH-6],wrWeight(v),23);
+        html+=wrTemplateField('bigc-footer',[x0+(table.rowOffsetX??2),table.footerY+(table.footerOffsetY??15),x1-x0,table.footerH-6],wrWeight(v),23);
       });
       // Big C House (C) only: sum the displayed per-floor averages in the last column.
       // Floors without a valid monthly headcount are excluded (they display blank).
@@ -4131,7 +4644,7 @@ async function loadTrendHistory(currentData, requestId) {
         const averageSum=visibleFloorAverages.reduce((sum,value)=>sum+value,0);
         const [x0,x1]=table.cols[5];
         html+=wrTemplateField('bigc-footer bigc-footer-average',
-          [x0+22,table.footerY+15,x1-x0,table.footerH-6],wrWeight(averageSum),23);
+          [x0+(table.averageOffsetX??22),table.footerY+(table.footerOffsetY??15),x1-x0,table.footerH-6],wrWeight(averageSum),23);
       }
       // Donut centered at the precise requested location, with its own color legend.
       const [cx,cy]=WR_BIGC_ANCHORS.donut;
@@ -4139,7 +4652,7 @@ async function loadTrendHistory(currentData, requestId) {
       const gradient='conic-gradient(#1769e8 0% '+gp+'%,#f0bd09 '+gp+'% '+(gp+rp)+'%,#0ea34a '+(gp+rp)+'% 100%)';
       html+='<div class="wr-template-ring wr-bigc-ring" style="left:'+(cx-diameter/2)+'px;top:'+(cy-diameter/2)+'px;width:'+diameter+'px;height:'+diameter+'px;background:'+gradient+'">'+
         '<div class="wr-template-ring-center">'+escapeHtml(wrWeight(t))+'<small>กก.</small></div></div>';
-      html+='<div class="wr-bigc-legend-custom">'+
+      html+='<div class="wr-bigc-legend-custom" style="left:'+WR_COORDINATE_MAP.c.legend[0]+'px;top:'+WR_COORDINATE_MAP.c.legend[1]+'px;width:'+WR_COORDINATE_MAP.c.legend[2]+'px;height:'+WR_COORDINATE_MAP.c.legend[3]+'px">'+
         '<span><i style="background:#1769e8"></i>ทั่วไป '+gp.toFixed(1)+'%</span>'+
         '<span><i style="background:#f0bd09"></i>รีไซเคิล '+rp.toFixed(1)+'%</span>'+
         '<span><i style="background:#0ea34a"></i>อาหาร '+fp.toFixed(1)+'%</span></div>';
@@ -4152,9 +4665,9 @@ async function loadTrendHistory(currentData, requestId) {
     // Draw a category legend alongside the existing donut, inside each template's left summary area.
     function wrOtherBuildingLegend(templateKey,gp,rp,fp){
       const positions={
-        'BJC House (A)': [425,756,316,102],
-        'อาคาร BJC1': [425,759,315,98],
-        'อาคาร BJC2': [545,775,240,83],
+        'BJC House (A)': WR_COORDINATE_MAP.a.legend,
+        'อาคาร BJC1': WR_COORDINATE_MAP.bjc1.legend,
+        'อาคาร BJC2': WR_COORDINATE_MAP.bjc2.legend,
         'อาคารจอดรถ D และ B': WR_PARKING_DB_CALIBRATION.legend
       };
       const area=positions[templateKey];
@@ -4172,46 +4685,17 @@ async function loadTrendHistory(currentData, requestId) {
     }
     // BJC2-only calibration (source template: 1672 x 941).
     // x/y are the center anchors selected in the coordinate picker.
-    const WR_BJC2_CALIBRATION = Object.freeze({
-      date:[822,205],
-      kpi:[[248,297],[655,297],[1066,298],[1485,297]],
-      tableX:2, tableY:3, footerY:5,
-      ring:[365,755,116],
-      mini:[
-        {number:[965,832],percent:[938,868]},
-        {number:[1242,832],percent:[1217,867]},
-        {number:[1515,832],percent:[1479,867]}
-      ]
-    });
+    const WR_BJC2_CALIBRATION = wrCoordinateBjc2();
     // PARKING D+B ONLY: positions in the original 1672 x 941 PNG.
     // x/y in rect arrays are left/top; legend and donut positions are likewise left/top.
     
-const WR_PARKING_DB_CALIBRATION = Object.freeze({
-  period:[630,157,420,36],
-  kpi:[
-    [159,254,189,35],
-    [567,253,194,35],
-    [979,254,196,35],
-    [1398,253,192,35]
-  ],
-  sections:{
-    D:{tableX:11,tableY:8,departmentX:12,footerX:10,footerY:9,hideDepartment:false},
-    B:{tableX:13,tableY:13,departmentX:6,footerX:12,footerY:11,hideDepartment:true}
-  },
-  ring:[286,800,96],
-  legend:[471,799,294,94],
-  mini:[
-    {number:[913,833,109,27],percent:[890,871,109,22]},
-    {number:[1185,834,111,27],percent:[1160,870,111,22]},
-    {number:[1467,833,101,27],percent:[1406,871,101,22]}
-  ]
-});
+const WR_PARKING_DB_CALIBRATION = WR_COORDINATE_MAP.park;
     
     function wrBjc2Anchor(cls,anchor,value,w,h,size){
       return wrTemplateField(cls,[anchor[0]-w/2,anchor[1]-h/2,w,h],value,size);
     }
     function wrBuildingTemplatePreview(templateKey,data,building){
-      const path=WR_BUILDING_TEMPLATES[templateKey], layout=WR_TEMPLATE_LAYOUTS[templateKey];
+      const path=WR_BUILDING_TEMPLATES[templateKey], layout=wrCoordinateLayout(templateKey);
       if(!path||!layout)return '';
       if(templateKey==='Big C House (C)')return wrBigCOnlyPreview(data,building);
       const sums=building||{};
@@ -4228,6 +4712,7 @@ const WR_PARKING_DB_CALIBRATION = Object.freeze({
         '<img class="wr-building-template-image" src="'+encodeURI(path)+'" alt="Template '+escapeHtml(templateKey)+'">';
       html+=isBjc2?wrBjc2Anchor('date',WR_BJC2_CALIBRATION.date,period,430,37,20):wrTemplateField('date',isParking?WR_PARKING_DB_CALIBRATION.period:layout.period,period,20);
       const kpiColumns=[[156,345],[555,749],[961,1157],[1375,1566]];
+      const pageCoords=WR_COORDINATE_MAP[WR_COORDINATE_PAGE[templateKey]];
       [g,r,f,t].forEach((num,i)=>{
         const [x0,x1]=kpiColumns[i],v=wrWeight(num);
         const kind=['general','recycle','food','total'][i];
@@ -4235,7 +4720,7 @@ const WR_PARKING_DB_CALIBRATION = Object.freeze({
         if(isParking){html+=wrTemplateField('kpi '+colorCls,WR_PARKING_DB_CALIBRATION.kpi[i],v,v.length>9?26:v.length>7?29:33);return;}
         html+=isBjc2
           ?wrBjc2Anchor('kpi '+colorCls,WR_BJC2_CALIBRATION.kpi[i],v,180,35,v.length>9?26:v.length>7?29:33)
-          :wrTemplateField('kpi '+colorCls,[x0,layout.kpiY,x1-x0,35],v,v.length>9?26:v.length>7?29:33);
+          :wrTemplateField('kpi '+colorCls,pageCoords.kpi[i],v,v.length>9?26:v.length>7?29:33);
       });
       if(layout.sections){
         layout.sections.forEach(section=>{
@@ -4267,8 +4752,8 @@ const WR_PARKING_DB_CALIBRATION = Object.freeze({
           html+=wrBjc2Anchor('total '+colorCls,WR_BJC2_CALIBRATION.mini[i].number,wrWeight(n),138,29,23);
           html+=wrBjc2Anchor('percent '+colorCls,WR_BJC2_CALIBRATION.mini[i].percent,pct.toFixed(1),96,26,21);
         }else{
-          html+=wrTemplateField('total '+colorCls,[x0,layout.bottom.minisY,w,27],wrWeight(n),23);
-          html+=wrTemplateField('percent '+colorCls,[x0,layout.bottom.pctY,w,22],pct.toFixed(1),21);
+          html+=wrTemplateField('total '+colorCls,pageCoords.mini[i].number,wrWeight(n),23);
+          html+=wrTemplateField('percent '+colorCls,pageCoords.mini[i].percent,pct.toFixed(1),21);
         }
       });
       return html+'</div>';
@@ -4300,10 +4785,10 @@ const WR_PARKING_DB_CALIBRATION = Object.freeze({
       };
       let html='<div class="wr-slide wr-exact-overview" aria-label="สรุปปริมาณขยะสำนักงานประจำสัปดาห์">'+
         '<img class="wr-exact-background" src="'+WR_OVERVIEW_TEMPLATE+'" alt="Template Infographic สรุปขยะสำนักงาน BJC Big C">';
-      html+=add('wr-exact-date',397,108,880,40,period);
-      html+=addKpi('general',379,192,159,82,sums.generalKg);
-      html+=addKpi('food',921,192,166,82,sums.foodKg);
-      html+=addKpi('recycle',1426,192,174,82,sums.recyclableKg);
+      html+=add('wr-exact-date',...WR_COORDINATE_MAP.overall.period,period);
+      html+=addKpi('general',...WR_COORDINATE_MAP.overall.kpi[0],sums.generalKg);
+      html+=addKpi('food',...WR_COORDINATE_MAP.overall.kpi[1],sums.foodKg);
+      html+=addKpi('recycle',...WR_COORDINATE_MAP.overall.kpi[2],sums.recyclableKg);
       const totalFigure=wrWeight(sums.totalKg);
       const totalSize=totalFigure.length>=11?31:totalFigure.length>=9?35:40;
       html+='<div class="wr-exact-value wr-exact-total" style="left:925px;top:329px;width:310px;height:73px;font-size:'+totalSize+'px"><span class="wr-total-number">'+escapeHtml(totalFigure)+'</span><span class="wr-total-unit">กก.</span></div>';
@@ -4312,13 +4797,14 @@ const WR_PARKING_DB_CALIBRATION = Object.freeze({
       buildings.slice(0,6).forEach((b,i)=>{
         const [y,bottom]=rowBounds[i], height=bottom-y;
         const textY=y+12, textHeight=height-12;
-        html+=add('wr-exact-name',54,textY,302,textHeight,b.building||'');
-        html+=add('wr-exact-cell',373,textY,338,textHeight,wrWeight(b.generalKg));
-        html+=add('wr-exact-cell',712,textY,321,textHeight,wrWeight(b.foodKg));
-        html+=add('wr-exact-cell',1034,textY,322,textHeight,wrWeight(b.recyclableKg));
-        html+=add('wr-exact-cell total',1357,textY,255,textHeight,wrWeight(b.totalKg));
+        const overviewX=WR_COORDINATE_MAP.overall.row[0]-54,overviewY=WR_COORDINATE_MAP.overall.row[1]-510;
+        html+=add('wr-exact-name',54+overviewX,textY+overviewY,302,textHeight,b.building||'');
+        html+=add('wr-exact-cell',373+overviewX,textY+overviewY,338,textHeight,wrWeight(b.generalKg));
+        html+=add('wr-exact-cell',712+overviewX,textY+overviewY,321,textHeight,wrWeight(b.foodKg));
+        html+=add('wr-exact-cell',1034+overviewX,textY+overviewY,322,textHeight,wrWeight(b.recyclableKg));
+        html+=add('wr-exact-cell total',1357+overviewX,textY+overviewY,255,textHeight,wrWeight(b.totalKg));
       });
-      html+='<div class="wr-exact-note">หมายเหตุ: สรุปจากประเภทขยะตามข้อมูลชั่งน้ำหนัก โดยไม่รวมคอลัมน์รายละเอียดที่นับซ้ำกับยอดขยะรีไซเคิล</div>';
+      html+='<div class="wr-exact-note" style="left:'+WR_COORDINATE_MAP.overall.note[0]+'px;top:'+WR_COORDINATE_MAP.overall.note[1]+'px;width:'+WR_COORDINATE_MAP.overall.note[2]+'px;height:'+WR_COORDINATE_MAP.overall.note[3]+'px">หมายเหตุ: สรุปจากประเภทขยะตามข้อมูลชั่งน้ำหนัก โดยไม่รวมคอลัมน์รายละเอียดที่นับซ้ำกับยอดขยะรีไซเคิล</div>';
       return html+'</div>';
     }
     function wrReportPeriodText(data){
