@@ -4165,27 +4165,28 @@ async function loadTrendHistory(currentData, requestId) {
     });
     // PARKING D+B ONLY: positions in the original 1672 x 941 PNG.
     // x/y in rect arrays are left/top; legend and donut positions are likewise left/top.
-    const WR_PARKING_DB_CALIBRATION = Object.freeze({
-      period:[615,157,420,36],
-      kpi:[
-        [156,247,189,35],      // General: down 2
-        [557,247,194,35],      // Recycle: right 2, down 2
-        [965,247,196,35],      // Food: right 4, down 2
-        [1379,247,192,35]      // Total: right 4, down 2
-      ],
-      sections:{
-        D:{tableX:3,tableY:3,departmentX:6,footerX:3,footerY:3,hideDepartment:false},
-        B:{tableX:3,tableY:3,departmentX:3,footerX:3,footerY:3,hideDepartment:true}
-      },
-      // Desired donut center (307,837), diameter 96.
-      ring:[259,789,96],
-      legend:[544,790,294,94],
-      mini:[
-        {number:[905,821,109,27],percent:[905,860,109,22]},
-        {number:[1171,821,111,27],percent:[1171,860,111,22]},
-        {number:[1450,821,101,27],percent:[1450,860,101,22]}
-      ]
-    });
+    
+const WR_PARKING_DB_CALIBRATION = Object.freeze({
+  period:[618,157,420,36],
+  kpi:[
+    [156,249,189,35],
+    [560,249,194,35],
+    [970,249,196,35],
+    [1384,249,192,35]
+  ],
+  sections:{
+    D:{tableX:6,tableY:5,departmentX:9,footerX:6,footerY:5,hideDepartment:false},
+    B:{tableX:6,tableY:5,departmentX:6,footerX:6,footerY:5,hideDepartment:true}
+  },
+  ring:[259,792,96],
+  legend:[544,793,294,94],
+  mini:[
+    {number:[905,826,109,27],percent:[905,865,109,22]},
+    {number:[1174,826,111,27],percent:[1171,865,111,22]},
+    {number:[1453,826,101,27],percent:[1450,865,101,22]}
+  ]
+});
+    
     function wrBjc2Anchor(cls,anchor,value,w,h,size){
       return wrTemplateField(cls,[anchor[0]-w/2,anchor[1]-h/2,w,h],value,size);
     }
