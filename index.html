@@ -3958,7 +3958,16 @@ async function loadTrendHistory(currentData, requestId) {
     const WR_TEMPLATE_LAYOUTS = Object.freeze({
       'BJC House (A)': {period:[615,157,420,36],kpiY:244, table:{floors:['G','M','2','3','4','5','6','7','8','9','10','11','12','12A','14','15','16','17','18','19'],y:329,rowH:17.7,footerY:682,footerH:35,cols:[[126,439],[439,683],[683,921],[921,1165],[1165,1397],[1397,1621]]},bottom:{ring:[285,789,102],minisY:797,pctY:843}},
       'Big C House (C)': {period:[615,157,420,36],kpiY:244, table:{floors:['B1','G','2','3','4','5','6','7','8'],y:330,rowH:33.5,footerY:631,footerH:49,cols:[[126,439],[439,683],[683,921],[921,1165],[1165,1397],[1397,1621]]},bottom:{ring:[285,779,104],minisY:797,pctY:842}},
-      'อาคาร BJC1': {period:[555,158,540,36],kpiY:246, table:{floors:['G','2','3','5'],y:353,rowH:69.3,footerY:630,footerH:65,cols:[[128,485],[485,713],[713,944],[944,1181],[1181,1405],[1405,1621]]},bottom:{ring:[285,782,104],minisY:797,pctY:838}},
+      'อาคาร BJC1': {period:[555,158,540,36],kpiY:246, table:{
+  floors:['G','2','3','5'],
+  y:353,
+  rowH:69.3,
+  footerY:630,
+  footerH:65,
+  cols:[[128,485],[485,713],[713,944],[944,1181],[1181,1405],[1405,1621]],
+  fontSize:21,
+  departmentFontSize:20
+}
       'อาคาร BJC2': {period:[603,186,444,41],kpiY:280,table:{floors:['G','5','8','9','10','11','12','16','โซนอาคารจอดรถ'],y:382,rowH:32,footerY:670,footerH:59,cols:[[145,439],[439,683],[683,921],[921,1165],[1165,1397],[1397,1621]]},bottom:{ring:[285,796,97],minisY:818,pctY:858}},
       'อาคารจอดรถ D และ B': {period:[615,157,420,36],kpiY:245,bottom:{ring:[285,801,82],minisY:817,pctY:854}, sections:[
         {building:'D',floors:['3','4','5','6','โซนอาคารจอดรถ'],y:379,rowH:29.1,footerY:525,footerH:37,cols:[[188,463],[463,692],[692,925],[925,1162],[1162,1393],[1393,1621]]},
@@ -3984,7 +3993,9 @@ async function loadTrendHistory(currentData, requestId) {
         else if(key==='department')val=String(row.department||'').trim()||'—';
         else val=row.hasData===false?'—':wrWeight(row[key]);
         const [x0,x1]=columns[i];
-        const fontSize=i===0?(h<21?16:17):(h<21?17:18);
+        const fontSize=calibration?.fontSize
+  ? (i===0 ? calibration.departmentFontSize : calibration.fontSize)
+  : i===0?(h<21?16:17):(h<21?17:18);
         const offset=i===0?(calibration?.departmentX??shiftX):shiftX;
         html+=wrTemplateField(i===0?'department':'cell'+(key==='totalKg'?' total':''),
           [x0+offset,y,x1-x0,h],val,fontSize);
@@ -4208,8 +4219,12 @@ const WR_PARKING_DB_CALIBRATION = Object.freeze({
       const isBjc2=templateKey==='อาคาร BJC2';
       const isParking=templateKey===WR_PARKING_COMBINED;
       const start=shortDate(data.weekStart),end=shortDate(data.weekEnd),year=thaiYear(data.weekEnd);
-      const period=(isBjc2||isParking)?'ระหว่างวันที่ '+start+' – '+end+' '+year:wrReportPeriodText(data);
-      let html='<div class="wr-slide wr-building-template wr-other-custom" aria-label="รายงาน '+escapeHtml(templateKey)+'">'+
+      const period=(isBjc2||isParking||templateKey==='อาคาร BJC1')
+  ?'ระหว่างวันที่ '+start+' – '+end+' '+year
+  :wrReportPeriodText(data);
+      let html='<div class="wr-slide wr-building-template wr-other-custom'+
+  (templateKey==='อาคาร BJC1'?' wr-building-bjc1':'')+
+  '" aria-label="รายงาน '+escapeHtml(templateKey)+'">'+
         '<img class="wr-building-template-image" src="'+encodeURI(path)+'" alt="Template '+escapeHtml(templateKey)+'">';
       html+=isBjc2?wrBjc2Anchor('date',WR_BJC2_CALIBRATION.date,period,430,37,20):wrTemplateField('date',isParking?WR_PARKING_DB_CALIBRATION.period:layout.period,period,20);
       const kpiColumns=[[156,345],[555,749],[961,1157],[1375,1566]];
