@@ -3967,7 +3967,7 @@ async function loadTrendHistory(currentData, requestId) {
   cols:[[128,485],[485,713],[713,944],[944,1181],[1181,1405],[1405,1621]],
   fontSize:21,
   departmentFontSize:20
-}
+},bottom:{ring:[285,782,104],minisY:797,pctY:838}},
       'อาคาร BJC2': {period:[603,186,444,41],kpiY:280,table:{floors:['G','5','8','9','10','11','12','16','โซนอาคารจอดรถ'],y:382,rowH:32,footerY:670,footerH:59,cols:[[145,439],[439,683],[683,921],[921,1165],[1165,1397],[1397,1621]]},bottom:{ring:[285,796,97],minisY:818,pctY:858}},
       'อาคารจอดรถ D และ B': {period:[615,157,420,36],kpiY:245,bottom:{ring:[285,801,82],minisY:817,pctY:854}, sections:[
         {building:'D',floors:['3','4','5','6','โซนอาคารจอดรถ'],y:379,rowH:29.1,footerY:525,footerH:37,cols:[[188,463],[463,692],[692,925],[925,1162],[1162,1393],[1393,1621]]},
@@ -3994,7 +3994,7 @@ async function loadTrendHistory(currentData, requestId) {
         else val=row.hasData===false?'—':wrWeight(row[key]);
         const [x0,x1]=columns[i];
         const fontSize=calibration?.fontSize
-  ? (i===0 ? calibration.departmentFontSize : calibration.fontSize)
+  ? (i===0 ? (calibration.departmentFontSize||calibration.fontSize) : calibration.fontSize)
   : i===0?(h<21?16:17):(h<21?17:18);
         const offset=i===0?(calibration?.departmentX??shiftX):shiftX;
         html+=wrTemplateField(i===0?'department':'cell'+(key==='totalKg'?' total':''),
@@ -4244,7 +4244,12 @@ const WR_PARKING_DB_CALIBRATION = Object.freeze({
           ['generalKg','recyclableKg','foodKg','totalKg'].forEach(key=>sectionTotals[key]=relevant.reduce((sum,row)=>sum+(Number(row[key])||0),0));
           html+=wrTemplateSection(section,relevant,sectionTotals,isParking?WR_PARKING_DB_CALIBRATION.sections[section.building]:null);
         });
-      }else html+=wrTemplateSection(layout.table,building.rows||[],sums,isBjc2?WR_BJC2_CALIBRATION:null);
+      }else html+=wrTemplateSection(layout.table,building.rows||[],sums,
+        isBjc2?WR_BJC2_CALIBRATION:
+        (templateKey==='อาคาร BJC1'?{
+          fontSize:layout.table.fontSize,
+          departmentFontSize:layout.table.departmentFontSize
+        }:null));
       const gp=t?g/t*100:0,rp=t?r/t*100:0,fp=t?f/t*100:0;
       const [cx,cy,diam]=isBjc2?WR_BJC2_CALIBRATION.ring:(isParking?WR_PARKING_DB_CALIBRATION.ring:layout.bottom.ring);
       const gradient='conic-gradient(#176ee4 0% '+gp+'%,#eab508 '+gp+'% '+(gp+rp)+'%,#109752 '+(gp+rp)+'% 100%)';
