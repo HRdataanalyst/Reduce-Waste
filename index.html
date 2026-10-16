@@ -3956,7 +3956,7 @@ async function loadTrendHistory(currentData, requestId) {
     // Coordinates are measured in source-image pixels (1672×941).
     // Fine alignment can be calibrated independently per building with Coordinate Picker.
     const WR_TEMPLATE_LAYOUTS = Object.freeze({
-      'BJC House (A)': {period:[633,160,420,36],kpiY:244, table:{floors:['G','M','2','3','4','5','6','7','8','9','10','11','12','12A','14','15','16','17','18','19'],y:345,rowH:17.7,footerY:682,footerH:35,cols:[[126,439],[439,683],[683,921],[921,1165],[1165,1397],[1397,1621]]},bottom:{ring:[285,789,102],minisY:797,pctY:843}},
+      'BJC House (A)': {period:[633,160,420,36],kpiY:244, table:{floors:['G','M','2','3','4','5','6','7','8','9','10','11','12','12A','14','15','16','17','18','19'],y:337,rowH:20,footerY:738,footerH:43,cols:[[126,439],[439,683],[683,921],[921,1165],[1165,1397],[1397,1621]]},bottom:{ring:[285,789,102],minisY:797,pctY:843}},
       'Big C House (C)': {period:[615,157,420,36],kpiY:244, table:{floors:['B1','G','2','3','4','5','6','7','8'],y:330,rowH:33.5,footerY:631,footerH:49,cols:[[126,439],[439,683],[683,921],[921,1165],[1165,1397],[1397,1621]]},bottom:{ring:[285,779,104],minisY:797,pctY:842}},
       'อาคาร BJC1': {period:[555,158,540,36],kpiY:246, table:{
   floors:['G','2','3','5'],
@@ -3975,6 +3975,7 @@ async function loadTrendHistory(currentData, requestId) {
       ]}
     });
     // ===============================================================
+    // BJC House (A) alignment fix: 20 rows aligned to template + footer and summary text.
     // SOURCE OF TRUTH: WR_COORDINATE_MAP (template image coordinates 1672x941)
     // Coordinate Picker v3 syncs this exact JSON object from GitHub.
     // Edit positions ONLY in this object. Data, API and export are unchanged.
@@ -4061,9 +4062,9 @@ async function loadTrendHistory(currentData, requestId) {
       ]
     ],
     "table": {
-      "y": 329,
-      "rowH": 17.7,
-      "footerY": 682
+      "y": 337,
+      "rowH": 20.0,
+      "footerY": 738
     },
     "ring": [
       285,
@@ -4072,21 +4073,21 @@ async function loadTrendHistory(currentData, requestId) {
     ],
     "legend": [
       425,
-      756,
+      795,
       316,
-      102
+      85
     ],
     "mini": [
       {
         "number": [
           905,
-          797,
+          825,
           109,
           27
         ],
         "percent": [
           905,
-          843,
+          862,
           109,
           22
         ]
@@ -4094,13 +4095,13 @@ async function loadTrendHistory(currentData, requestId) {
       {
         "number": [
           1168,
-          797,
+          825,
           111,
           27
         ],
         "percent": [
           1168,
-          843,
+          862,
           111,
           22
         ]
@@ -4108,13 +4109,13 @@ async function loadTrendHistory(currentData, requestId) {
       {
         "number": [
           1447,
-          797,
+          825,
           101,
           27
         ],
         "percent": [
           1447,
-          843,
+          862,
           101,
           22
         ]
@@ -4737,7 +4738,8 @@ const WR_PARKING_DB_CALIBRATION = WR_COORDINATE_MAP.park;
         });
       }else html+=wrTemplateSection(layout.table,building.rows||[],sums,
         isBjc2?WR_BJC2_CALIBRATION:
-        (templateKey==='อาคาร BJC1'?{
+        (templateKey==='BJC House (A)'?{fontSize:15,departmentFontSize:14}:
+        templateKey==='อาคาร BJC1'?{
           fontSize:layout.table.fontSize,
           departmentFontSize:layout.table.departmentFontSize
         }:null));
