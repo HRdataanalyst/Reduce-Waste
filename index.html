@@ -3966,21 +3966,21 @@ async function loadTrendHistory(currentData, requestId) {
       const [x,y,w,h]=rect;
       return '<div class="wr-template-field '+cls+'" style="left:'+x+'px;top:'+y+'px;width:'+w+'px;height:'+h+'px'+(size?';font-size:'+size+'px':'')+'">'+escapeHtml(String(value))+'</div>';
     }
-    function wrTemplateRowFields(row,columns,y,h,shiftX=0){
+    function wrTemplateRowFields(row,columns,y,h,shiftX=0,calibration=null){
       if(!row)return '';
       const keys=['department','generalKg','recyclableKg','foodKg','totalKg','average'];
       let html='';
       keys.forEach((key,i)=>{
+        if(i===0 && calibration?.hideDepartment)return; // B: template has no department data
         let val;
-        if(key==='average'){
-          val=wrBuildingAverageText(row);
-        }else if(key==='department')val=String(row.department||'').trim()||'—';
+        if(key==='average')val=wrBuildingAverageText(row);
+        else if(key==='department')val=String(row.department||'').trim()||'—';
         else val=row.hasData===false?'—':wrWeight(row[key]);
         const [x0,x1]=columns[i];
-        // Match Big C's type hierarchy, while respecting A's exceptionally short fixed rows.
-        // Only font size changes; x/y/width/height remain exactly as supplied by each template.
         const fontSize=i===0?(h<21?16:17):(h<21?17:18);
-        html+=wrTemplateField(i===0?'department':'cell'+(key==='totalKg'?' total':''),[x0+shiftX,y,x1-x0,h],val,fontSize);
+        const offset=i===0?(calibration?.departmentX??shiftX):shiftX;
+        html+=wrTemplateField(i===0?'department':'cell'+(key==='totalKg'?' total':''),
+          [x0+offset,y,x1-x0,h],val,fontSize);
       });
       return html;
     }
@@ -4010,20 +4010,22 @@ async function loadTrendHistory(currentData, requestId) {
       const rowMap=new Map();
       rows.forEach(r=>{const key=wrFloorKey(r.floor);if(!rowMap.has(key))rowMap.set(key,r);});
       let html='';
-      const shiftX=calibration?.tableX||0, shiftY=calibration?.tableY||0, footerShiftY=calibration?.footerY||0;
-      section.floors.forEach((floor,i)=>{const row=rowMap.get(wrFloorKey(floor));if(row)html+=wrTemplateRowFields(row,section.cols,section.y+i*section.rowH+shiftY,section.rowH,shiftX);});
+      const shiftX=calibration?.tableX||0, shiftY=calibration?.tableY||0,
+            footerShiftY=calibration?.footerY||0,footerShiftX=calibration?.footerX??0;
+      section.floors.forEach((floor,i)=>{
+        const row=rowMap.get(wrFloorKey(floor));
+        if(row)html+=wrTemplateRowFields(row,section.cols,section.y+i*section.rowH+shiftY,section.rowH,shiftX,calibration);
+      });
       const sums=totals||{};
       ['generalKg','recyclableKg','foodKg','totalKg'].forEach((key,i)=>{
         const [x0,x1]=section.cols[i+1];
-        html+=wrTemplateField('total',[x0,section.footerY+footerShiftY,x1-x0,section.footerH],wrWeight(sums[key]),23);
+        html+=wrTemplateField('total',[x0+footerShiftX,section.footerY+footerShiftY,x1-x0,section.footerH],wrWeight(sums[key]),23);
       });
-      // Column 7: add the per-floor averages for this building/parking section.
-      // Keep the original PNG, typography, row coordinates and other totals unchanged.
       const averageTotal=wrTemplateAverageTotal(section,rows);
       if(averageTotal!=='—' && section.cols[5]){
         const [x0,x1]=section.cols[5];
         html+=wrTemplateField('total wr-average-footer',
-          [x0,section.footerY+footerShiftY,x1-x0,section.footerH],averageTotal,23);
+          [x0+footerShiftX,section.footerY+footerShiftY,x1-x0,section.footerH],averageTotal,23);
       }
       return html;
     }
@@ -4133,7 +4135,7 @@ async function loadTrendHistory(currentData, requestId) {
         'BJC House (A)': [425,756,316,102],
         'อาคาร BJC1': [425,759,315,98],
         'อาคาร BJC2': [545,775,240,83],
-        'อาคารจอดรถ D และ B': [402,779,320,91]
+        'อาคารจอดรถ D และ B': WR_PARKING_DB_CALIBRATION.legend
       };
       const area=positions[templateKey];
       if(!area)return '';
@@ -4161,6 +4163,29 @@ async function loadTrendHistory(currentData, requestId) {
         {number:[1515,832],percent:[1479,867]}
       ]
     });
+    // PARKING D+B ONLY: positions in the original 1672 x 941 PNG.
+    // x/y in rect arrays are left/top; legend and donut positions are likewise left/top.
+    const WR_PARKING_DB_CALIBRATION = Object.freeze({
+      period:[615,157,420,36],
+      kpi:[
+        [156,247,189,35],      // General: down 2
+        [557,247,194,35],      // Recycle: right 2, down 2
+        [965,247,196,35],      // Food: right 4, down 2
+        [1379,247,192,35]      // Total: right 4, down 2
+      ],
+      sections:{
+        D:{tableX:3,tableY:3,departmentX:6,footerX:3,footerY:3,hideDepartment:false},
+        B:{tableX:3,tableY:3,departmentX:3,footerX:3,footerY:3,hideDepartment:true}
+      },
+      // Desired donut center (307,837), diameter 96.
+      ring:[259,789,96],
+      legend:[544,790,294,94],
+      mini:[
+        {number:[905,821,109,27],percent:[905,860,109,22]},
+        {number:[1171,821,111,27],percent:[1171,860,111,22]},
+        {number:[1450,821,101,27],percent:[1450,860,101,22]}
+      ]
+    });
     function wrBjc2Anchor(cls,anchor,value,w,h,size){
       return wrTemplateField(cls,[anchor[0]-w/2,anchor[1]-h/2,w,h],value,size);
     }
@@ -4171,14 +4196,16 @@ async function loadTrendHistory(currentData, requestId) {
       const sums=building||{};
       const g=Number(sums.generalKg)||0,r=Number(sums.recyclableKg)||0,f=Number(sums.foodKg)||0,t=Number(sums.totalKg)||0;
       const isBjc2=templateKey==='อาคาร BJC2';
+      const isParking=templateKey===WR_PARKING_COMBINED;
       const start=shortDate(data.weekStart),end=shortDate(data.weekEnd),year=thaiYear(data.weekEnd);
-      const period=isBjc2?'ระหว่างวันที่ '+start+' – '+end+' '+year:wrReportPeriodText(data);
+      const period=(isBjc2||isParking)?'ระหว่างวันที่ '+start+' – '+end+' '+year:wrReportPeriodText(data);
       let html='<div class="wr-slide wr-building-template wr-other-custom" aria-label="รายงาน '+escapeHtml(templateKey)+'">'+
         '<img class="wr-building-template-image" src="'+encodeURI(path)+'" alt="Template '+escapeHtml(templateKey)+'">';
-      html+=isBjc2?wrBjc2Anchor('date',WR_BJC2_CALIBRATION.date,period,430,37,20):wrTemplateField('date',layout.period,period,20);
+      html+=isBjc2?wrBjc2Anchor('date',WR_BJC2_CALIBRATION.date,period,430,37,20):wrTemplateField('date',isParking?WR_PARKING_DB_CALIBRATION.period:layout.period,period,20);
       const kpiColumns=[[156,345],[555,749],[961,1157],[1375,1566]];
       [g,r,f,t].forEach((num,i)=>{
         const [x0,x1]=kpiColumns[i],v=wrWeight(num);
+        if(isParking){html+=wrTemplateField('kpi',WR_PARKING_DB_CALIBRATION.kpi[i],v,v.length>9?26:v.length>7?29:33);return;}
         html+=isBjc2
           ?wrBjc2Anchor('kpi',WR_BJC2_CALIBRATION.kpi[i],v,180,35,v.length>9?26:v.length>7?29:33)
           :wrTemplateField('kpi',[x0,layout.kpiY,x1-x0,35],v,v.length>9?26:v.length>7?29:33);
@@ -4188,18 +4215,22 @@ async function loadTrendHistory(currentData, requestId) {
           const relevant=(building.rows||[]).filter(row=>String(row.sourceBuilding||'').includes('('+section.building+')'));
           const sectionTotals={};
           ['generalKg','recyclableKg','foodKg','totalKg'].forEach(key=>sectionTotals[key]=relevant.reduce((sum,row)=>sum+(Number(row[key])||0),0));
-          html+=wrTemplateSection(section,relevant,sectionTotals);
+          html+=wrTemplateSection(section,relevant,sectionTotals,isParking?WR_PARKING_DB_CALIBRATION.sections[section.building]:null);
         });
       }else html+=wrTemplateSection(layout.table,building.rows||[],sums,isBjc2?WR_BJC2_CALIBRATION:null);
       const gp=t?g/t*100:0,rp=t?r/t*100:0,fp=t?f/t*100:0;
-      const [cx,cy,diam]=isBjc2?WR_BJC2_CALIBRATION.ring:layout.bottom.ring;
+      const [cx,cy,diam]=isBjc2?WR_BJC2_CALIBRATION.ring:(isParking?WR_PARKING_DB_CALIBRATION.ring:layout.bottom.ring);
       const gradient='conic-gradient(#176ee4 0% '+gp+'%,#eab508 '+gp+'% '+(gp+rp)+'%,#109752 '+(gp+rp)+'% 100%)';
       html+='<div class="wr-template-ring" style="left:'+cx+'px;top:'+cy+'px;width:'+diam+'px;height:'+diam+'px;background:'+gradient+'"><div class="wr-template-ring-center">'+escapeHtml(wrWeight(t))+'<small>กก.</small></div></div>';
       html+=wrOtherBuildingLegend(templateKey,gp,rp,fp);
       const miniX=[[905,1014],[1168,1279],[1447,1548]];
       [[g,gp],[r,rp],[f,fp]].forEach(([n,pct],i)=>{
         const [x0,x1]=miniX[i],w=x1-x0;
-        if(isBjc2){
+        if(isParking){
+          const mini=WR_PARKING_DB_CALIBRATION.mini[i];
+          html+=wrTemplateField('total',mini.number,wrWeight(n),23);
+          html+=wrTemplateField('percent',mini.percent,pct.toFixed(1),21);
+        }else if(isBjc2){
           html+=wrBjc2Anchor('total',WR_BJC2_CALIBRATION.mini[i].number,wrWeight(n),138,29,23);
           html+=wrBjc2Anchor('percent',WR_BJC2_CALIBRATION.mini[i].percent,pct.toFixed(1),96,26,21);
         }else{
