@@ -3916,7 +3916,7 @@ async function loadTrendHistory(currentData, requestId) {
       const [x,y,w,h]=rect;
       return '<div class="wr-template-field '+cls+'" style="left:'+x+'px;top:'+y+'px;width:'+w+'px;height:'+h+'px'+(size?';font-size:'+size+'px':'')+'">'+escapeHtml(String(value))+'</div>';
     }
-    function wrTemplateRowFields(row,columns,y,h){
+    function wrTemplateRowFields(row,columns,y,h,shiftX=0){
       if(!row)return '';
       const keys=['department','generalKg','recyclableKg','foodKg','totalKg','average'];
       let html='';
@@ -3930,7 +3930,7 @@ async function loadTrendHistory(currentData, requestId) {
         // Match Big C's type hierarchy, while respecting A's exceptionally short fixed rows.
         // Only font size changes; x/y/width/height remain exactly as supplied by each template.
         const fontSize=i===0?(h<21?16:17):(h<21?17:18);
-        html+=wrTemplateField(i===0?'department':'cell'+(key==='totalKg'?' total':''),[x0,y,x1-x0,h],val,fontSize);
+        html+=wrTemplateField(i===0?'department':'cell'+(key==='totalKg'?' total':''),[x0+shiftX,y,x1-x0,h],val,fontSize);
       });
       return html;
     }
@@ -3956,15 +3956,16 @@ async function loadTrendHistory(currentData, requestId) {
       });
       return count?wrWeight(sum):'—';
     }
-    function wrTemplateSection(section,rows,totals){
+    function wrTemplateSection(section,rows,totals,calibration=null){
       const rowMap=new Map();
       rows.forEach(r=>{const key=wrFloorKey(r.floor);if(!rowMap.has(key))rowMap.set(key,r);});
       let html='';
-      section.floors.forEach((floor,i)=>{const row=rowMap.get(wrFloorKey(floor));if(row)html+=wrTemplateRowFields(row,section.cols,section.y+i*section.rowH,section.rowH);});
+      const shiftX=calibration?.tableX||0, shiftY=calibration?.tableY||0, footerShiftY=calibration?.footerY||0;
+      section.floors.forEach((floor,i)=>{const row=rowMap.get(wrFloorKey(floor));if(row)html+=wrTemplateRowFields(row,section.cols,section.y+i*section.rowH+shiftY,section.rowH,shiftX);});
       const sums=totals||{};
       ['generalKg','recyclableKg','foodKg','totalKg'].forEach((key,i)=>{
         const [x0,x1]=section.cols[i+1];
-        html+=wrTemplateField('total',[x0,section.footerY,x1-x0,section.footerH],wrWeight(sums[key]),23);
+        html+=wrTemplateField('total',[x0,section.footerY+footerShiftY,x1-x0,section.footerH],wrWeight(sums[key]),23);
       });
       // Column 7: add the per-floor averages for this building/parking section.
       // Keep the original PNG, typography, row coordinates and other totals unchanged.
@@ -3972,7 +3973,7 @@ async function loadTrendHistory(currentData, requestId) {
       if(averageTotal!=='—' && section.cols[5]){
         const [x0,x1]=section.cols[5];
         html+=wrTemplateField('total wr-average-footer',
-          [x0,section.footerY,x1-x0,section.footerH],averageTotal,23);
+          [x0,section.footerY+footerShiftY,x1-x0,section.footerH],averageTotal,23);
       }
       return html;
     }
@@ -4081,7 +4082,7 @@ async function loadTrendHistory(currentData, requestId) {
       const positions={
         'BJC House (A)': [425,756,316,102],
         'อาคาร BJC1': [425,759,315,98],
-        'อาคาร BJC2': [405,773,320,96],
+        'อาคาร BJC2': [545,775,240,83],
         'อาคารจอดรถ D และ B': [402,779,320,91]
       };
       const area=positions[templateKey];
@@ -4097,20 +4098,40 @@ async function loadTrendHistory(currentData, requestId) {
           '<i class="wr-other-building-dot" style="background:'+color+'"></i>'+label+' '+pct.toFixed(1)+'%</div>').join('')+
         '</div>';
     }
+    // BJC2-only calibration (source template: 1672 x 941).
+    // x/y are the center anchors selected in the coordinate picker.
+    const WR_BJC2_CALIBRATION = Object.freeze({
+      date:[822,205],
+      kpi:[[248,297],[655,297],[1066,298],[1485,297]],
+      tableX:2, tableY:3, footerY:5,
+      ring:[365,755,116],
+      mini:[
+        {number:[965,832],percent:[938,868]},
+        {number:[1242,832],percent:[1217,867]},
+        {number:[1515,832],percent:[1479,867]}
+      ]
+    });
+    function wrBjc2Anchor(cls,anchor,value,w,h,size){
+      return wrTemplateField(cls,[anchor[0]-w/2,anchor[1]-h/2,w,h],value,size);
+    }
     function wrBuildingTemplatePreview(templateKey,data,building){
       const path=WR_BUILDING_TEMPLATES[templateKey], layout=WR_TEMPLATE_LAYOUTS[templateKey];
       if(!path||!layout)return '';
       if(templateKey==='Big C House (C)')return wrBigCOnlyPreview(data,building);
       const sums=building||{};
       const g=Number(sums.generalKg)||0,r=Number(sums.recyclableKg)||0,f=Number(sums.foodKg)||0,t=Number(sums.totalKg)||0;
-      const period=wrReportPeriodText(data);
+      const isBjc2=templateKey==='อาคาร BJC2';
+      const start=shortDate(data.weekStart),end=shortDate(data.weekEnd),year=thaiYear(data.weekEnd);
+      const period=isBjc2?'ระหว่างวันที่ '+start+' – '+end+' '+year:wrReportPeriodText(data);
       let html='<div class="wr-slide wr-building-template wr-other-custom" aria-label="รายงาน '+escapeHtml(templateKey)+'">'+
         '<img class="wr-building-template-image" src="'+encodeURI(path)+'" alt="Template '+escapeHtml(templateKey)+'">';
-      html+=wrTemplateField('date',layout.period,period,20);
+      html+=isBjc2?wrBjc2Anchor('date',WR_BJC2_CALIBRATION.date,period,430,37,20):wrTemplateField('date',layout.period,period,20);
       const kpiColumns=[[156,345],[555,749],[961,1157],[1375,1566]];
       [g,r,f,t].forEach((num,i)=>{
         const [x0,x1]=kpiColumns[i],v=wrWeight(num);
-        html+=wrTemplateField('kpi',[x0,layout.kpiY,x1-x0,35],v,v.length>9?26:v.length>7?29:33);
+        html+=isBjc2
+          ?wrBjc2Anchor('kpi',WR_BJC2_CALIBRATION.kpi[i],v,180,35,v.length>9?26:v.length>7?29:33)
+          :wrTemplateField('kpi',[x0,layout.kpiY,x1-x0,35],v,v.length>9?26:v.length>7?29:33);
       });
       if(layout.sections){
         layout.sections.forEach(section=>{
@@ -4119,17 +4140,22 @@ async function loadTrendHistory(currentData, requestId) {
           ['generalKg','recyclableKg','foodKg','totalKg'].forEach(key=>sectionTotals[key]=relevant.reduce((sum,row)=>sum+(Number(row[key])||0),0));
           html+=wrTemplateSection(section,relevant,sectionTotals);
         });
-      }else html+=wrTemplateSection(layout.table,building.rows||[],sums);
+      }else html+=wrTemplateSection(layout.table,building.rows||[],sums,isBjc2?WR_BJC2_CALIBRATION:null);
       const gp=t?g/t*100:0,rp=t?r/t*100:0,fp=t?f/t*100:0;
-      const [cx,cy,diam]=layout.bottom.ring;
+      const [cx,cy,diam]=isBjc2?WR_BJC2_CALIBRATION.ring:layout.bottom.ring;
       const gradient='conic-gradient(#176ee4 0% '+gp+'%,#eab508 '+gp+'% '+(gp+rp)+'%,#109752 '+(gp+rp)+'% 100%)';
       html+='<div class="wr-template-ring" style="left:'+cx+'px;top:'+cy+'px;width:'+diam+'px;height:'+diam+'px;background:'+gradient+'"><div class="wr-template-ring-center">'+escapeHtml(wrWeight(t))+'<small>กก.</small></div></div>';
       html+=wrOtherBuildingLegend(templateKey,gp,rp,fp);
       const miniX=[[905,1014],[1168,1279],[1447,1548]];
       [[g,gp],[r,rp],[f,fp]].forEach(([n,pct],i)=>{
         const [x0,x1]=miniX[i],w=x1-x0;
-        html+=wrTemplateField('total',[x0,layout.bottom.minisY,w,27],wrWeight(n),23);
-        html+=wrTemplateField('percent',[x0,layout.bottom.pctY,w,22],pct.toFixed(1),21);
+        if(isBjc2){
+          html+=wrBjc2Anchor('total',WR_BJC2_CALIBRATION.mini[i].number,wrWeight(n),138,29,23);
+          html+=wrBjc2Anchor('percent',WR_BJC2_CALIBRATION.mini[i].percent,pct.toFixed(1),96,26,21);
+        }else{
+          html+=wrTemplateField('total',[x0,layout.bottom.minisY,w,27],wrWeight(n),23);
+          html+=wrTemplateField('percent',[x0,layout.bottom.pctY,w,22],pct.toFixed(1),21);
+        }
       });
       return html+'</div>';
     }
