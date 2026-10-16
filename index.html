@@ -4484,7 +4484,13 @@ async function loadTrendHistory(currentData, requestId) {
       if(!base)return null;
       const settings=WR_COORDINATE_MAP[WR_COORDINATE_PAGE[templateKey]];
       if(!settings)return base;
-      const table=base.table?{...base.table,...(settings.table||{})}:null;
+      // BJC2 tableX/tableY/footerY are RELATIVE OFFSETS, not absolute
+      // positions. Do not overwrite the base table's footerY (670).
+      const table=base.table
+        ? (templateKey==='อาคาร BJC2'
+            ? {...base.table}
+            : {...base.table,...(settings.table||{})})
+        : null;
       const sections=base.sections?base.sections.map(section=>({...section})):null;
       return {...base,period:settings.period||base.period,table:table||base.table,sections,
         bottom:{...base.bottom,ring:settings.ring||base.bottom.ring}};
