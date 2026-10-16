@@ -1947,6 +1947,13 @@
     #weeklyReportPage .wr-other-custom .wr-other-building-legend-row{gap:9px;}
 
 
+    /* CATEGORY NUMBER COLOR SYNC — same palette as Big C House (C).
+       Only generated data overlays; original infographic artwork is untouched. */
+    #weeklyReportPage .wr-other-custom .wr-template-field.wr-color-general{color:#005da4!important;}
+    #weeklyReportPage .wr-other-custom .wr-template-field.wr-color-recycle{color:#9a7000!important;}
+    #weeklyReportPage .wr-other-custom .wr-template-field.wr-color-food{color:#0b6a3f!important;}
+    #weeklyReportPage .wr-other-custom .wr-template-field.wr-color-total{color:#123c2c!important;}
+
     /* REPORT PERIOD FILTER — scoped to report; existing infographic coordinates remain untouched. */
     #weeklyReportPage .wr-controls{align-items:end}
     #weeklyReportPage .wr-controls .wr-field{flex:1 1 180px}
@@ -4022,7 +4029,9 @@ async function loadTrendHistory(currentData, requestId) {
         html+=wrTemplateField('total',[x0+footerShiftX,section.footerY+footerShiftY,x1-x0,section.footerH],wrWeight(sums[key]),23);
       });
       const averageTotal=wrTemplateAverageTotal(section,rows);
-      if(averageTotal!=='—' && section.cols[5]){
+      // Show a dash instead of an invisible empty cell when monthly Headcount
+      // is absent. Never invent an average from weight totals alone.
+      if(section.cols[5]){
         const [x0,x1]=section.cols[5];
         html+=wrTemplateField('total wr-average-footer',
           [x0+footerShiftX,section.footerY+footerShiftY,x1-x0,section.footerH],averageTotal,23);
@@ -4206,10 +4215,12 @@ const WR_PARKING_DB_CALIBRATION = Object.freeze({
       const kpiColumns=[[156,345],[555,749],[961,1157],[1375,1566]];
       [g,r,f,t].forEach((num,i)=>{
         const [x0,x1]=kpiColumns[i],v=wrWeight(num);
-        if(isParking){html+=wrTemplateField('kpi',WR_PARKING_DB_CALIBRATION.kpi[i],v,v.length>9?26:v.length>7?29:33);return;}
+        const kind=['general','recycle','food','total'][i];
+        const colorCls='wr-color-'+kind;
+        if(isParking){html+=wrTemplateField('kpi '+colorCls,WR_PARKING_DB_CALIBRATION.kpi[i],v,v.length>9?26:v.length>7?29:33);return;}
         html+=isBjc2
-          ?wrBjc2Anchor('kpi',WR_BJC2_CALIBRATION.kpi[i],v,180,35,v.length>9?26:v.length>7?29:33)
-          :wrTemplateField('kpi',[x0,layout.kpiY,x1-x0,35],v,v.length>9?26:v.length>7?29:33);
+          ?wrBjc2Anchor('kpi '+colorCls,WR_BJC2_CALIBRATION.kpi[i],v,180,35,v.length>9?26:v.length>7?29:33)
+          :wrTemplateField('kpi '+colorCls,[x0,layout.kpiY,x1-x0,35],v,v.length>9?26:v.length>7?29:33);
       });
       if(layout.sections){
         layout.sections.forEach(section=>{
@@ -4227,16 +4238,17 @@ const WR_PARKING_DB_CALIBRATION = Object.freeze({
       const miniX=[[905,1014],[1168,1279],[1447,1548]];
       [[g,gp],[r,rp],[f,fp]].forEach(([n,pct],i)=>{
         const [x0,x1]=miniX[i],w=x1-x0;
+        const colorCls='wr-color-'+['general','recycle','food'][i];
         if(isParking){
           const mini=WR_PARKING_DB_CALIBRATION.mini[i];
-          html+=wrTemplateField('total',mini.number,wrWeight(n),23);
-          html+=wrTemplateField('percent',mini.percent,pct.toFixed(1),21);
+          html+=wrTemplateField('total '+colorCls,mini.number,wrWeight(n),23);
+          html+=wrTemplateField('percent '+colorCls,mini.percent,pct.toFixed(1),21);
         }else if(isBjc2){
-          html+=wrBjc2Anchor('total',WR_BJC2_CALIBRATION.mini[i].number,wrWeight(n),138,29,23);
-          html+=wrBjc2Anchor('percent',WR_BJC2_CALIBRATION.mini[i].percent,pct.toFixed(1),96,26,21);
+          html+=wrBjc2Anchor('total '+colorCls,WR_BJC2_CALIBRATION.mini[i].number,wrWeight(n),138,29,23);
+          html+=wrBjc2Anchor('percent '+colorCls,WR_BJC2_CALIBRATION.mini[i].percent,pct.toFixed(1),96,26,21);
         }else{
-          html+=wrTemplateField('total',[x0,layout.bottom.minisY,w,27],wrWeight(n),23);
-          html+=wrTemplateField('percent',[x0,layout.bottom.pctY,w,22],pct.toFixed(1),21);
+          html+=wrTemplateField('total '+colorCls,[x0,layout.bottom.minisY,w,27],wrWeight(n),23);
+          html+=wrTemplateField('percent '+colorCls,[x0,layout.bottom.pctY,w,22],pct.toFixed(1),21);
         }
       });
       return html+'</div>';
