@@ -3980,6 +3980,8 @@ async function loadTrendHistory(currentData, requestId) {
     // Coordinate Picker v3 syncs this exact JSON object from GitHub.
     // Edit positions ONLY in this object. Data, API and export are unchanged.
     // Keys: overall,a,c,bjc1,bjc2,park (parking D & B share one PNG).
+    // A/BJC1 tableX/tableY/departmentX/footerX/footerShiftY are pixel offsets.
+    // table.y, rowH and footerY are the absolute table geometry.
     // ===============================================================
     const WR_COORDINATE_MAP = Object.freeze({
   "overall": {
@@ -4064,7 +4066,8 @@ async function loadTrendHistory(currentData, requestId) {
     "table": {
       "y": 332,
       "rowH": 20.0,
-      "footerY": 738
+      "footerY": 738,
+      "tableX": 0, "tableY": 0, "departmentX": 0, "footerX": 0, "footerShiftY": 0
     },
     "ring": [
       285,
@@ -4236,6 +4239,7 @@ async function loadTrendHistory(currentData, requestId) {
       "y": 353,
       "rowH": 69.3,
       "footerY": 630,
+      "tableX": 0, "tableY": 0, "departmentX": 0, "footerX": 0, "footerShiftY": 0,
       "fontSize": 21,
       "departmentFontSize": 20
     },
@@ -4560,7 +4564,7 @@ async function loadTrendHistory(currentData, requestId) {
       rows.forEach(r=>{const key=wrFloorKey(r.floor);if(!rowMap.has(key))rowMap.set(key,r);});
       let html='';
       const shiftX=calibration?.tableX||0, shiftY=calibration?.tableY||0,
-            footerShiftY=calibration?.footerY||0,footerShiftX=calibration?.footerX??0;
+            footerShiftY=calibration?.footerShiftY??(calibration?.footerY||0),footerShiftX=calibration?.footerX??0;
       section.floors.forEach((floor,i)=>{
         const row=rowMap.get(wrFloorKey(floor));
         if(row)html+=wrTemplateRowFields(row,section.cols,section.y+i*section.rowH+shiftY,section.rowH,shiftX,calibration);
@@ -4738,8 +4742,8 @@ const WR_PARKING_DB_CALIBRATION = WR_COORDINATE_MAP.park;
         });
       }else html+=wrTemplateSection(layout.table,building.rows||[],sums,
         isBjc2?WR_BJC2_CALIBRATION:
-        (templateKey==='BJC House (A)'?{fontSize:15,departmentFontSize:14}:
-        templateKey==='อาคาร BJC1'?{
+        (templateKey==='BJC House (A)'?{...pageCoords.table,fontSize:15,departmentFontSize:14}:
+        templateKey==='อาคาร BJC1'?{...pageCoords.table,
           fontSize:layout.table.fontSize,
           departmentFontSize:layout.table.departmentFontSize
         }:null));
