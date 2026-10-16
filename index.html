@@ -1946,6 +1946,11 @@
     #weeklyReportPage .wr-other-custom .wr-other-building-legend{gap:9px;font-size:16px;line-height:1.1;}
     #weeklyReportPage .wr-other-custom .wr-other-building-legend-row{gap:9px;}
 
+
+    /* REPORT PERIOD FILTER — scoped to report; existing infographic coordinates remain untouched. */
+    #weeklyReportPage .wr-controls{align-items:end}
+    #weeklyReportPage .wr-controls .wr-field{flex:1 1 180px}
+    #weeklyReportPage #wrMonthField{flex-basis:200px}
   </style>
 </head>
 <body>
@@ -2348,18 +2353,21 @@
       <!-- WEEKLY REPORT — Step 3: read-only view powered by action=weeklyReport -->
       <section class="dashboard-page hidden" id="weeklyReportPage" aria-label="สรุปภาพรวมประจำสัปดาห์">
         <div class="weekly-report-header">
-          <div><span class="yearly-kicker">WEEKLY WASTE REPORT</span><h1>สรุปภาพรวมประจำสัปดาห์</h1><p>ตรวจสอบยอดขยะจริงจาก Data Records และชื่อแผนกจาก Department Mapping</p></div>
-          <span class="yearly-fixed">WEEKLY INFOGRAPHIC · 16:9</span>
+          <div><span class="yearly-kicker">WEEKLY WASTE REPORT</span><h1>สรุปภาพรวมปริมาณขยะ</h1><p>ตรวจสอบยอดขยะจริงจาก Data Records และชื่อแผนกจาก Department Mapping</p></div>
+          <span class="yearly-fixed">WASTE INFOGRAPHIC · 16:9</span>
         </div>
         <section class="card wr-controls" aria-label="ตัวกรองรายงาน">
-          <label class="wr-field">วันจันทร์เริ่มสัปดาห์ <input id="wrWeekStart" type="date" /></label>
+          <label class="wr-field">ประเภทรายงาน <select id="wrMode"><option value="WEEK">รายสัปดาห์ (จันทร์–ศุกร์)</option><option value="RANGE">กำหนดช่วงวันที่</option><option value="MONTH">รายเดือน</option></select></label>
+          <label class="wr-field" id="wrStartField">วันที่เริ่มต้น <input id="wrWeekStart" type="date" /></label>
+          <label class="wr-field" id="wrEndField">วันที่สิ้นสุด <input id="wrEndDate" type="date" /></label>
+          <label class="wr-field hidden" id="wrMonthField">เลือกเดือน <input id="wrMonth" type="month" /></label>
           <label class="wr-field">อาคาร <select id="wrBuilding"><option value="ALL">ทุกอาคาร — ภาพรวม</option></select></label>
           <button id="wrLoad" type="button" class="refresh-button">แสดงรายงาน</button>
           <button id="wrExportPng" type="button" class="refresh-button" disabled>Export PNG</button>
           <button id="wrExportPdf" type="button" class="refresh-button" disabled>Export PDF</button>
         </section>
         <p class="wr-status">การ Export จะใช้ภาพ Template เต็มขนาดและตัวเลขของสัปดาห์ที่เลือก หากภาพจาก Postimg ไม่อนุญาตการจับภาพ จะมีคำแนะนำให้แก้ไข</p>
-        <p id="wrStatus" class="wr-status" role="status" aria-live="polite">เลือกสัปดาห์แล้วกดแสดงรายงาน</p>
+        <p id="wrStatus" class="wr-status" role="status" aria-live="polite">เลือกช่วงเวลาแล้วกดแสดงรายงาน</p>
         <section id="wrResult" class="hidden" aria-label="ตารางสรุปขยะ"></section>
         <section id="wrWarnings" class="hidden wr-warnings" aria-label="ข้อควรตรวจสอบจากข้อมูล"></section>
       </section>
@@ -3753,38 +3761,80 @@ async function loadTrendHistory(currentData, requestId) {
         document.head.appendChild(script);
       });
     }
+    function wrUpdatePeriodFields(){
+      const mode=wrElement('wrMode').value;
+      wrElement('wrStartField').classList.toggle('hidden',mode==='MONTH');
+      wrElement('wrEndField').classList.toggle('hidden',mode==='MONTH');
+      wrElement('wrMonthField').classList.toggle('hidden',mode!=='MONTH');
+      const start=wrElement('wrWeekStart').value;
+      if(mode==='WEEK' && start && wrIsMonday(start))wrElement('wrEndDate').value=wrAddReportDays(start,4);
+      wrElement('wrEndDate').disabled=mode==='WEEK';
+    }
+    function wrAddReportDays(iso,days){
+      const d=new Date(iso+'T00:00:00Z');d.setUTCDate(d.getUTCDate()+days);
+      return d.toISOString().slice(0,10);
+    }
+    function wrDateIsValid(iso){
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(iso||''))return false;
+      const d=new Date(iso+'T00:00:00Z');
+      return !Number.isNaN(d.getTime())&&d.toISOString().slice(0,10)===iso;
+    }
+    function wrReportRange(){
+      const mode=wrElement('wrMode').value;
+      if(mode==='MONTH'){
+        const month=wrElement('wrMonth').value;
+        if(!/^\d{4}-\d{2}$/.test(month))throw new Error('กรุณาเลือกเดือน');
+        const [y,m]=month.split('-').map(Number);
+        if(m<1||m>12)throw new Error('เดือนไม่ถูกต้อง');
+        return {startDate:month+'-01',endDate:month+'-'+String(new Date(Date.UTC(y,m,0)).getUTCDate()).padStart(2,'0'),periodMode:mode};
+      }
+      const startDate=wrElement('wrWeekStart').value;
+      const endDate=mode==='WEEK'?wrAddReportDays(startDate,4):wrElement('wrEndDate').value;
+      if(!wrDateIsValid(startDate)||!wrDateIsValid(endDate))throw new Error('กรุณาเลือกวันที่ให้ถูกต้อง');
+      if(mode==='WEEK'&&!wrIsMonday(startDate))throw new Error('รายสัปดาห์ต้องเริ่มวันจันทร์');
+      if(endDate<startDate)throw new Error('วันที่สิ้นสุดต้องไม่ก่อนวันที่เริ่มต้น');
+      const diff=(new Date(endDate+'T00:00:00Z')-new Date(startDate+'T00:00:00Z'))/86400000;
+      if(diff>366)throw new Error('กรุณาเลือกช่วงเวลาไม่เกิน 367 วัน');
+      return {startDate,endDate,periodMode:mode};
+    }
     function wrInitialize(){
       if(wrUI.initialized)return;
       wrUI.initialized=true;
-      wrElement('wrWeekStart').value=wrDefaultMonday();
+      const monday=wrDefaultMonday();
+      wrElement('wrWeekStart').value=monday;
+      wrElement('wrEndDate').value=wrAddReportDays(monday,4);
+      wrElement('wrMonth').value=todayBangkok().slice(0,7);
+      wrElement('wrMode').value='WEEK';
       wrElement('wrLoad').addEventListener('click',wrLoad);
-      wrElement('wrWeekStart').addEventListener('change',()=>{wrUI.loaded=false;wrStatus('เปลี่ยนสัปดาห์แล้ว กด “แสดงรายงาน” เพื่อโหลดข้อมูลใหม่');wrElement('wrResult').classList.add('hidden');});
+      ['wrWeekStart','wrEndDate','wrMonth','wrMode'].forEach(id=>wrElement(id).addEventListener('change',()=>{
+        wrUpdatePeriodFields();wrUI.loaded=false;
+        wrStatus('เปลี่ยนช่วงเวลาแล้ว กด “แสดงรายงาน” เพื่อโหลดข้อมูลใหม่');
+        wrElement('wrResult').classList.add('hidden');
+        wrElement('wrExportPng').disabled=true;wrElement('wrExportPdf').disabled=true;
+      }));
       wrElement('wrBuilding').addEventListener('change',wrRender);
-      wrLoad();
+      wrUpdatePeriodFields();wrLoad();
     }
     async function wrLoad(){
-      const weekStart=wrElement('wrWeekStart').value;
-      if(!wrIsMonday(weekStart)){
-        wrStatus('กรุณาเลือกวันจันทร์เป็นวันเริ่มต้นสัปดาห์',true);
-        wrElement('wrResult').classList.add('hidden');return;
-      }
+      let range;
+      try{range=wrReportRange();}
+      catch(error){wrStatus(error.message,true);wrElement('wrResult').classList.add('hidden');return;}
       const seq=++wrUI.request;
       wrElement('wrLoad').disabled=true;
-      wrStatus('กำลังดึงข้อมูลรายงานสัปดาห์ '+weekStart+'…');
+      wrStatus('กำลังดึงข้อมูล '+range.startDate+' ถึง '+range.endDate+'…');
       wrElement('wrWarnings').classList.add('hidden');
       try{
-        // Always request ALL so changing the building filter does not refetch or lose the Overview.
-        const result=await wrJsonp({weekStart,building:'ALL'});
+        const result=await wrJsonp({...range,building:'ALL'});
         if(seq!==wrUI.request)return;
         if(!result||!result.ok)throw new Error(result?.message||'API ไม่ส่งข้อมูลรายงาน');
+        if(result.weekStart!==range.startDate||result.weekEnd!==range.endDate)throw new Error('ช่วงวันที่จาก API ไม่ตรงกับที่เลือก โปรดตรวจสอบการ Deploy');
         wrUI.data=result;wrUI.loaded=true;
         const select=wrElement('wrBuilding');
         const oldValue=select.value;
         const buildings=result.buildings||[];
         const options=buildings.filter(b=>!wrIsParking(b.building)).map(b=>b.building);
         if(buildings.some(b=>wrIsParking(b.building)))options.push(WR_PARKING_COMBINED);
-        select.innerHTML='<option value="ALL">ทุกอาคาร — ภาพรวม</option>'+
-          options.map(name=>'<option value="'+escapeHtml(name)+'">'+escapeHtml(name)+'</option>').join('');
+        select.innerHTML='<option value="ALL">ทุกอาคาร — ภาพรวม</option>'+options.map(name=>'<option value="'+escapeHtml(name)+'">'+escapeHtml(name)+'</option>').join('');
         select.value=options.includes(oldValue)?oldValue:(wrIsParking(oldValue)?WR_PARKING_COMBINED:'ALL');
         wrRender();
       }catch(error){
