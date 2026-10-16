@@ -4776,7 +4776,7 @@ const WR_PARKING_DB_CALIBRATION = WR_COORDINATE_MAP.park;
       const sums=data.overview||{};
       const start=shortDate(data.weekStart), end=shortDate(data.weekEnd);
       const year=thaiYear(data.weekEnd);
-      const period='ระหว่างวันที่ '+start+' – '+end+' '+year+'   |   หน่วย: กิโลกรัม (กก.)';
+      const period='ระหว่างวันที่ '+start+' – '+end+' '+year;
       const add=(cls,left,top,width,height,value)=>'<div class="wr-exact-value '+cls+'" style="left:'+left+'px;top:'+top+'px;width:'+width+'px;height:'+height+'px">'+escapeHtml(value)+'</div>';
       const addKpi=(cls,left,top,width,height,value)=>{
         const figure=wrWeight(value);
@@ -4808,10 +4808,10 @@ const WR_PARKING_DB_CALIBRATION = WR_COORDINATE_MAP.park;
       return html+'</div>';
     }
     function wrReportPeriodText(data){
-      const start=shortDate(data.weekStart), end=shortDate(data.weekEnd);
-      const year=thaiYear(data.weekEnd);
-      return 'ระหว่างวันที่ '+start+' – '+end+' '+year+' | หน่วย : กิโลกรัม';
-    }
+  const start=shortDate(data.weekStart), end=shortDate(data.weekEnd);
+  const year=thaiYear(data.weekEnd);
+  return 'ระหว่างวันที่ '+start+' – '+end+' '+year;
+}
     function wrBuildingAverageText(row){
       const candidates=['avgWastePerPerson','avgPerPerson','averageKgPerPerson','avgWastePerPersonPerDay','avgPerPersonPerDay','averagePerPersonPerDay','averageKgPerPersonDay','averageKgPerPerson'];
       for(const key of candidates){
@@ -4986,7 +4986,7 @@ const WR_PARKING_DB_CALIBRATION = WR_COORDINATE_MAP.park;
       const branding='<div class="wr-brand-area" aria-label="BJC Big C"><img class="wr-brand-image" alt="BJC Big C" src="'+WR_LOGO+'"></div>';
       const heading='<div class="wr-slide-head">'+branding+'<div class="wr-slide-title"><h2>'+escapeHtml(title)+'</h2>'+
         '<div class="wr-slide-sub">'+(isOverview?'':escapeHtml(b.building)+' รายชั้น')+'</div>'+
-        '<div class="wr-slide-period">ระหว่างวันที่ '+escapeHtml(period)+' | หน่วย: กิโลกรัม</div></div>'+
+        '<div class="wr-slide-period">ระหว่างวันที่ '+escapeHtml(period)+'</div></div>'+
         '<div class="wr-slogan"><img class="wr-slogan-image" alt="Together for a cleaner greener tomorrow" src="'+WR_SLOGAN+'"></div></div>';
       const extra=isOverview?'<div class="wr-totalband"><span class="wr-total-leaf">❧</span>รวมขยะทั้งหมด '+wrWeight(totals.totalKg)+' กก.<span class="wr-total-leaf">❧</span></div>':
         wrRatioAndRanking(b);
