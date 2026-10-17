@@ -3850,6 +3850,7 @@ async function loadTrendHistory(currentData, requestId) {
       }catch(error){
         if(seq!==wrUI.request)return;
         wrUI.loaded=false;wrElement('wrResult').classList.add('hidden');
+        wrElement('wrExportPng').disabled=true;wrElement('wrExportPdf').disabled=true;
         wrStatus('โหลดข้อมูลไม่สำเร็จ: '+String(error.message||error),true);
       }finally{if(seq===wrUI.request)wrElement('wrLoad').disabled=false;}
     }
@@ -5035,7 +5036,7 @@ const WR_PARKING_DB_CALIBRATION = WR_COORDINATE_MAP.park;
       }catch(err){
         console.error('Weekly Report export failed',err);
         wrStatus('Export ไม่สำเร็จ: '+(err.message||String(err))+' · หากเป็นปัญหาภาพข้ามเว็บไซต์ (CORS) ให้เก็บภาพ Template ใน GitHub Repository แล้วเปลี่ยน WR_OVERVIEW_TEMPLATE เป็น ./assets/Eco-Waste-Sorting-Infographic.png',true);
-      }finally{const failed=wrUI.data&&wrAuditReport(wrUI.data).length>0;png.disabled=failed;pdf.disabled=failed;}
+      }finally{const ready=Boolean(wrUI.loaded&&wrUI.data&&wrElement('wrResult').querySelector('.wr-slide'));png.disabled=!ready;pdf.disabled=!ready;}
     }
     wrElement('wrExportPng').addEventListener('click',()=>wrExport('png'));
     wrElement('wrExportPdf').addEventListener('click',()=>wrExport('pdf'));
@@ -5151,14 +5152,16 @@ const WR_PARKING_DB_CALIBRATION = WR_COORDINATE_MAP.park;
         '<div class="wr-slide-bottom"><span>SAVE EARTH · SAVE OFFICE · ลดขยะวันนี้ เพื่อโลกที่ยั่งยืน</span><span>WEEKLY REPORT · '+escapeHtml(data.weekEnd)+'</span></div></div>';
       wrElement('wrResult').innerHTML='<article class="wr-report"><p class="wr-preview-help">'+(templatePath?'Template ของ '+escapeHtml(buildingName)+' · แสดงข้อมูลจริงจาก Google Sheets · ตรวจตำแหน่งก่อน Export':'Preview ตาม Template ที่ส่งมา · ตัวเลขอัปเดตจาก Google Sheets ตามสัปดาห์ · พร้อม Export PNG / PDF')+'</p><div class="wr-slide-scroll"><div class="wr-slide-stage">'+slide+'</div></div></article>';
       wrElement('wrResult').classList.remove('hidden');
-      wrElement('wrExportPng').disabled=auditIssues.length>0;
-      wrElement('wrExportPdf').disabled=auditIssues.length>0;
+      // Audit discrepancies are reported, but do not disable exporting the visible report.
+      // Missing data/preview still prevents export in wrCaptureReport().
+      wrElement('wrExportPng').disabled=false;
+      wrElement('wrExportPdf').disabled=false;
       wrFitSlide();
       const count=Number(data.matchedRecords||0);
-      wrStatus((auditIssues.length?'พบยอดรวมไม่ตรง '+auditIssues.length+' จุด · ระงับ Export':'ตรวจยอดรวมทุกอาคารผ่าน · โหลดสำเร็จ')+' · '+count.toLocaleString('th-TH')+' รายการชั่งในสัปดาห์ที่เลือก · '+(isOverview?'ทุกอาคาร':b.building)+(templatePath?' · ข้อมูลแสดงบน Template แล้ว':''));
+      wrStatus((auditIssues.length?'พบข้อควรตรวจสอบ '+auditIssues.length+' จุด · สามารถ Export ได้':'ตรวจยอดรวมทุกอาคารผ่าน · โหลดสำเร็จ')+' · '+count.toLocaleString('th-TH')+' รายการชั่งในสัปดาห์ที่เลือก · '+(isOverview?'ทุกอาคาร':b.building)+(templatePath?' · ข้อมูลแสดงบน Template แล้ว':''));
       const warnings=data.warnings||{};
       const parts=[];
-      if(auditIssues.length)parts.push('ตรวจสอบยอดรวมไม่ผ่าน '+auditIssues.length+' จุด (ระงับ Export): '+auditIssues.join(' | '));
+      if(auditIssues.length)parts.push('ตรวจสอบยอดรวมพบข้อแตกต่าง '+auditIssues.length+' จุด (ไม่ปิดปุ่ม Export): '+auditIssues.join(' | '));
       if(warnings.invalidDateRows)parts.push('วันที่ผิดรูปแบบ '+warnings.invalidDateRows+' แถว');
       if(warnings.invalidWeightCells)parts.push('ค่าน้ำหนักผิดรูปแบบ '+warnings.invalidWeightCells+' ช่อง');
       if(warnings.missingWeightRows)parts.push('แถวที่ไม่มีน้ำหนัก 3 ประเภท '+warnings.missingWeightRows+' รายการ');
