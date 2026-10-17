@@ -4515,7 +4515,17 @@ async function loadTrendHistory(currentData, requestId) {
        mini:Object.fromEntries(['general','recycle','food'].map((k,i)=>[k,c.mini[i]])),donut:c.donut};
     }
     function wrFloorKey(value){
-      return String(value??'').trim().toLowerCase().replace(/^ชั้น\s*/,'').replace(/\s+/g,' ').replace(/zone office/g,'wellness').replace(/\(wellness center\)/g,'(wellness)').replace(/\(zone wellness\)/g,'(wellness)');
+      // Normalize sheet floor names and infographic template labels to one key.
+      const key=String(value??'').trim().toLowerCase()
+        .replace(/^ชั้น\s*/,'').replace(/\s+/g,' ')
+        .replace(/zone office/g,'wellness')
+        .replace(/\(wellness\s*center\)/g,'(wellness)')
+        .replace(/\(zone\s*wellness\)/g,'(wellness)');
+      // Condition 1: Sheet "7.1 (Wellness center)" = Template "ชั้น 7.1 (Wellness)".
+      if(/^7\.1\s*\(wellness\)$/.test(key))return '7.1 (wellness)';
+      // Condition 2: Sheet "โซนการจอดรถ" = Template "โซนอาคารจอดรถ".
+      if(/^(?:โซนการจอดรถ|โซนอาคารจอดรถ)$/.test(key.replace(/\s+/g,'')))return 'โซนอาคารจอดรถ';
+      return key;
     }
     function wrTemplateField(cls,rect,value,size){
       if(value===undefined||value===null||value==='')return '';
@@ -4783,8 +4793,8 @@ const WR_PARKING_DB_CALIBRATION = WR_COORDINATE_MAP.park;
     }
     // Match optional spelling / spacing for the Wellness row.
     function wrIsWellnessFloor(floor){
-      const key=wrFloorKey(floor).replace(/\s+/g,'');
-      return /^7\.1(?:\(|$)/.test(key) || key.includes('wellness');
+      const key=wrFloorKey(floor);
+      return key==='7.1 (wellness)' || key==='7.1';
     }
     function wrSumWasteRows(rows){
       const sums={generalKg:0,recyclableKg:0,foodKg:0,totalKg:0};
@@ -4813,7 +4823,7 @@ const WR_PARKING_DB_CALIBRATION = WR_COORDINATE_MAP.park;
         if(rows.length===1){item.headcount=rows[0].headcount;item.average=rows[0].average;}
         return item;
       };
-      return [aggregate(wellness,'7.1 (Wellness)'),aggregate(parking,'โซนการจอดรถ')].filter(Boolean);
+      return [aggregate(wellness,'7.1 (Wellness)'),aggregate(parking,'โซนอาคารจอดรถ')].filter(Boolean);
     }
     function wrIsParking(name){
       return name==='อาคารจอดรถ (B)' || name==='อาคารจอดรถ (D)' ||
