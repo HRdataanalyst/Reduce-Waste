@@ -5158,18 +5158,16 @@ const WR_PARKING_DB_CALIBRATION = WR_COORDINATE_MAP.park;
       wrElement('wrExportPdf').disabled=false;
       wrFitSlide();
       const count=Number(data.matchedRecords||0);
-      wrStatus((auditIssues.length?'พบข้อควรตรวจสอบ '+auditIssues.length+' จุด · สามารถ Export ได้':'ตรวจยอดรวมทุกอาคารผ่าน · โหลดสำเร็จ')+' · '+count.toLocaleString('th-TH')+' รายการชั่งในสัปดาห์ที่เลือก · '+(isOverview?'ทุกอาคาร':b.building)+(templatePath?' · ข้อมูลแสดงบน Template แล้ว':''));
+      wrStatus('โหลดรายงานสำเร็จ · '+count.toLocaleString('th-TH')+' รายการชั่งในสัปดาห์ที่เลือก · '+(isOverview?'ทุกอาคาร':b.building)+(templatePath?' · ข้อมูลแสดงบน Template แล้ว':''));
+      // Keep audit diagnostics available to developers without a long warning box in the UI.
+      // Do not change report calculations, mapping, export availability or template rendering.
+      if(auditIssues.length)console.warn('[SAVE EARTH] Report audit:',auditIssues);
       const warnings=data.warnings||{};
-      const parts=[];
-      if(auditIssues.length)parts.push('ตรวจสอบยอดรวมพบข้อแตกต่าง '+auditIssues.length+' จุด (ไม่ปิดปุ่ม Export): '+auditIssues.join(' | '));
-      if(warnings.invalidDateRows)parts.push('วันที่ผิดรูปแบบ '+warnings.invalidDateRows+' แถว');
-      if(warnings.invalidWeightCells)parts.push('ค่าน้ำหนักผิดรูปแบบ '+warnings.invalidWeightCells+' ช่อง');
-      if(warnings.missingWeightRows)parts.push('แถวที่ไม่มีน้ำหนัก 3 ประเภท '+warnings.missingWeightRows+' รายการ');
-      if((warnings.duplicateMappings||[]).length)parts.push('Mapping ซ้ำ '+warnings.duplicateMappings.length+' รายการ');
-      if((warnings.missingMappings||[]).length)parts.push('ชื่อแผนกว่าง '+warnings.missingMappings.length+' ชั้น');
-      if((warnings.unmappedFloors||[]).length)parts.push('พบอาคาร/ชั้นที่ไม่อยู่ใน Mapping '+warnings.unmappedFloors.map(x=>x.building+' ชั้น '+x.floor).join(', '));
-      wrElement('wrWarnings').textContent=parts.length?'ตรวจสอบข้อมูล: '+parts.join(' · '):'';
-      wrElement('wrWarnings').classList.toggle('hidden',!parts.length);
+      if(Object.values(warnings).some(value=>Array.isArray(value)?value.length>0:Boolean(value))) {
+        console.warn('[SAVE EARTH] Source-data warnings:',warnings);
+      }
+      wrElement('wrWarnings').textContent='';
+      wrElement('wrWarnings').classList.add('hidden');
     }
 
     showDashboardPage(location.hash);
