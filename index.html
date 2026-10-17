@@ -4740,10 +4740,16 @@ const WR_PARKING_DB_CALIBRATION = WR_COORDINATE_MAP.park;
       });
       if(layout.sections){
         layout.sections.forEach(section=>{
-          const relevant=(building.rows||[]).filter(row=>String(row.sourceBuilding||'').includes('('+section.building+')'));
-          const sectionTotals={};
-          ['generalKg','recyclableKg','foodKg','totalKg'].forEach(key=>sectionTotals[key]=relevant.reduce((sum,row)=>sum+(Number(row[key])||0),0));
-          html+=wrTemplateSection(section,relevant,sectionTotals,isParking?WR_PARKING_DB_CALIBRATION.sections[section.building]:null);
+          const sourceRows=(building.rows||[]).filter(row=>
+            String(row.sourceBuilding||'').includes('('+section.building+')') ||
+            String(row.sourceBuilding||'').trim().endsWith(' '+section.building));
+          // The parking B template has only two display rows. Consolidate every
+          // non-Wellness source floor into the parking-zone row instead of hiding
+          // its weight while still including it in the section footer.
+          const relevant=section.building==='B' ? wrParkingBDisplayRows(sourceRows) : sourceRows;
+          const sectionTotals=wrSumWasteRows(relevant);
+          html+=wrTemplateSection(section,relevant,sectionTotals,
+            isParking?WR_PARKING_DB_CALIBRATION.sections[section.building]:null);
         });
       }else html+=wrTemplateSection(layout.table,building.rows||[],sums,
         isBjc2?WR_BJC2_CALIBRATION:
@@ -4774,6 +4780,40 @@ const WR_PARKING_DB_CALIBRATION = WR_COORDINATE_MAP.park;
         }
       });
       return html+'</div>';
+    }
+    // Match optional spelling / spacing for the Wellness row.
+    function wrIsWellnessFloor(floor){
+      const key=wrFloorKey(floor).replace(/\s+/g,'');
+      return /^7\.1(?:\(|$)/.test(key) || key.includes('wellness');
+    }
+    function wrSumWasteRows(rows){
+      const sums={generalKg:0,recyclableKg:0,foodKg:0,totalKg:0};
+      (rows||[]).forEach(row=>{
+        sums.generalKg+=Number(row.generalKg)||0;
+        sums.recyclableKg+=Number(row.recyclableKg)||0;
+        sums.foodKg+=Number(row.foodKg)||0;
+      });
+      // Derive total from the same 3 displayed categories to avoid inconsistent
+      // precomputed values / hidden floors in the parking section.
+      sums.totalKg=sums.generalKg+sums.recyclableKg+sums.foodKg;
+      return sums;
+    }
+    function wrParkingBDisplayRows(sourceRows){
+      const wellness=[],parking=[];
+      (sourceRows||[]).forEach(row=>(wrIsWellnessFloor(row.floor)?wellness:parking).push(row));
+      const aggregate=(rows,floor)=>{
+        if(!rows.length)return null;
+        const sums=wrSumWasteRows(rows);
+        const hasData=rows.some(row=>row.hasData!==false);
+        const item={floor,department:'',...sums,hasData};
+        // Headcount/average of several combined floors cannot be inferred.
+        // Keep average blank instead of incorrectly summing unrelated averages.
+        item.headcount=null;
+        item.average=null;
+        if(rows.length===1){item.headcount=rows[0].headcount;item.average=rows[0].average;}
+        return item;
+      };
+      return [aggregate(wellness,'7.1 (Wellness)'),aggregate(parking,'โซนการจอดรถ')].filter(Boolean);
     }
     function wrIsParking(name){
       return name==='อาคารจอดรถ (B)' || name==='อาคารจอดรถ (D)' ||
@@ -4985,14 +5025,97 @@ const WR_PARKING_DB_CALIBRATION = WR_COORDINATE_MAP.park;
       }catch(err){
         console.error('Weekly Report export failed',err);
         wrStatus('Export ไม่สำเร็จ: '+(err.message||String(err))+' · หากเป็นปัญหาภาพข้ามเว็บไซต์ (CORS) ให้เก็บภาพ Template ใน GitHub Repository แล้วเปลี่ยน WR_OVERVIEW_TEMPLATE เป็น ./assets/Eco-Waste-Sorting-Infographic.png',true);
-      }finally{png.disabled=false;pdf.disabled=false;}
+      }finally{const failed=wrUI.data&&wrAuditReport(wrUI.data).length>0;png.disabled=failed;pdf.disabled=failed;}
     }
     wrElement('wrExportPng').addEventListener('click',()=>wrExport('png'));
     wrElement('wrExportPdf').addEventListener('click',()=>wrExport('pdf'));
 
+    // AUDIT: verify all buildings, all floor rows and all totals before allowing export.
+    // Source figures are never silently replaced by figures from the infographic.
+    function wrAuditReport(data){
+      const issues=[];
+      const fields=['generalKg','recyclableKg','foodKg','totalKg'];
+      const names={generalKg:'ทั่วไป',recyclableKg:'รีไซเคิล',foodKg:'เศษอาหาร',totalKg:'รวม'};
+      const fmt=n=>wrWeight(n);
+      const valid=(a,b)=>Math.abs(a-b)<=0.015;
+      const get=(obj,key,where)=>{
+        const raw=obj?.[key];
+        if(raw===null||raw===undefined||raw===''){
+          issues.push(where+' ไม่มีค่า '+names[key]);return 0;
+        }
+        const n=Number(raw);
+        if(!Number.isFinite(n)){
+          issues.push(where+' ค่า '+names[key]+' ไม่ใช่ตัวเลข');return 0;
+        }
+        return n;
+      };
+      const sumRows=rows=>{
+        const sum=Object.fromEntries(fields.map(f=>[f,0]));
+        (rows||[]).forEach(r=>fields.forEach(f=>sum[f]+=Number(r[f])||0));
+        return sum;
+      };
+      const compare=(a,b,label)=>fields.forEach(f=>{
+        const av=get(a,f,label),bv=Number(b[f])||0;
+        if(!valid(av,bv))issues.push(label+' '+names[f]+' ยอด '+fmt(av)+' ไม่เท่าผลรวมแถว '+fmt(bv)+' (ต่าง '+fmt(av-bv)+' กก.)');
+      });
+      const buildings=data?.buildings||[];
+      buildings.forEach(b=>{
+        const label=b.building||'ไม่ระบุอาคาร';
+        const rows=b.rows||[];
+        rows.forEach(r=>{
+          const loc=label+' ชั้น '+(r.floor||'?');
+          const g=get(r,'generalKg',loc),rec=get(r,'recyclableKg',loc),f=get(r,'foodKg',loc),total=get(r,'totalKg',loc);
+          if(!valid(g+rec+f,total))issues.push(loc+' รวม 3 ประเภท '+fmt(g+rec+f)+' แต่ Total '+fmt(total));
+        });
+        const sums=sumRows(rows);
+        compare(b,sums,label);
+        const key=label;
+        const layout=wrCoordinateLayout(key);
+        if(layout?.table?.floors){
+          const allowed=new Set(layout.table.floors.map(wrFloorKey));
+          const used=new Set();
+          rows.forEach(r=>{
+            const fk=wrFloorKey(r.floor);
+            if(!allowed.has(fk))issues.push(label+' ชั้น '+r.floor+' ไม่มีแถวใน Template (ข้อมูลจะถูกซ่อน)');
+            if(used.has(fk))issues.push(label+' ชั้น '+r.floor+' ซ้ำในข้อมูล ทำให้ Template แสดงไม่ครบ');
+            used.add(fk);
+          });
+          const shown=rows.filter(r=>allowed.has(wrFloorKey(r.floor)));
+          compare(b,sumRows(shown),label+' / ตาราง Template');
+        }
+      });
+      if(data?.overview){
+        const all=sumRows(buildings);
+        compare(data.overview,all,'ภาพรวมทุกอาคาร');
+        const v=data.overview;
+        if(!valid((Number(v.generalKg)||0)+(Number(v.recyclableKg)||0)+(Number(v.foodKg)||0),Number(v.totalKg)||0))
+          issues.push('ภาพรวม: Total ไม่เท่าผลรวมขยะ 3 ประเภท');
+      }
+      const parking=buildings.filter(b=>wrIsParking(b.building));
+      if(parking.length){
+        const byCode=code=>parking.filter(b=>b.building.trim().endsWith('('+code+')') || b.building.trim().endsWith(' '+code));
+        ['B','D'].forEach(code=>{
+          const group=byCode(code);
+          if(!group.length)return;
+          const source=group.flatMap(b=>b.rows||[]);
+          const shown=code==='B'?wrParkingBDisplayRows(source):source;
+          const layout=wrCoordinateLayout(WR_PARKING_COMBINED);
+          const section=(layout?.sections||[]).find(x=>x.building===code);
+          if(!section)return;
+          const allowed=new Set(section.floors.map(wrFloorKey));
+          const visible=shown.filter(r=>allowed.has(wrFloorKey(r.floor)));
+          const omitted=shown.filter(r=>!allowed.has(wrFloorKey(r.floor)));
+          omitted.forEach(r=>issues.push('อาคารจอดรถ '+code+' ชั้น '+r.floor+' ไม่มีแถวใน Template'));
+          const reference=sumRows(source),display=sumRows(visible);
+          fields.forEach(f=>{if(!valid(reference[f],display[f]))issues.push('อาคารจอดรถ '+code+' '+names[f]+' แถวที่แสดง '+fmt(display[f])+' แต่ข้อมูลต้นทาง '+fmt(reference[f]));});
+        });
+      }
+      return [...new Set(issues)];
+    }
     function wrRender(){
       if(!wrUI.loaded||!wrUI.data)return;
       const data=wrUI.data;
+      const auditIssues=wrAuditReport(data);
       const buildingName=wrElement('wrBuilding').value;
       const b=buildingName===WR_PARKING_COMBINED
         ?wrCombineParking(data.buildings)
@@ -5018,13 +5141,14 @@ const WR_PARKING_DB_CALIBRATION = WR_COORDINATE_MAP.park;
         '<div class="wr-slide-bottom"><span>SAVE EARTH · SAVE OFFICE · ลดขยะวันนี้ เพื่อโลกที่ยั่งยืน</span><span>WEEKLY REPORT · '+escapeHtml(data.weekEnd)+'</span></div></div>';
       wrElement('wrResult').innerHTML='<article class="wr-report"><p class="wr-preview-help">'+(templatePath?'Template ของ '+escapeHtml(buildingName)+' · แสดงข้อมูลจริงจาก Google Sheets · ตรวจตำแหน่งก่อน Export':'Preview ตาม Template ที่ส่งมา · ตัวเลขอัปเดตจาก Google Sheets ตามสัปดาห์ · พร้อม Export PNG / PDF')+'</p><div class="wr-slide-scroll"><div class="wr-slide-stage">'+slide+'</div></div></article>';
       wrElement('wrResult').classList.remove('hidden');
-      wrElement('wrExportPng').disabled=false;
-      wrElement('wrExportPdf').disabled=false;
+      wrElement('wrExportPng').disabled=auditIssues.length>0;
+      wrElement('wrExportPdf').disabled=auditIssues.length>0;
       wrFitSlide();
       const count=Number(data.matchedRecords||0);
-      wrStatus('โหลดสำเร็จ · '+count.toLocaleString('th-TH')+' รายการชั่งในสัปดาห์ที่เลือก · '+(isOverview?'ทุกอาคาร':b.building)+(templatePath?' · ข้อมูลแสดงบน Template แล้ว':''));
+      wrStatus((auditIssues.length?'พบยอดรวมไม่ตรง '+auditIssues.length+' จุด · ระงับ Export':'ตรวจยอดรวมทุกอาคารผ่าน · โหลดสำเร็จ')+' · '+count.toLocaleString('th-TH')+' รายการชั่งในสัปดาห์ที่เลือก · '+(isOverview?'ทุกอาคาร':b.building)+(templatePath?' · ข้อมูลแสดงบน Template แล้ว':''));
       const warnings=data.warnings||{};
       const parts=[];
+      if(auditIssues.length)parts.push('ตรวจสอบยอดรวมไม่ผ่าน '+auditIssues.length+' จุด (ระงับ Export): '+auditIssues.join(' | '));
       if(warnings.invalidDateRows)parts.push('วันที่ผิดรูปแบบ '+warnings.invalidDateRows+' แถว');
       if(warnings.invalidWeightCells)parts.push('ค่าน้ำหนักผิดรูปแบบ '+warnings.invalidWeightCells+' ช่อง');
       if(warnings.missingWeightRows)parts.push('แถวที่ไม่มีน้ำหนัก 3 ประเภท '+warnings.missingWeightRows+' รายการ');
