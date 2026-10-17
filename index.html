@@ -3935,7 +3935,7 @@ async function loadTrendHistory(currentData, requestId) {
         .map(([color,label,n])=>'<div><i style="background:'+color+'"></i>'+label+' '+percentage(n)+'</div>').join('');
       const rank=(b.top3||[]).map((x,i)=>'<div class="wr-rank"><b>'+(i+1)+'</b><span>ชั้น '+escapeHtml(x.floor)+'</span><strong>'+wrWeight(x.totalKg)+' กก.</strong></div>').join('');
       return '<div class="wr-slide-foot"><section><h3>สัดส่วนปริมาณขยะทั้งหมด</h3><div class="wr-ratio-layout">'+
-        '<div class="wr-donut" style="background:'+donut+';background-size:100% 100%'"><div class="wr-donut-inner">'+wrWeight(b.totalKg)+'<br>กก.</div></div>'+
+        '<div class="wr-donut" style="background:'+donut+';background-size:100% 100%"><div class="wr-donut-inner">'+wrWeight(b.totalKg)+'<br>กก.</div></div>'+
         '<div class="wr-legend">'+legend+'</div></div></section><section><h3>🏆 3 อันดับชั้นที่มีปริมาณขยะรวมสูงสุด</h3>'+
         '<div class="wr-rank-grid">'+(rank||'<div>ยังไม่มีข้อมูล</div>')+'</div></section></div>';
     }
@@ -4663,7 +4663,7 @@ async function loadTrendHistory(currentData, requestId) {
       const [cx,cy]=WR_BIGC_ANCHORS.donut;
       const diameter=116;
       const gradient=wrDonutBackground(g,r,f,['#1769e8','#f0bd09','#0ea34a']);
-      html+='<div class="wr-template-ring wr-bigc-ring" style="left:'+(cx-diameter/2)+'px;top:'+(cy-diameter/2)+'px;width:'+diameter+'px;height:'+diameter+'px;background:'+gradient+';background-size:100% 100%'">'+
+      html+='<div class="wr-template-ring wr-bigc-ring" style="left:'+(cx-diameter/2)+'px;top:'+(cy-diameter/2)+'px;width:'+diameter+'px;height:'+diameter+'px;background:'+gradient+';background-size:100% 100%">'+
         '<div class="wr-template-ring-center">'+escapeHtml(wrWeight(t))+'<small>กก.</small></div></div>';
       html+='<div class="wr-bigc-legend-custom" style="left:'+WR_COORDINATE_MAP.c.legend[0]+'px;top:'+WR_COORDINATE_MAP.c.legend[1]+'px;width:'+WR_COORDINATE_MAP.c.legend[2]+'px;height:'+WR_COORDINATE_MAP.c.legend[3]+'px">'+
         '<span><i style="background:#1769e8"></i>ทั่วไป '+gp.toFixed(1)+'%</span>'+
@@ -4752,7 +4752,7 @@ const WR_PARKING_DB_CALIBRATION = WR_COORDINATE_MAP.park;
       const gp=t?g/t*100:0,rp=t?r/t*100:0,fp=t?f/t*100:0;
       const [cx,cy,diam]=isBjc2?WR_BJC2_CALIBRATION.ring:(isParking?WR_PARKING_DB_CALIBRATION.ring:layout.bottom.ring);
       const gradient=wrDonutBackground(g,r,f,['#176ee4','#eab508','#109752']);
-      html+='<div class="wr-template-ring" style="left:'+cx+'px;top:'+cy+'px;width:'+diam+'px;height:'+diam+'px;background:'+gradient+';background-size:100% 100%'"><div class="wr-template-ring-center">'+escapeHtml(wrWeight(t))+'<small>กก.</small></div></div>';
+      html+='<div class="wr-template-ring" style="left:'+cx+'px;top:'+cy+'px;width:'+diam+'px;height:'+diam+'px;background:'+gradient+';background-size:100% 100%"><div class="wr-template-ring-center">'+escapeHtml(wrWeight(t))+'<small>กก.</small></div></div>';
       html+=wrOtherBuildingLegend(templateKey,gp,rp,fp);
       const miniX=[[905,1014],[1168,1279],[1447,1548]];
       [[g,gp],[r,rp],[f,fp]].forEach(([n,pct],i)=>{
@@ -4875,7 +4875,7 @@ const WR_PARKING_DB_CALIBRATION = WR_COORDINATE_MAP.park;
       html+='</div>';
       const donut=wrDonutBackground(generalKg,recycleKg,foodKg,['#1d70ea','#f2c11b','#20a453']);
       html+='<div class="wr-bigc-ratio">'+
-        '<div class="wr-bigc-donut" style="background:'+donut+';background-size:100% 100%'"><div class="wr-bigc-donut-inner">'+escapeHtml(wrWeight(totalKg))+'<small>กก.</small></div></div>'+
+        '<div class="wr-bigc-donut" style="background:'+donut+';background-size:100% 100%"><div class="wr-bigc-donut-inner">'+escapeHtml(wrWeight(totalKg))+'<small>กก.</small></div></div>'+
         '<div class="wr-bigc-legend">'+
           '<div><i style="background:#1d70ea"></i>ขยะทั่วไป '+escapeHtml(generalPct.toFixed(1))+'%</div>'+
           '<div><i style="background:#f2c11b"></i>ขยะรีไซเคิล '+escapeHtml(recyclePct.toFixed(1))+'%</div>'+
